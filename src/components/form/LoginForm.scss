@@ -1,0 +1,31 @@
+.login{
+    background-image: url("../../images/bgzalo.png");
+    
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+}
+
+.login_form{
+   position:relative;
+   top: 50%;
+   transform: translateY(-55%);
+}
+
+.forgetPassword{
+    font-size:14px;
+    text-align:"center";
+    color: rgba(0,0,0,0.8);
+    display: flex;
+    justify-content: center;
+    margin: 0 !important;
+    span{
+        margin-left:8px;
+        cursor: pointer;
+        color: var(--B40);
+        &:hover{
+            color: var(--shades-left-bar);
+        }
+    }
+    
+}
