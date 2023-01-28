@@ -1,0 +1,28 @@
+.notification{
+    width: 35px;
+    height: 35px;
+    background-color: #c8deff;
+    display: flex;
+    justify-content: center !important;
+    align-items:  center !important;
+    border-radius: 4px;
+    cursor: pointer;
+    &:hover{
+        background-color: var(--shades-left-bar);
+       
+        .notification_icon{
+            color: white !important;
+        }
+    }
+}
+
+.avt_group{
+  
+    padding: 2px 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    &:hover{
+        background-color: var(--B20);
+    }
+
+}
