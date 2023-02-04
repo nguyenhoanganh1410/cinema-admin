@@ -21,12 +21,12 @@ const columns = [
     dataIndex: "address",
   },
   {
-    title: "Email",
-    dataIndex: "email",
+    title: "Chức vụ",
+    dataIndex: "chucVu",
   },
    {
-    title: "Rank",
-    dataIndex: "rank",
+    title: "Trạng thái",
+    dataIndex: "status",
   },
 ];
 const data = [];
@@ -36,11 +36,11 @@ for (let i = 0; i < 46; i++) {
     name: `Edward King ${i}`,
     phone: "0397574636",
     address: `London, Park Lane no. ${i}`,
-    email: "hoanganh1410tb@gmail.com",
-    rank:"gold"
+    chucVu: "Nhân viên",
+    status:"active"
   });
 }
-const TableCustomer = () => {
+const TableEmployee = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -125,14 +125,14 @@ const TableCustomer = () => {
       </div>
       <Table rowSelection={rowSelection} columns={columns} dataSource={data} />
       <Modal
-        title="Xóa khách hàng"
+        title="Xóa nhân viên"
         open={isModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
       >
-        <p>Bạn muốn xóa khách hàng không?</p>
+        <p>Bạn muốn xóa nhân viên không?</p>
       </Modal>
     </div>
   );
 };
-export default TableCustomer;
+export default TableEmployee;

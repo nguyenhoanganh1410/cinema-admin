@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Input, Col, Row, Typography, Button, Modal } from "antd";
+import { Input, Col, Row, Typography, Button, Modal, Breadcrumb } from "antd";
 
 import {
   SearchOutlined,
@@ -9,11 +9,13 @@ import {
   DeleteOutlined,
   DownloadOutlined,
 } from "@ant-design/icons";
-import TableCustomer from "./TableCustomer";
-import ModelAddCustomer from "./ModelAddCustomer";
+import TableCustomer from "../customer/TableCustomer";
+import ModelAddCustomer from "../customer/ModelAddCustomer";
+import TableShows from "./TableShows";
+import ModelAddShow from "./ModelAddShow";
 
 const { Title, Text } = Typography;
-const IndexCustomer = () => {
+const IndexShow = ({ setTab }) => {
   const [showModalAddCustomer, setShowModalAddCustomer] = useState(false);
   // //model
   // const [isModalOpen, setIsModalOpen] = useState(false);
@@ -38,10 +40,15 @@ const IndexCustomer = () => {
 
   return (
     <div className="site-card-wrapper">
-      <Title level={5} style={{ marginBottom: "1rem" }}>
-        Khách Hàng
-      </Title>
-      <Row
+      <Breadcrumb style={{ marginBottom: "1rem", marginTop: "1rem" }}>
+        <Breadcrumb.Item>Home</Breadcrumb.Item>
+        <Breadcrumb.Item>
+          <a href="">Quản lý phim</a>
+        </Breadcrumb.Item>
+
+        <Breadcrumb.Item>Suất chiếu</Breadcrumb.Item>
+      </Breadcrumb>
+      {/* <Row
         gutter={{
           xs: 8,
           sm: 16,
@@ -50,29 +57,26 @@ const IndexCustomer = () => {
         }}
       >
         <Col span={12}>
-          <Input
-            placeholder="Nhập tên, số điện thoại hoặc email..."
-            prefix={<SearchOutlined />}
-          />
+          <Input placeholder="Nhập tên phim..." prefix={<SearchOutlined />} />
         </Col>
         <Col span={9}>
           {" "}
-          <Button type="primary" icon={<UserAddOutlined />} onClick={showModal}>
+          <Button
+            type="primary"
+            icon={<UserAddOutlined />}
+            onClick={showModal}
+            title="Thêm mới bộ phim"
+          >
             Thêm
           </Button>
         </Col>
-        {/* <Col style={{ margin: "0 1rem" }}>
-          {" "}
-          <Button type="primary" size="large" icon={<ToolOutlined />}>
-            Cập nhật
-          </Button>
-        </Col> */}
+
         <Col span={1}>
           <Button type="primary" icon={<DownloadOutlined />}>
             Xuất file
           </Button>
         </Col>
-      </Row>
+      </Row> */}
 
       <Row
         style={{ margin: "1rem 0 1rem 0" }}
@@ -84,11 +88,15 @@ const IndexCustomer = () => {
         }}
       >
         <Col span={24}>
-          <TableCustomer />
+          <TableShows
+            setTab={setTab}
+            showModalAddCustomer={showModalAddCustomer}
+            setShowModalAddCustomer={setShowModalAddCustomer}
+          />
         </Col>
       </Row>
       {showModalAddCustomer ? (
-        <ModelAddCustomer
+        <ModelAddShow
           showModalAddCustomer={showModalAddCustomer}
           setShowModalAddCustomer={setShowModalAddCustomer}
         />
@@ -96,4 +104,4 @@ const IndexCustomer = () => {
     </div>
   );
 };
-export default IndexCustomer;
+export default IndexShow;

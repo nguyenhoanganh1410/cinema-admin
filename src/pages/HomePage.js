@@ -31,6 +31,10 @@ import ItemNotification from "../components/notification/ItemNotification";
 import Index from "../components/dashboard";
 import IndexDashboard from "../components/dashboard";
 import IndexCustomer from "../components/customer";
+import IndexEmployee from "../components/employee/IndexEmployee";
+import IndexFilm from "../components/film/IndexFilm";
+import IndexShow from "../components/show/IndexShow";
+import IndexRouter from "../components/show/IndexRouter";
 const { Header, Content, Footer, Sider } = Layout;
 
 const { Text } = Typography;
@@ -103,7 +107,7 @@ const items = [
   ]),
 
   getItem("Quản lý khách hàng", "11", <TeamOutlined />),
-  getItem("Quản lý dịch vụ", "12", <DesktopOutlined />),
+  getItem("Quản lý đơn giá", "12", <DesktopOutlined />),
   getItem("Quản lý nhân viên", "15", <UserOutlined />),
   getItem("Quản lý tài khoản", "16", <DesktopOutlined />),
   getItem("Quản lý thu chi", "17", <DesktopOutlined />),
@@ -169,8 +173,13 @@ const HomePage = () => {
       return <IndexDashboard />;
     } else if (itemClicked === 11) {
       return <IndexCustomer />;
-    }else if( itemClicked === 11){
-
+    } else if (itemClicked === 11) {
+    } else if (itemClicked === 15) {
+      return <IndexEmployee />;
+    } else if (itemClicked === 3) {
+      return <IndexFilm />;
+    } else if (itemClicked === 4) {
+      return <IndexRouter />;
     }
     return <IndexDashboard />;
   };

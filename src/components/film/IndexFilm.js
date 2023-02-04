@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Input, Col, Row, Typography, Button, Modal } from "antd";
+import { Input, Col, Row, Typography, Button, Modal, Breadcrumb } from "antd";
 
 import {
   SearchOutlined,
@@ -9,11 +9,13 @@ import {
   DeleteOutlined,
   DownloadOutlined,
 } from "@ant-design/icons";
-import TableCustomer from "./TableCustomer";
-import ModelAddCustomer from "./ModelAddCustomer";
+import TableCustomer from "../customer/TableCustomer";
+import ModelAddCustomer from "../customer/ModelAddCustomer";
+import TableFilms from "./TableFilms";
+import ModelAddFilm from "./ModelAddFilm";
 
 const { Title, Text } = Typography;
-const IndexCustomer = () => {
+const IndexFilm = () => {
   const [showModalAddCustomer, setShowModalAddCustomer] = useState(false);
   // //model
   // const [isModalOpen, setIsModalOpen] = useState(false);
@@ -38,9 +40,14 @@ const IndexCustomer = () => {
 
   return (
     <div className="site-card-wrapper">
-      <Title level={5} style={{ marginBottom: "1rem" }}>
-        Khách Hàng
-      </Title>
+      <Breadcrumb style={{ marginBottom: "1rem", marginTop: "1rem" }}>
+        <Breadcrumb.Item>Home</Breadcrumb.Item>
+        <Breadcrumb.Item>
+          <a href="">Quản lý phim</a>
+        </Breadcrumb.Item>
+
+        <Breadcrumb.Item>Danh sách phim</Breadcrumb.Item>
+      </Breadcrumb>
       <Row
         gutter={{
           xs: 8,
@@ -51,13 +58,13 @@ const IndexCustomer = () => {
       >
         <Col span={12}>
           <Input
-            placeholder="Nhập tên, số điện thoại hoặc email..."
+            placeholder="Nhập tên phim..."
             prefix={<SearchOutlined />}
           />
         </Col>
         <Col span={9}>
           {" "}
-          <Button type="primary" icon={<UserAddOutlined />} onClick={showModal}>
+          <Button type="primary" icon={<UserAddOutlined />} onClick={showModal} title="Thêm mới bộ phim">
             Thêm
           </Button>
         </Col>
@@ -84,11 +91,11 @@ const IndexCustomer = () => {
         }}
       >
         <Col span={24}>
-          <TableCustomer />
+          <TableFilms />
         </Col>
       </Row>
       {showModalAddCustomer ? (
-        <ModelAddCustomer
+        <ModelAddFilm
           showModalAddCustomer={showModalAddCustomer}
           setShowModalAddCustomer={setShowModalAddCustomer}
         />
@@ -96,4 +103,4 @@ const IndexCustomer = () => {
     </div>
   );
 };
-export default IndexCustomer;
+export default IndexFilm;

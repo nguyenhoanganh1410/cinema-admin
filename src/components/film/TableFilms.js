@@ -9,24 +9,20 @@ import {
 } from "@ant-design/icons";
 const columns = [
   {
-    title: "Họ và Tên",
+    title: "Tên phim",
     dataIndex: "name",
   },
   {
-    title: "Số điện thoại",
-    dataIndex: "phone",
+    title: "Thể loại",
+    dataIndex: "category",
   },
   {
-    title: "Địa chỉ",
-    dataIndex: "address",
+    title: "Thời lượng",
+    dataIndex: "time",
   },
   {
-    title: "Email",
-    dataIndex: "email",
-  },
-   {
-    title: "Rank",
-    dataIndex: "rank",
+    title: "Ngày phát hành",
+    dataIndex: "releaseDate",
   },
 ];
 const data = [];
@@ -34,13 +30,12 @@ for (let i = 0; i < 46; i++) {
   data.push({
     key: i,
     name: `Edward King ${i}`,
-    phone: "0397574636",
-    address: `London, Park Lane no. ${i}`,
-    email: "hoanganh1410tb@gmail.com",
-    rank:"gold"
+    category: "Hài hước",
+    time: "120p phút",
+    releaseDate: "30/01/2023",
   });
 }
-const TableCustomer = () => {
+const TableFilms = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -125,14 +120,14 @@ const TableCustomer = () => {
       </div>
       <Table rowSelection={rowSelection} columns={columns} dataSource={data} />
       <Modal
-        title="Xóa khách hàng"
+        title="Xóa bộ phim"
         open={isModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
       >
-        <p>Bạn muốn xóa khách hàng không?</p>
+        <p>Bạn muốn xóa bộ phim này không?</p>
       </Modal>
     </div>
   );
 };
-export default TableCustomer;
+export default TableFilms;

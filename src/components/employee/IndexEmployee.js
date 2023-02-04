@@ -9,11 +9,13 @@ import {
   DeleteOutlined,
   DownloadOutlined,
 } from "@ant-design/icons";
-import TableCustomer from "./TableCustomer";
-import ModelAddCustomer from "./ModelAddCustomer";
+import TableCustomer from "../customer/TableCustomer";
+import ModelAddCustomer from "../customer/ModelAddCustomer";
+import TableEmployee from "./TableEmployee";
+import ModelAddEmployee from "./ModelAddEmployee";
 
 const { Title, Text } = Typography;
-const IndexCustomer = () => {
+const IndexEmployee = () => {
   const [showModalAddCustomer, setShowModalAddCustomer] = useState(false);
   // //model
   // const [isModalOpen, setIsModalOpen] = useState(false);
@@ -39,7 +41,7 @@ const IndexCustomer = () => {
   return (
     <div className="site-card-wrapper">
       <Title level={5} style={{ marginBottom: "1rem" }}>
-        Khách Hàng
+        Nhân Viên
       </Title>
       <Row
         gutter={{
@@ -84,11 +86,11 @@ const IndexCustomer = () => {
         }}
       >
         <Col span={24}>
-          <TableCustomer />
+          <TableEmployee />
         </Col>
       </Row>
       {showModalAddCustomer ? (
-        <ModelAddCustomer
+        <ModelAddEmployee
           showModalAddCustomer={showModalAddCustomer}
           setShowModalAddCustomer={setShowModalAddCustomer}
         />
@@ -96,4 +98,4 @@ const IndexCustomer = () => {
     </div>
   );
 };
-export default IndexCustomer;
+export default IndexEmployee;
