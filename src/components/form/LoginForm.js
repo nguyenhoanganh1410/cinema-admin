@@ -19,6 +19,22 @@ import {
 
 const { Title, Text } = Typography;
 const LoginForm = () => {
+  const [userName, setUserName] = React.useState("");
+  const [password, setPassword] = React.useState("");
+
+  const setOnChangeUserName = (e) => {
+    setUserName(e.target.value);
+  };
+  const setOnChangePass = (e) => {
+    setPassword(e.target.value);
+  };
+
+  //handle submit to login user
+  const handleSubmitForm = () => {
+    console.log(userName);
+    console.log(password);
+  };
+
   return (
     <Row style={{ height: "100vh" }} className="login">
       <Col span={8}></Col>
@@ -57,6 +73,7 @@ const LoginForm = () => {
             </p>
           </div>
           <form
+            onSubmit={() => handleSubmitForm()}
             style={{
               backgroundColor: "white",
               borderRadius: "8px",
@@ -78,22 +95,35 @@ const LoginForm = () => {
             <Input
               size="large"
               placeholder="Nhập tên tài khoản"
+              onChange={(e) => setOnChangeUserName(e)}
               prefix={<UserOutlined />}
             />
 
             <Input.Password
               size="large"
               placeholder="Nhập mật khẩu"
+              onChange={(e) => setOnChangePass(e)}
               prefix={<LockOutlined />}
               style={{ marginTop: "1.5rem", marginBottom: "1.5rem" }}
             />
-            <Button
-              disabled
-              type="primary"
-              style={{ width: "100%", height: "40px", marginBottom: "1rem" }}
-            >
-              Đăng Nhập
-            </Button>
+            {userName && password ? (
+              <Button
+                onClick={() => handleSubmitForm()}
+                type="primary"
+                style={{ width: "100%", height: "40px", marginBottom: "1rem" }}
+              >
+                Đăng Nhập
+              </Button>
+            ) : (
+              <Button
+                onClick={() => handleSubmitForm()}
+                disabled
+                type="primary"
+                style={{ width: "100%", height: "40px", marginBottom: "1rem" }}
+              >
+                Đăng Nhập
+              </Button>
+            )}
             <p className="forgetPassword">
               Quên mật khẩu? <span> Lấy lại mật khẩu</span>
             </p>
