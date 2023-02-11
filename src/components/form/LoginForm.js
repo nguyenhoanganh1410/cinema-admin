@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Button,
   Checkbox,
@@ -11,16 +11,21 @@ import {
   Space,
 } from "antd";
 import "./LoginForm.scss";
-import {
-  InfoCircleOutlined,
-  UserOutlined,
-  LockOutlined,
-} from "@ant-design/icons";
+import { UserOutlined, LockOutlined } from "@ant-design/icons";
+import userApi from "../../api/userApi";
+import { useDispatch } from "react-redux";
+import { setUser } from "../../redux/actions";
+import { useNavigate } from "react-router-dom";
+import tokenService from "../../service/token.service";
 
 const { Title, Text } = Typography;
 const LoginForm = () => {
+  const navigate = useNavigate();
   const [userName, setUserName] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [loadingStatus, setLoadingStatus] = useState(false);
+
+  const dispatch = useDispatch();
 
   const setOnChangeUserName = (e) => {
     setUserName(e.target.value);
@@ -31,8 +36,29 @@ const LoginForm = () => {
 
   //handle submit to login user
   const handleSubmitForm = () => {
-    console.log(userName);
-    console.log(password);
+    setLoadingStatus(true);
+    //call api for login
+    const loginUser = async (username, pass) => {
+      try {
+        const response = await userApi.login(username, pass);
+
+        setLoadingStatus(false);
+        //console.log(response);
+        //set user info
+        if (response) {
+          //redirct home page
+          navigate("/");
+          dispatch(setUser(response.data.staff));
+
+          //luu thông tin acessTonken vào localstorage
+          tokenService.setUser(response.data);
+        }
+      } catch (error) {
+        console.log("Failed to login ", error);
+        setLoadingStatus(false);
+      }
+    };
+    loginUser(userName, password);
   };
 
   return (
@@ -111,6 +137,7 @@ const LoginForm = () => {
                 onClick={() => handleSubmitForm()}
                 type="primary"
                 style={{ width: "100%", height: "40px", marginBottom: "1rem" }}
+                loading={loadingStatus}
               >
                 Đăng Nhập
               </Button>

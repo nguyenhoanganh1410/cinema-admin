@@ -20,12 +20,13 @@ const axiosApi = axios.create({
   // paramsSerializer: (params) => queryString.stringify(params),
 });
 
-axiosClient.interceptors.request.use(async (config) => {
+axiosApi.interceptors.request.use(async (config) => {
   // Handle token here ...
+  console.log("token in here");
   return config;
 });
 
-axiosClient.interceptors.response.use(
+axiosApi.interceptors.response.use(
   (response) => {
     if (response && response.data) {
       return response.data;

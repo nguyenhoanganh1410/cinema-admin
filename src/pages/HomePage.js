@@ -35,6 +35,11 @@ import IndexEmployee from "../components/employee/IndexEmployee";
 import IndexFilm from "../components/film/IndexFilm";
 import IndexShow from "../components/show/IndexShow";
 import IndexRouter from "../components/show/IndexRouter";
+import { useSelector } from "react-redux";
+import UserInfo from "../components/user/UserIndex";
+import tokenService from "../service/token.service";
+import { useNavigate } from "react-router-dom";
+
 const { Header, Content, Footer, Sider } = Layout;
 
 const { Text } = Typography;
@@ -114,6 +119,9 @@ const items = [
   getItem("Thống kê", "18", <PieChartOutlined />),
 ];
 const HomePage = () => {
+  const navigator = useNavigate();
+  const user = useSelector((state) => state.user);
+
   //model
   const [isModalOpen, setIsModalOpen] = useState(false);
   const showModal = () => {
@@ -121,7 +129,7 @@ const HomePage = () => {
   };
   const handleOk = () => {
     setIsModalOpen(false);
-
+    handleLogout();
     //handle code for log out in here
 
     ////////
@@ -180,10 +188,26 @@ const HomePage = () => {
       return <IndexFilm />;
     } else if (itemClicked === 4) {
       return <IndexRouter />;
+    } else if (itemClicked === 100) {
+      //info user
+      return <UserInfo />;
     }
     return <IndexDashboard />;
   };
 
+  //handle show info user
+  const handleUserInfo = () => {
+    //console.log("user info");
+    setItemClicked(100);
+  };
+
+  //handle logout
+  const handleLogout = () => {
+    //redict to login page
+    navigator("/login");
+    //delete user in local storage
+    tokenService.removeUser();
+  };
   return (
     <Layout
       style={{
@@ -302,13 +326,13 @@ const HomePage = () => {
                               marginRight: "12px",
                             }}
                           >
-                            U
+                            {/* {user?.lastName[0]} */}L
                           </Avatar>
                           <div
                             style={{ display: "flex", flexDirection: "column" }}
                           >
                             <Text style={{ fontWeight: "500", color: "#333" }}>
-                              Ant Desig
+                              {user?.firstName + " " + user?.lastName}
                             </Text>
                             <Text
                               style={{
@@ -317,7 +341,7 @@ const HomePage = () => {
                                 color: "#abb4bc",
                               }}
                             >
-                              Employee
+                              {user?.nameRole}
                             </Text>
                           </div>
                         </div>
@@ -328,7 +352,7 @@ const HomePage = () => {
                         style={{ padding: " 12px 12px" }}
                       >
                         {" "}
-                        <div>
+                        <div onClick={() => handleUserInfo()}>
                           <ProfileOutlined />
                           <Text style={{ marginLeft: "12px" }}>Thông tin</Text>
                         </div>
@@ -344,7 +368,7 @@ const HomePage = () => {
                         </div>
                       </Menu.Item>
                       <Menu.Item key="logout" style={{ padding: " 12px 12px" }}>
-                        <div>
+                        <div onClick={() => showModal()}>
                           <LogoutOutlined />
                           <Text style={{ marginLeft: "12px" }}>Đăng xuất</Text>
                         </div>
@@ -375,10 +399,10 @@ const HomePage = () => {
                       marginRight: "6px",
                     }}
                   >
-                    U
+                    {/* {user?.lastName[0]} */}L
                   </Avatar>
                   <Text style={{ fontWeight: "500", color: "#333" }}>
-                    Ant Desig
+                    {user?.firstName + " " + user?.lastName}
                   </Text>
                 </div>
               </Dropdown>

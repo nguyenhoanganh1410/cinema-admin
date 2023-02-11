@@ -5,6 +5,7 @@ const userApi = {
     return axiosApi.post("/auth/login", {
       phone,
       password,
+      staff: 1,
     });
   },
 };

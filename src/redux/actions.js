@@ -1,6 +1,6 @@
-export const login = (payload) => {
+export const setUser = (data) => {
   return {
-    type: "login",
-    payload: 5,
+    type: "user/setUser",
+    payload: data,
   };
 };

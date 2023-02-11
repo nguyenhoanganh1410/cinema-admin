@@ -1,17 +1,13 @@
 const initValue = {
-  user: {
-    username: "",
-    password: "",
-  },
-  count: 0,
+  user: {},
 };
 
 const rootReducer = (state = initValue, action) => {
   switch (action.type) {
-    case "login":
+    case "user/setUser":
       return {
         ...state,
-        count: 1,
+        user: action.payload,
       };
     default:
       return state;
