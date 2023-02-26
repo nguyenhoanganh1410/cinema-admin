@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Table, Modal } from "antd";
 import {
   SearchOutlined,
@@ -7,37 +7,30 @@ import {
   ToolOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
+import movieApi from "../../api/movieApi";
 const columns = [
   {
     title: "Tên phim",
-    dataIndex: "name",
+    dataIndex: "nameMovie",
   },
   {
-    title: "Thể loại",
-    dataIndex: "category",
+    title: "Đạo diễn",
+    dataIndex: "director",
   },
   {
     title: "Thời lượng",
-    dataIndex: "time",
+    dataIndex: "duration",
   },
   {
     title: "Ngày phát hành",
     dataIndex: "releaseDate",
   },
 ];
-const data = [];
-for (let i = 0; i < 46; i++) {
-  data.push({
-    key: i,
-    name: `Edward King ${i}`,
-    category: "Hài hước",
-    time: "120p phút",
-    releaseDate: "30/01/2023",
-  });
-}
+
 const TableFilms = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [listMovie, setListMovie] = useState([]);
 
   const onSelectChange = (newSelectedRowKeys) => {
     console.log("selectedRowKeys changed: ", newSelectedRowKeys);
@@ -83,6 +76,30 @@ const TableFilms = () => {
   };
   /////
 
+  useEffect(() => {
+    //load movies
+    const gettListMovie = async () => {
+      try {
+        const response = await movieApi.getMovies();
+
+        console.log(response);
+        //set user info
+        if (response) {
+          //handle data
+          const newList = response.map((movie) => {
+            movie.releaseDate = movie.releaseDate.substring(0, 10);
+            movie.duration = movie.duration + " " + "phút";
+            return movie;
+          });
+          setListMovie(response);
+        }
+      } catch (error) {
+        console.log("Failed to login ", error);
+      }
+    };
+    gettListMovie();
+  }, []);
+
   return (
     <div>
       <div
@@ -118,7 +135,11 @@ const TableFilms = () => {
           {hasSelected ? `Selected ${selectedRowKeys.length} items` : ""}
         </span>
       </div>
-      <Table rowSelection={rowSelection} columns={columns} dataSource={data} />
+      <Table
+        rowSelection={rowSelection}
+        columns={columns}
+        dataSource={listMovie}
+      />
       <Modal
         title="Xóa bộ phim"
         open={isModalOpen}

@@ -15,6 +15,7 @@ import {
 } from "antd";
 
 import { PlusOutlined } from "@ant-design/icons";
+import categoryMovie from "../../api/categoryMovie";
 
 const { Option } = Select;
 
@@ -27,6 +28,7 @@ const getBase64 = (file) =>
   });
 
 const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
+  const [listCategory, setListCategory] = useState([]);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
@@ -92,6 +94,28 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
   const onChangeDate = (date, dateString) => {
     console.log(date, dateString);
   };
+
+  useEffect(() => {
+    //load movies
+    const getCategories = async () => {
+      try {
+        const response = await categoryMovie.getCategory();
+
+        console.log(response);
+        //set user info
+        if (response) {
+          //handle data
+          const newArr = response.map((val) => {
+            return { value: val.id, label: val.nameCategory };
+          });
+          setListCategory(newArr);
+        }
+      } catch (error) {
+        console.log("Failed to login ", error);
+      }
+    };
+    getCategories();
+  }, []);
   return (
     <>
       <Drawer
@@ -144,20 +168,7 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
                     width: "100%",
                   }}
                   onChange={handleChangePosition}
-                  options={[
-                    {
-                      value: "category01",
-                      label: "Hành động",
-                    },
-                    {
-                      value: "category02",
-                      label: "Kinh dị",
-                    },
-                    {
-                      value: "category03",
-                      label: "Tình cảm",
-                    },
-                  ]}
+                  options={listCategory}
                 />
               </Form.Item>
             </Col>
