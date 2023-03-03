@@ -1,5 +1,6 @@
 const initValue = {
   user: {},
+  promotionHeaderId: null,
 };
 
 const rootReducer = (state = initValue, action) => {
@@ -8,6 +9,11 @@ const rootReducer = (state = initValue, action) => {
       return {
         ...state,
         user: action.payload,
+      };
+    case "promotion/promotionHeaderId":
+      return {
+        ...state,
+        promotionHeaderId: action.payload,
       };
     default:
       return state;

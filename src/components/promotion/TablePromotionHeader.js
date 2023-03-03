@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Table, Modal } from "antd";
+import { Button, Table, Modal, Space } from "antd";
 import {
   SearchOutlined,
   PlusSquareFilled,
@@ -7,49 +7,38 @@ import {
   ToolOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
+import { useDispatch } from "react-redux";
 import movieApi from "../../api/movieApi";
-const columns = [
-  {
-    title: "Tên CT khuyễn mãi",
-    dataIndex: "nameMovie",
-  },
-  {
-    title: "Mô tả",
-    dataIndex: "director",
-  },
-  {
-    title: "Ngày bắt đầu",
-    dataIndex: "duration",
-  },
-  {
-    title: "Ngày kết thúc",
-    dataIndex: "releaseDate",
-  },
-  {
-    title: "Trạng thái",
-    dataIndex: "status",
-  },
-  {
-    title: "CT con",
-    dataIndex: "childPromotion",
-  },
-];
-const data = [];
-for (let i = 0; i < 46; i++) {
-  data.push({
-    key: i,
-    nameMovie: `Edward King ${i}`,
-    director: "0397574636",
-    duration: `London, Park Lane no. ${i}`,
-    releaseDate: "Nhân viên",
-    status: "active",
-    childPromotion: "Xem CT con (5)",
-  });
-}
+import promotionApi from "../../api/promotionApi";
+import { setPromotionHeader } from "../../redux/actions";
+// const columns = [
+//   {
+//     title: "Tên CT khuyễn mãi",
+//     dataIndex: "namePromotion",
+//   },
+//   {
+//     title: "Mô tả",
+//     dataIndex: "title",
+//   },
+//   {
+//     title: "Ngày bắt đầu",
+//     dataIndex: "startDate",
+//   },
+//   {
+//     title: "Ngày kết thúc",
+//     dataIndex: "endDate",
+//   },
+//   {
+//     title: "Trạng thái",
+//     dataIndex: "statusPromotion",
+//   },
+// ];
+
 const TablePromotionHeader = ({ setTab }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const [promotionHeaderList, setPromotionHeaderList] = useState([]);
+  const dispatch = useDispatch();
   const onSelectChange = (newSelectedRowKeys) => {
     console.log("selectedRowKeys changed: ", newSelectedRowKeys);
     setSelectedRowKeys(newSelectedRowKeys);
@@ -58,6 +47,7 @@ const TablePromotionHeader = ({ setTab }) => {
     selectedRowKeys,
     onChange: onSelectChange,
   };
+  console.log(rowSelection);
   const hasSelected = selectedRowKeys.length > 0;
   const selectedOne = selectedRowKeys.length === 1;
 
@@ -66,10 +56,11 @@ const TablePromotionHeader = ({ setTab }) => {
     showModal();
   };
 
-  //handle show details of promotion header
-  const handeShowDetailsPromotion = () => {
-    setTab(1);
-  };
+  // //handle show details of promotion header
+  // const handeShowDetailsPromotion = () => {
+  //   dispatch(setPromotionHeader());
+  //   setTab(1);
+  // };
 
   ///
   //model
@@ -89,29 +80,77 @@ const TablePromotionHeader = ({ setTab }) => {
   };
   /////
 
-  //   useEffect(() => {
-  //     //load movies
-  //     const gettListMovie = async () => {
-  //       try {
-  //         const response = await movieApi.getMovies();
+  useEffect(() => {
+    //load movies
+    const getListPromotionHeader = async () => {
+      try {
+        const response = await promotionApi.getPromotionHeader();
 
-  //         console.log(response);
-  //         //set user info
-  //         if (response) {
-  //           //handle data
-  //           const newList = response.map((movie) => {
-  //             movie.releaseDate = movie.releaseDate.substring(0, 10);
-  //             movie.duration = movie.duration + " " + "phút";
-  //             return movie;
-  //           });
-  //           setListMovie(response);
-  //         }
-  //       } catch (error) {
-  //         console.log("Failed to login ", error);
-  //       }
-  //     };
-  //     gettListMovie();
-  //   }, []);
+        console.log(response);
+        //set user info
+        if (response) {
+          //handle data
+          const newList = response.map((item) => {
+            item.startDate = item.startDate.substring(0, 10);
+            item.endDate = item.endDate.substring(0, 10);
+            if (item.statusPromotion) {
+              item.statusPromotion = "Active";
+            } else {
+              item.statusPromotion = "Disabled";
+            }
+            return item;
+          });
+          setPromotionHeaderList(newList);
+        }
+      } catch (error) {
+        console.log("Failed to login ", error);
+      }
+    };
+    getListPromotionHeader();
+  }, []);
+
+  const handleOnclik = (id) => {
+    //set id in headerId;
+    dispatch(setPromotionHeader(id));
+    setTab(1);
+  };
+
+  const columns = [
+    {
+      title: "Tên CT khuyễn mãi",
+      dataIndex: "namePromotion",
+      key: "name",
+      render: (text, record) => (
+        <a onClick={() => handleOnclik(record.id)}>{text}</a>
+      ),
+    },
+    {
+      title: "Mô tả",
+      dataIndex: "title",
+    },
+    {
+      title: "Ngày bắt đầu",
+      dataIndex: "startDate",
+    },
+    {
+      title: "Ngày kết thúc",
+      dataIndex: "endDate",
+    },
+    {
+      title: "Trạng thái",
+      dataIndex: "statusPromotion",
+    },
+
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Space size="middle">
+          <a>Delete</a>
+        </Space>
+      ),
+    },
+  ];
 
   return (
     <div>
@@ -131,7 +170,7 @@ const TablePromotionHeader = ({ setTab }) => {
         >
           Xóa
         </Button>
-        <Button
+        {/* <Button
           type="primary"
           onClick={handeShowDetailsPromotion}
           disabled={!selectedOne}
@@ -139,7 +178,7 @@ const TablePromotionHeader = ({ setTab }) => {
           icon={<ToolOutlined />}
         >
           Chi tiết
-        </Button>
+        </Button> */}
         <span
           style={{
             marginLeft: 8,
@@ -148,14 +187,18 @@ const TablePromotionHeader = ({ setTab }) => {
           {hasSelected ? `Selected ${selectedRowKeys.length} items` : ""}
         </span>
       </div>
-      <Table rowSelection={rowSelection} columns={columns} dataSource={data} />
+      <Table
+        rowSelection={rowSelection}
+        columns={columns}
+        dataSource={promotionHeaderList}
+      />
       <Modal
         title="Xóa bộ phim"
         open={isModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
       >
-        <p>Bạn muốn xóa bộ phim này không?</p>
+        <p>Bạn muốn xóa chương trình khuyến mãi này không?</p>
       </Modal>
     </div>
   );

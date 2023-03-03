@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   Button,
@@ -20,6 +20,8 @@ import {
 
 import { PlusOutlined } from "@ant-design/icons";
 import ModelAddPromoLine from "./ModelAddPromoLine";
+import { useSelector } from "react-redux";
+import promotionApi from "../../api/promotionApi";
 const { TextArea } = Input;
 const getBase64 = (file) =>
   new Promise((resolve, reject) => {
@@ -35,8 +37,8 @@ const dateFormat = "YYYY/MM/DD";
 const columns = [
   {
     title: "Mã Code",
-    dataIndex: "name",
-    key: "name",
+    dataIndex: "promotionCode",
+    key: "promotionCode",
     render: (text) => <a>{text}</a>,
   },
   {
@@ -46,79 +48,33 @@ const columns = [
   },
   {
     title: "Loại khuyến mãi",
-    dataIndex: "category",
-    key: "promoType",
+    dataIndex: "type",
+    key: "type",
   },
   {
     title: "Ngày bắt đầu",
-    dataIndex: "dateStart",
-    key: "dateStart",
+    dataIndex: "startDate",
+    key: "startDate",
   },
   {
     title: "Ngày kết thức",
-    dataIndex: "dateEnd",
-    key: "dateEnd",
+    dataIndex: "endDate",
+    key: "endDate",
   },
   {
-    title: "Tags",
-    key: "tags",
-    dataIndex: "tags",
-    render: (_, { tags }) => (
-      <>
-        {tags.map((tag) => {
-          let color = tag.length > 5 ? "geekblue" : "green";
-          if (tag === "loser") {
-            color = "volcano";
-          }
-          return (
-            <Tag color={color} key={tag}>
-              {tag.toUpperCase()}
-            </Tag>
-          );
-        })}
-      </>
-    ),
-  },
-  // {
-  //   title: "Action",
-  //   key: "action",
-  //   render: (_, record) => (
-  //     <Space size="middle">
-  //       <a>Invite {record.name}</a>
-  //       <a>Delete</a>
-  //     </Space>
-  //   ),
-  // },
-];
-const data = [
-  {
-    key: "1",
-    name: "John Brown",
-    mieuTa: "mua 2 vé tặng 1 vé",
-    category: "Tặng vé",
-    dateStart: "10/11/2023",
-    dateEnd: "20/11/2023",
-    tags: ["nice", "developer"],
-  },
-  {
-    key: "1",
-    name: "John Brown",
-    mieuTa: "mua 2 vé tặng 1 vé",
-    category: "Tặng vé",
-    dateStart: "10/11/2023",
-    dateEnd: "20/11/2023",
-    tags: ["nice", "developer"],
-  },
-  {
-    key: "1",
-    name: "John Brown",
-    mieuTa: "mua 2 vé tặng 1 vé",
-    category: "Tặng vé",
-    dateStart: "10/11/2023",
-    dateEnd: "20/11/2023",
-    tags: ["nice", "developer"],
+    title: "Status",
+    key: "status",
+    dataIndex: "status",
+    render: (_, record) => {
+      if (record.status === 1) {
+        return <Tag color="green">Hoạt động</Tag>;
+      } else if (record.status === 0) {
+        return <Tag color="red">Đã hủy</Tag>;
+      }
+    },
   },
 ];
+
 const IndexLinePromotion = () => {
   const [showModalAddCustomer, setShowModalAddCustomer] = useState(false);
 
@@ -126,6 +82,11 @@ const IndexLinePromotion = () => {
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
   const [fileList, setFileList] = useState([]);
+
+  const [listPromotionLine, setPromotionLine] = useState([]);
+  const [promotionHeader, setPromotionHeader] = useState(null);
+  const idHeaderPromotion = useSelector((state) => state.promotionHeaderId);
+
   const handleCancel = () => setPreviewOpen(false);
   const handlePreview = async (file) => {
     if (!file.url && !file.preview) {
@@ -165,6 +126,43 @@ const IndexLinePromotion = () => {
     console.log(date, dateString);
   };
 
+  useEffect(() => {
+    //load movies
+    const getPromotionLineByHeader = async (id) => {
+      try {
+        const response = await promotionApi.getPromotionLineByHeader(id);
+
+        console.log(response);
+        //set user info
+        if (response) {
+          //handle data
+          setPromotionLine(response);
+        }
+      } catch (error) {
+        console.log("Failed to login ", error);
+      }
+    };
+    getPromotionLineByHeader(idHeaderPromotion);
+
+    //load movies
+    const getPromotionHeaderById = async (id) => {
+      try {
+        const response = await promotionApi.getPromotionHeaderById(id);
+
+        console.log(response);
+        //set user info
+        if (response) {
+          //handle data
+          setPromotionHeader(response);
+        }
+      } catch (error) {
+        console.log("Failed to login ", error);
+      }
+    };
+    getPromotionLineByHeader(idHeaderPromotion);
+    getPromotionHeaderById(idHeaderPromotion);
+  }, []);
+
   return (
     <div className="site-card-wrapper" style={{ minWidth: "100vh" }}>
       <Breadcrumb style={{ marginBottom: "1rem", marginTop: "1rem" }}>
@@ -198,7 +196,10 @@ const IndexLinePromotion = () => {
                 },
               ]}
             >
-              <Input placeholder="Hãy nhập tên CT khuyến mãi..." />
+              <Input
+                placeholder="Hãy nhập tên CT khuyến mãi..."
+                value={promotionHeader?.namePromotion}
+              />
             </Form.Item>
           </Col>
           <Col span={12}>
@@ -234,6 +235,7 @@ const IndexLinePromotion = () => {
                 rows={4}
                 placeholder="Nhập chi tiết CTKM"
                 maxLength={6}
+                value={promotionHeader?.desc}
               />
             </Form.Item>
           </Col>
@@ -346,7 +348,7 @@ const IndexLinePromotion = () => {
             Thêm
           </Button>
         </div>
-        <Table columns={columns} dataSource={data} />;
+        <Table columns={columns} dataSource={listPromotionLine} />;
       </div>
       {showModalAddCustomer ? (
         <ModelAddPromoLine

@@ -4,3 +4,10 @@ export const setUser = (data) => {
     payload: data,
   };
 };
+
+export const setPromotionHeader = (data) => {
+  return {
+    type: "promotion/promotionHeaderId",
+    payload: data,
+  };
+};
