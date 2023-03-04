@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Table, Modal, Select } from "antd";
 import {
   SearchOutlined,
@@ -7,6 +7,7 @@ import {
   ToolOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
+import showApi from "../../api/showApi";
 const columns = [
   {
     title: "Bộ phim",
@@ -48,6 +49,7 @@ for (let i = 0; i < 46; i++) {
 const TableShows = ({ setShowModalAddCustomer, setTab }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [listShow, setListShow] = useState([]);
 
   const onSelectChange = (newSelectedRowKeys) => {
     console.log("selectedRowKeys changed: ", newSelectedRowKeys);
@@ -99,8 +101,25 @@ const TableShows = ({ setShowModalAddCustomer, setTab }) => {
 
   //show chart
   const handleShowChart = () => {
-    setTab(1)
-  }
+    setTab(1);
+  };
+
+  useEffect(() => {
+    //load movies
+    const getListShow = async () => {
+      try {
+        const response = await showApi.getShow();
+        console.log(response);
+        //set user info
+        if (response) {
+          setListShow(response);
+        }
+      } catch (error) {
+        console.log("Failed to login ", error);
+      }
+    };
+    getListShow();
+  }, []);
 
   return (
     <div>
@@ -151,7 +170,11 @@ const TableShows = ({ setShowModalAddCustomer, setTab }) => {
         </div>
 
         <div>
-          <Button type="primary" icon={<ToolOutlined />} onClick={()=>handleShowChart()}>
+          <Button
+            type="primary"
+            icon={<ToolOutlined />}
+            onClick={() => handleShowChart()}
+          >
             Xem biểu đồ
           </Button>
           <Select

@@ -39,6 +39,8 @@ import { useSelector } from "react-redux";
 import UserInfo from "../components/user/UserIndex";
 import tokenService from "../service/token.service";
 import { useNavigate } from "react-router-dom";
+import IndexPromotion from "../components/promotion/IndexPromotion";
+import IndexRoutePro from "../components/promotion/IndexRoutePro";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -102,10 +104,7 @@ const items = [
     getItem("Ghế", "14"),
   ]),
 
-  getItem("Quản lý khuyến mãi", "sub2", <ThunderboltOutlined />, [
-    getItem("Voucher", "6"),
-    getItem("Khuyến mãi", "8"),
-  ]),
+  getItem("Quản lý khuyến mãi", "19", <ThunderboltOutlined />),
   getItem("Quản lý vé", "sub3", <ProjectOutlined />, [
     getItem("Vé đã đặt", "9"),
     getItem("Các đơn đặt online", "10"),
@@ -191,6 +190,8 @@ const HomePage = () => {
     } else if (itemClicked === 100) {
       //info user
       return <UserInfo />;
+    } else if (itemClicked === 19) {
+      return <IndexRoutePro />;
     }
     return <IndexDashboard />;
   };
