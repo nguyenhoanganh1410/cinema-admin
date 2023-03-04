@@ -14,9 +14,11 @@ import {
   Upload,
 } from "antd";
 
+import { useFormik } from "formik";
 import { PlusOutlined } from "@ant-design/icons";
 import categoryMovie from "../../api/categoryMovie";
-
+import { fimlValidator } from "./FilmSchema";
+import cinameApi from "../../api/cinemaApi";
 const { Option } = Select;
 
 const getBase64 = (file) =>
@@ -29,6 +31,7 @@ const getBase64 = (file) =>
 
 const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
   const [listCategory, setListCategory] = useState([]);
+  const [listCinema, setListCinema] = useState([]);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
@@ -40,6 +43,14 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
       url: "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png",
     },
   ]);
+  const [nameMovie, setNameMovie] = useState("");
+  const [cast, setCast] = useState("");
+  const [director, setDirector] = useState("");
+  const [linkTrailer, setLinkTrailer] = useState("");
+  const [category, setCategory] = useState("");
+  const [time, setTime] = useState(0);
+  const [releaseDate, setReleaseDate] = useState("");
+  const [desc, setDesc] = useState("");
 
   const handleCancel = () => setPreviewOpen(false);
   const handlePreview = async (file) => {
@@ -55,7 +66,9 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
   };
   const handleChange = ({ fileList: newFileList }) => {
     console.log(newFileList);
-    setFileList(newFileList);
+    if (fileList.length < 1) {
+      setFileList(newFileList);
+    }
   };
   const uploadButton = (
     <div>
@@ -70,8 +83,6 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
     </div>
   );
 
-  /////
-
   const onSearch = (value) => {
     console.log("search:", value);
   };
@@ -80,23 +91,39 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
     setShowModalAddCustomer(false);
   };
 
-  //handle submit form create new customer...
-  const handleSubmit = () => {
-    //write code in here...
-  };
-
   //change position
   const handleChangePosition = (value) => {
     console.log(`selected ${value}`);
   };
+  const handleChangeTime = (value) => {
+    setTime(value);
+  };
+  const handleChangeCategory = (value) => {
+    setCategory(value);
+  };
 
   //choise date start worling
   const onChangeDate = (date, dateString) => {
-    console.log(date, dateString);
+    setReleaseDate(dateString);
   };
 
+  const handleSubmit = () => {
+    //call api create a new movie
+    const newMove = {
+      nameMovie,
+      cast,
+      director,
+      linkTrailer,
+      idCategoryMovie: category,
+      duration: time,
+      releaseDate,
+      idCinema: 1,
+      desc,
+    };
+    console.log(newMove);
+  };
   useEffect(() => {
-    //load movies
+    //load categories
     const getCategories = async () => {
       try {
         const response = await categoryMovie.getCategory();
@@ -114,6 +141,26 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
         console.log("Failed to login ", error);
       }
     };
+
+    //load categories
+    const getCinemas = async () => {
+      try {
+        const response = await cinameApi.getCinemas();
+
+        console.log(response);
+        //set user info
+        if (response) {
+          const newArr = response.map((val) => {
+            return { value: val.id, label: val.name };
+          });
+
+          setListCinema(newArr);
+        }
+      } catch (error) {
+        console.log("Failed to login ", error);
+      }
+    };
+    getCinemas();
     getCategories();
   }, []);
   return (
@@ -148,7 +195,10 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
                   },
                 ]}
               >
-                <Input placeholder="Hãy nhập tên bộ phim..." />
+                <Input
+                  onChange={(e) => setNameMovie(e.target.value)}
+                  placeholder="Hãy nhập tên bộ phim..."
+                />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -167,7 +217,7 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
                   style={{
                     width: "100%",
                   }}
-                  onChange={handleChangePosition}
+                  onChange={handleChangeCategory}
                   options={listCategory}
                 />
               </Form.Item>
@@ -191,22 +241,22 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
                   style={{
                     width: "100%",
                   }}
-                  onChange={handleChangePosition}
+                  onChange={handleChangeTime}
                   options={[
                     {
-                      value: "time01",
+                      value: "60",
                       label: "60 phút",
                     },
                     {
-                      value: "time02",
+                      value: "90",
                       label: "90 phút",
                     },
                     {
-                      value: "time03",
+                      value: "120",
                       label: "120 phút",
                     },
                     {
-                      value: "time04",
+                      value: "180",
                       label: "180 phút",
                     },
                   ]}
@@ -244,7 +294,10 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
                   },
                 ]}
               >
-                <Input placeholder="Hãy nhập tên đạo diễn..." />
+                <Input
+                  onChange={(e) => setDirector(e.target.value)}
+                  placeholder="Hãy nhập tên đạo diễn..."
+                />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -258,7 +311,10 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
                   },
                 ]}
               >
-                <Input placeholder="Hãy nhập tên diễn viên..." />
+                <Input
+                  onChange={(e) => setCast(e.target.value)}
+                  placeholder="Hãy nhập tên diễn viên..."
+                />
               </Form.Item>
             </Col>
           </Row>
@@ -274,7 +330,10 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
                   },
                 ]}
               >
-                <Input placeholder="Hãy nhập link trailer..." />
+                <Input
+                  onChange={(e) => setLinkTrailer(e.target.value)}
+                  placeholder="Hãy nhập link trailer..."
+                />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -294,12 +353,18 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
                     width: "100%",
                   }}
                   onChange={handleChangePosition}
-                  options={[
-                    {
-                      value: "ciname01",
-                      label: "cinema võ văn ngân",
-                    },
-                  ]}
+                  options={listCinema}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row style={{ marginTop: "16px" }} gutter={16}>
+            <Col span={24}>
+              <Form.Item name="description" label="Miêu tả">
+                <Input.TextArea
+                  onChange={(e) => setDesc(e.target.value)}
+                  rows={4}
+                  placeholder="Nhập miêu tả..."
                 />
               </Form.Item>
             </Col>
