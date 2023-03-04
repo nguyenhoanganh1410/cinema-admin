@@ -1,52 +1,142 @@
-import React, { useState } from "react";
-import { Button, Table, Modal } from "antd";
+import React, { useEffect, useState } from "react";
+import { Button, Table, Modal, Tag, Image,Alert,Space,message } from "antd";
 import {
   SearchOutlined,
   PlusSquareFilled,
   UserAddOutlined,
   ToolOutlined,
   DeleteOutlined,
+  ReloadOutlined,
 } from "@ant-design/icons";
-const columns = [
-  {
-    title: "Họ và Tên",
-    dataIndex: "name",
-  },
-  {
-    title: "Số điện thoại",
-    dataIndex: "phone",
-  },
-  {
-    title: "Địa chỉ",
-    dataIndex: "address",
-  },
-  {
-    title: "Email",
-    dataIndex: "email",
-  },
-   {
-    title: "Rank",
-    dataIndex: "rank",
-  },
-];
-const data = [];
-for (let i = 0; i < 46; i++) {
-  data.push({
-    key: i,
-    name: `Edward King ${i}`,
-    phone: "0397574636",
-    address: `London, Park Lane no. ${i}`,
-    email: "hoanganh1410tb@gmail.com",
-    rank:"gold"
-  });
-}
-const TableCustomer = () => {
+import customerApi from "../../api/customerApi";
+import ModelAddCustomer from "./ModelAddCustomer";
+import ModelDetailCustomer from "./ModelCustomerDetail";
+import openAddressApi from "../../api/openApi";
+
+
+
+const TableCustomer = () => {  
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [listCustomer, setListCustomer] = useState([]);
+  const [selectedId, setSelectedId] = useState([]);
+  const [showModalDetailCustomer, setShowModalDetailCustomer] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+  
 
-  const onSelectChange = (newSelectedRowKeys) => {
-    console.log("selectedRowKeys changed: ", newSelectedRowKeys);
-    setSelectedRowKeys(newSelectedRowKeys);
+  const showModalDetail = (e) => {
+    setShowModalDetailCustomer(true);
+    setSelectedId(e);
+  };
+
+
+  const columns = [
+    {
+      title: "Id",
+      dataIndex: "id",
+
+      render: (val) => {
+        return <a onClick={()=>{
+          showModalDetail(val);
+        }}>{val}</a>;
+      }
+    },
+    {
+      title: "Họ và Tên",
+      dataIndex: "name",
+  
+    },
+    {
+      title: "Số điện thoại",
+      dataIndex: "phone",
+    },
+    {
+      title: "Địa chỉ",
+      dataIndex: "address",
+      
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+    },
+    {
+      title: "Ngày sinh",
+      dataIndex: "dob",
+    },
+     {
+      title: "Rank",
+      dataIndex: "rank",
+      key: "rank",
+      render: (rank) => {
+        let color = "green";
+        if (rank === "Start") {
+          color = "green";
+        }
+        if (rank === "Gold") {
+          color = "gold";
+        }
+        if (rank === "Silver") {
+          color = "silver";
+        }
+        if (rank === "Diamond") {
+          color = "blue";
+        }
+        return (
+          <Tag color={color} key={rank}>
+            {rank?.toUpperCase()}
+          </Tag>
+        );
+      },
+    },
+    {
+      title: "Hình ảnh",
+      dataIndex: "image",
+      render: (image) => (
+        <Image
+          width={50}
+          src={image}
+        />
+      ),
+    }
+  ];
+
+  useEffect(() => {
+    //get list customer in here
+    const fetchListCustomer = async () => {
+      try {
+        const response = await customerApi.getCustomers();
+        console.log(response);
+        const data = await Promise.all(response.map(async (item, index) => {
+          const ward = await openAddressApi.getWardByCode(item.ward_id);
+          const district = await openAddressApi.getDistrictByCode(item.district_id);
+          const city = await openAddressApi.getProvinceByCode(item.city_id);
+          item.ward_id = ward.name;
+          item.district_id = district.name;
+          item.city_id = city.name;
+          return {
+            key: index,
+            id: item.id,
+            name: `${item.firstName} ${item.lastName}`,
+            phone: item.phone,
+            address: ` ${item?.ward_id+' /'} ${item?.district_id+' /'} ${item?.city_id}`,
+            email: item.email,
+            dob: item.dob,
+            rank: item.Rank?.nameRank,
+            image: item.image,
+          };
+        }));
+        setListCustomer(data);
+      } catch (error) {
+        console.log("Failed to fetch product list: ", error);
+      }
+    };
+    fetchListCustomer();
+  }, []);
+
+
+  const onSelectChange = (selectedId) => {
+    console.log("selectedRowKeys changed: ", selectedId);
+    setSelectedRowKeys(selectedId);
   };
   const rowSelection = {
     selectedRowKeys,
@@ -59,6 +149,17 @@ const TableCustomer = () => {
   const handleDelete = () => {
     showModal();
   };
+  
+  const handleRefresh = () => {
+    setLoading(true);
+    // ajax request after empty completing
+    setTimeout(() => {
+      setSelectedRowKeys([]);
+      setLoading(false);
+      setRefreshKey(oldKey => oldKey + 1)
+      message.success("Tải lại thành công");
+    }, 1000);
+  };
 
   //handle update customer in here ....
   const handleUpdate = () => {
@@ -67,7 +168,7 @@ const TableCustomer = () => {
     setTimeout(() => {
       setSelectedRowKeys([]);
       setLoading(false);
-    }, 1000);
+    }, 500);
   };
 
   ///
@@ -78,15 +179,28 @@ const TableCustomer = () => {
   };
   const handleOk = () => {
     setIsModalOpen(false);
+    console.log("selectedId", selectedId);
+    const fetchDeleteCustomer = async () => {
+      try {
+        const response = await customerApi.deleteCustomer(selectedId);
+        console.log(response);
+        setRefreshKey(oldKey => oldKey + 1)
+      } catch (error) {
+        console.log("Failed to fetch product list: ", error);
+      }
+    };
+    fetchDeleteCustomer();
+    setTimeout(() => {
+      message.success("Xóa thành công");
+    }, 1000);
 
-    //handle code for log out in here
-
-    ////////
   };
   const handleCancel = () => {
     setIsModalOpen(false);
   };
   /////
+
+
 
   return (
     <div>
@@ -108,12 +222,12 @@ const TableCustomer = () => {
         </Button>
         <Button
           type="primary"
-          onClick={handleUpdate}
-          disabled={!selectedOne}
+          onClick={handleRefresh}
           loading={loading}
-          icon={<ToolOutlined />}
+          icon={<ReloadOutlined />}
+          style={{ marginRight: "1rem" }}
         >
-          Cập nhật
+          Làm mới
         </Button>
         <span
           style={{
@@ -123,7 +237,16 @@ const TableCustomer = () => {
           {hasSelected ? `Selected ${selectedRowKeys.length} items` : ""}
         </span>
       </div>
-      <Table rowSelection={rowSelection} columns={columns} dataSource={data} />
+      <Table  rowSelection={
+        {
+          selectedRowKeys,
+          onChange: onSelectChange,
+          onSelect:(record) => {
+            setSelectedId(record.id)
+          }
+        }
+      } 
+      columns={columns} dataSource={listCustomer} />
       <Modal
         title="Xóa khách hàng"
         open={isModalOpen}
@@ -132,6 +255,14 @@ const TableCustomer = () => {
       >
         <p>Bạn muốn xóa khách hàng không?</p>
       </Modal>
+      {showModalDetailCustomer ? (
+        <ModelDetailCustomer
+          showModalDetailCustomer={showModalDetailCustomer}
+          setShowModalDetailCustomer={setShowModalDetailCustomer}
+          selectedId={selectedId}
+        />
+      ) : null}
+
     </div>
   );
 };

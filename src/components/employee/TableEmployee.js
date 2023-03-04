@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Button, Table, Modal } from "antd";
+import React, { useEffect,useState } from "react";
+import { Button, Table, Modal, Tag, Image } from "antd";
 import {
   SearchOutlined,
   PlusSquareFilled,
@@ -7,7 +7,16 @@ import {
   ToolOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
+import staffApi from "../../api/staffApi";
+const onClick=(e)=>{
+  console.log("evet",e)
+}
 const columns = [
+  {
+    title: "Id",
+    dataIndex: "id",
+    render: (text) => <a>{text}</a>,
+  },
   {
     title: "Họ và Tên",
     dataIndex: "name",
@@ -17,32 +26,88 @@ const columns = [
     dataIndex: "phone",
   },
   {
+    title: "Giới Tính",
+    dataIndex: "gender",
+  },
+  {
+    title: "Ngày sinh",
+    dataIndex: "dob",
+  },
+  {
     title: "Địa chỉ",
     dataIndex: "address",
   },
   {
-    title: "Chức vụ",
-    dataIndex: "chucVu",
+    title: "Email",
+    dataIndex: "email",
   },
-   {
+  {
+    title: "Chức vụ",
+    dataIndex: "position",
+    render: (position) => {
+      let color = "green";
+      if (position === "Nhân Viên") {
+        color = "green";
+      }
+      if (position === "Quản Lý") {
+        color = "blue";
+      }
+      return (
+        <Tag color={color} key={position}>
+          {position?.toUpperCase()}
+        </Tag>
+      );
+    },
+  },
+  {
     title: "Trạng thái",
     dataIndex: "status",
   },
+  {
+    title: "Người Quản Lý",
+    dataIndex: "maneger",
+  },
+  {
+    title: "Hình ảnh",
+    dataIndex: "image",
+    render: (image) => <Image width={50} src={image} />,
+  },
 ];
-const data = [];
-for (let i = 0; i < 46; i++) {
-  data.push({
-    key: i,
-    name: `Edward King ${i}`,
-    phone: "0397574636",
-    address: `London, Park Lane no. ${i}`,
-    chucVu: "Nhân viên",
-    status:"active"
-  });
-}
+
 const TableEmployee = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [listStaff, setListStaff] = useState([]);
+
+  useEffect(() => {
+    const fetchListStaff = async () => {
+      try {
+        const response = await staffApi.getStaffs();
+        console.log(response);
+        const data = response.map((item, index) => {
+          return {
+            key: index,
+            id: item.id,
+            name: `${item.firstName} ${item.lastName}`,
+            phone: item.phone,
+            gender: item.gender,
+            dob: item.dob,
+            address: ` ${item.ward_id} ${item.district_id} ${item.city_id}`,
+            email: item.email,
+            position: item.position,
+            status: item.status,
+            // maneger: `${item.Staffs[0]?.firstName} ${item.Staffs[0]?.lastName}`,
+            maneger: item.Staffs[0]?.firstName + item.Staffs[0]?.lastName,
+            image: item.image,
+          };
+        });
+        setListStaff(data);
+      } catch (error) {
+        console.log("Failed to fetch product list: ", error);
+      }
+    };
+    fetchListStaff();
+  }, []);
 
   const onSelectChange = (newSelectedRowKeys) => {
     console.log("selectedRowKeys changed: ", newSelectedRowKeys);
@@ -123,7 +188,7 @@ const TableEmployee = () => {
           {hasSelected ? `Selected ${selectedRowKeys.length} items` : ""}
         </span>
       </div>
-      <Table rowSelection={rowSelection} columns={columns} dataSource={data} />
+      <Table rowSelection={rowSelection} columns={columns} dataSource={listStaff} />
       <Modal
         title="Xóa nhân viên"
         open={isModalOpen}
