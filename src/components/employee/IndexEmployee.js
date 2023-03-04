@@ -17,6 +17,7 @@ import ModelAddEmployee from "./ModelAddEmployee";
 const { Title, Text } = Typography;
 const IndexEmployee = () => {
   const [showModalAddCustomer, setShowModalAddCustomer] = useState(false);
+  
   // //model
   // const [isModalOpen, setIsModalOpen] = useState(false);
   // const showModal = () => {

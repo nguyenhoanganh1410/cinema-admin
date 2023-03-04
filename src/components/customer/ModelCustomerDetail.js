@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { PlusOutlined,UploadOutlined } from "@ant-design/icons";
+import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import {
   Button,
   Col,
@@ -11,15 +11,17 @@ import {
   Select,
   Space,
   Upload,
-  message,
 } from "antd";
 import openAddressApi from "../../api/openApi";
 import customerApi from "../../api/customerApi";
+import moment from "moment";
+
 const { Option } = Select;
 
-const ModelAddCustomer = ({
-  showModalAddCustomer,
-  setShowModalAddCustomer,
+const ModelDetailCustomer = ({
+  showModalDetailCustomer,
+  setShowModalDetailCustomer,
+  selectedId,
 }) => {
   const [province, setProvince] = useState([]);
   const [districts, setDistricts] = useState([]);
@@ -27,11 +29,12 @@ const ModelAddCustomer = ({
   const [provincePicked, setProvincePicked] = useState(0);
   const [districtPicked, setDistrictPicked] = useState(0);
   const [wardPicked, setWardPicked] = useState(0);
+  const [customerInfo, setCustomerInfo] = useState({});
+  const [fileList, setFileList] = useState([]);
   const [form] = Form.useForm();
 
-
   const normFile = (e) => {
-    console.log('Upload event:', e);
+    console.log("Upload event:", e);
     if (Array.isArray(e)) {
       return e;
     }
@@ -57,40 +60,81 @@ const ModelAddCustomer = ({
   };
 
   const onClose = () => {
-    setShowModalAddCustomer(false);
+    setShowModalDetailCustomer(false);
   };
 
   //handle submit form create new customer...
-  const handleSubmit = async(val) => {
+  const handleSubmit = async (val) => {
     console.log("submit", val);
-    const { firstname,lastname, phone, email, address, dob, note,image } = val;
-    const date = new Date(dob?.$d).toISOString();
-    const data = new FormData();
-    data.append("firstName", firstname);
-    data.append("lastName", lastname);
-    data.append("phone", phone);
-    data.append("email", email);
-    data.append("address", address);
-    data.append("dob", date);
-    data.append("city_id", provincePicked);
-    data.append("district_id", districtPicked);
-    data.append("ward_id", wardPicked);
-    data.append("street", address);
-    data.append("note", note);
-    data.append("image", image[0].originFileObj);  
-      
-    const rs = await customerApi.createCustomer(data);
-    console.log(rs);
-    if (rs) {
-      setShowModalAddCustomer(false);
-      form.resetFields();
-      setTimeout(() => {
-        message.success("Thêm khách hàng thành công!");
-      }, 500);
-    }  
+    const { id, firstname, lastname, phone, email, address, dob, note } = val;
+    const data = {
+      firstName: firstname,
+      lastName: lastname,
+      phone: phone,
+      email: email,
+      address: address,
+      dob: dob,
+      note: note,
+      city_id: provincePicked,
+      district_id: districtPicked,
+      ward_id: wardPicked,
+      street: address,
+    };
+    try {
+      const response = await customerApi.updateCustomer(id, data);
+      console.log(response);
+      if (response) {
+        onClose();
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  
+  useEffect(() => {
+    const fetchCustomerInfo = async (id) => {
+      try {
+        const response = await customerApi.getCustomer(id);
+
+        if (response) {
+          console.log("res", response);
+          setCustomerInfo(response);
+          setProvincePicked(Number(response.city_id));
+          setDistrictPicked(Number(response.district_id));
+          setWardPicked(Number(response.ward_id));
+          console.log("file", response.image);
+          setFileList([
+            {
+              uid: "-1",
+              name: "image.png",
+              status: "done",
+              url: response.image,
+            },
+          ]);
+          form.setFieldsValue({
+            id: response.id,
+            fristname: response.firstName,
+            lastname: response.lastName,
+            phone: response.phone,
+            email: response.email,
+            dob: response.dob,
+            address: response.address,
+            province: response.province,
+            district: response.district,
+            ward: response.ward,
+            // image: response.image,
+          });
+        }
+      } catch (error) {
+        console.log("Failed to fetch conversation list: ", error);
+      }
+    };
+    fetchCustomerInfo(selectedId);
+
+  }, []);
+  console.log("customerInfo", customerInfo);
+  console.log("fileList", fileList);
+
   useEffect(() => {
     const fetchConversations = async () => {
       try {
@@ -171,78 +215,68 @@ const ModelAddCustomer = ({
     setTimeout(() => {
       onSuccess("ok");
     }, 0);
-
   };
 
+
+ 
 
   return (
     <>
       <Drawer
-        title="Tạo mới khách hàng"
+        title="Thông tin khách hàng"
         width={720}
         onClose={onClose}
-        open={showModalAddCustomer}
+        open={showModalDetailCustomer}
         bodyStyle={{
           paddingBottom: 80,
         }}
         extra={
           <Space>
             <Button onClick={onClose}>Cancel</Button>
-            <Button form="myForm" htmlType="submit"  type="primary" >
+            <Button form="myForm" htmlType="submit" type="primary">
               Submit
             </Button>
           </Space>
         }
       >
-        <Form form={form} onFinish={handleSubmit} id="myForm" layout="vertical" hideRequiredMark>
+        <Form
+          form={form}
+          onFinish={handleSubmit}
+          id="myForm"
+          layout="vertical"
+          hideRequiredMark
+        >
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item
-                name="firstname"
-                label="Họ"
-                rules={[
-                  {
-                    required: true,
-                    message: "Hãy nhập tên khách hàng...",
-                  },
-                ]}
-              >
-                <Input placeholder="Hãy nhập tên khách hàng..." />
+              <Form.Item name="id" label="ID">
+                <Input disabled={true} />
+              </Form.Item>
+            </Col>
+
+            <Col span={12}></Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="fristname" label="Họ">
+                <Input />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item
-                name="lastname"
-                label="Tên"
-                rules={[
-                  {
-                    required: true,
-                    message: "Hãy nhập tên khách hàng...",
-                  },
-                ]}
-              >
-                <Input placeholder="Hãy nhập tên khách hàng..." />
+              <Form.Item name="lastname" label="Tên">
+                <Input />
               </Form.Item>
             </Col>
             <Col span={12}></Col>
           </Row>
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item 
-                name="phone" label="Hãy nhập số điện thoại"
-                rules={[
-                  {
-                    required: true,
-                    message: "Hãy nhập số điện thoại...",
-                  },
-                ]}
-              >
-                <Input placeholder="Hãy nhập số điện thoại..." />
+              <Form.Item name="phone" label="Số điện thoại">
+                <Input />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="email" label="Hãy nhập email">
-                <Input placeholder="Hãy nhập email..." />
+              <Form.Item name="email" label="Email">
+                <Input />
               </Form.Item>
             </Col>
           </Row>
@@ -253,6 +287,7 @@ const ModelAddCustomer = ({
                 showSearch
                 placeholder="Chọn tỉnh thành"
                 optionFilterProp="children"
+                value={provincePicked}
                 onChange={onChangeProvince}
                 onSearch={onSearch}
                 style={{ width: "100%" }}
@@ -269,6 +304,7 @@ const ModelAddCustomer = ({
                 showSearch
                 placeholder="Chọn quận huyện"
                 optionFilterProp="children"
+                value={districtPicked}
                 onChange={onChangeDistrict}
                 onSearch={onSearch}
                 style={{ width: "100%" }}
@@ -288,6 +324,7 @@ const ModelAddCustomer = ({
                 placeholder="Chọn phường/xã"
                 optionFilterProp="children"
                 onChange={onChangeWard}
+                value={wardPicked}
                 onSearch={onSearch}
                 style={{ width: "100%" }}
                 filterOption={(input, option) =>
@@ -299,9 +336,7 @@ const ModelAddCustomer = ({
               />
             </Col>
             <Col span={12}>
-              <Form.Item
-                name="address"
-              >
+              <Form.Item name="address">
                 <Input
                   style={{
                     width: "100%",
@@ -311,40 +346,45 @@ const ModelAddCustomer = ({
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item
-                name="dob"
-                label="Ngày sinh"
-              >
+              <Form.Item name="dob" label="Ngày sinh" valuePropName="date">
                 <DatePicker
+                  value={moment(customerInfo?.dob)}
                   style={{
                     width: "100%",
                   }}
                   format="YYYY-MM-DD"
-                  />
+                />
               </Form.Item>
             </Col>
             <Col span={12}>
-            <Form.Item
-              name="image"
-              label="Hình ảnh"
-              valuePropName="fileList"
-              getValueFromEvent={normFile}
-              extra="Chỉ chấp nhận file ảnh"
-              type="file"
-            >
-              <Upload name="logo" customRequest={dummyRequest}
-                 listType="picture" maxCount={1} accept=".jpg,.jpeg,.png"
+              <Form.Item
+                name="image"
+                label="Hình ảnh"
+                valuePropName="fileList"
+                getValueFromEvent={normFile}
+                extra="Chỉ chấp nhận file ảnh"
+                type="file"
               >
-                <Button  icon={<UploadOutlined />}>Click to upload</Button>
-              </Upload>
-            </Form.Item>
+                <Upload
+                  name="logo"
+                  customRequest={dummyRequest}
+                  listType="picture"
+                  maxCount={1}
+                  accept=".jpg,.jpeg,.png"
+                  fileList={fileList}
+
+                  
+                >
+                  <Button icon={<UploadOutlined />}>Click to upload</Button>
+                </Upload>
+              </Form.Item>
             </Col>
             <Col span={12}></Col>
           </Row>
 
           <Row style={{ marginTop: "16px" }} gutter={16}>
             <Col span={24}>
-              <Form.Item name="note" label="Ghi chú">
+              <Form.Item name="description" label="Ghi chú">
                 <Input.TextArea rows={4} placeholder="Nhập ghi chú..." />
               </Form.Item>
             </Col>
@@ -354,4 +394,4 @@ const ModelAddCustomer = ({
     </>
   );
 };
-export default ModelAddCustomer;
+export default ModelDetailCustomer;
