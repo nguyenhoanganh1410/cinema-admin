@@ -122,9 +122,6 @@ const items = [
     getItem("Tài khoản", "16"),
     getItem("Thu chi", "17"),
   ]),
-  // getItem("Quản lý nhân viên", "15", <UserOutlined />),
-  // getItem("Quản lý tài khoản", "16", <DesktopOutlined />),
-  // getItem("Quản lý thu chi", "17", <DesktopOutlined />),
   getItem("Thống kê", "18", <PieChartOutlined />),
 ];
 const HomePage = () => {
@@ -140,8 +137,6 @@ const HomePage = () => {
     setIsModalOpen(false);
     handleLogout();
     //handle code for log out in here
-
-    ////////
   };
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -173,7 +168,6 @@ const HomePage = () => {
   }
 
   const onClickMenuUser = (info) => {
-    //console.log(info);
     //if user click logout
     if (info.key === "logout") {
       //show model
@@ -183,7 +177,7 @@ const HomePage = () => {
     }
   };
 
-  //// console.log("home page");
+  // console.log("home page");
   const RenderHome = () => {
     console.log(itemClicked);
     if (itemClicked === 1) {
@@ -198,7 +192,6 @@ const HomePage = () => {
     } else if (itemClicked === 4) {
       return <IndexRouter />;
     } else if (itemClicked === 100) {
-      //info user
       return <UserInfo />;
     } else if (itemClicked === 19) {
       return <IndexRoutePro />;

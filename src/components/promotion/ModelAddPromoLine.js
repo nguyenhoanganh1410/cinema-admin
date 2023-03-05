@@ -7,6 +7,7 @@ import {
   Drawer,
   Form,
   Input,
+  InputNumber,
   Modal,
   Radio,
   Row,
@@ -16,14 +17,57 @@ import {
   Upload,
 } from "antd";
 
-import { PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
+import ProductPromotion from "./ProductPromotion";
+import MoneyPromotion from "./MoneyPromotion";
+import PercentPromotion from "./PercentPromotion";
 
 const { Option } = Select;
+
+const getBase64 = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
+  });
 
 const ModelAddPromoLine = ({
   showModalAddCustomer,
   setShowModalAddCustomer,
 }) => {
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewImage, setPreviewImage] = useState("");
+  const [previewTitle, setPreviewTitle] = useState("");
+  const [fileList, setFileList] = useState([]);
+
+  const [type, setType] = useState(1);
+
+  const handleCancel = () => setPreviewOpen(false);
+  const handlePreview = async (file) => {
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj);
+    }
+    setPreviewImage(file.url || file.preview);
+    setPreviewOpen(true);
+    setPreviewTitle(
+      file.name || file.url.substring(file.url.lastIndexOf("/") + 1)
+    );
+  };
+  const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
+  const uploadButton = (
+    <div>
+      <PlusOutlined />
+      <div
+        style={{
+          marginTop: 8,
+        }}
+      >
+        Upload
+      </div>
+    </div>
+  );
+
   const onSearch = (value) => {
     console.log("search:", value);
   };
@@ -38,18 +82,31 @@ const ModelAddPromoLine = ({
   };
 
   //change position
-  const handleChangePosition = (value) => {
-    console.log(`selected ${value}`);
+  const handleChangeTypePro = (value) => {
+    setType(+value);
   };
 
   //choise date start worling
   const onChangeDate = (date, dateString) => {
     console.log(date, dateString);
   };
+
+  const RenderType = () => {
+    switch (type) {
+      case 1:
+        return <MoneyPromotion />;
+      case 2:
+        return <ProductPromotion />;
+      case 3:
+        return <PercentPromotion />;
+      default:
+        return <PercentPromotion />;
+    }
+  };
   return (
     <>
       <Drawer
-        title="Thêm khuyến mãi"
+        title="Thêm chi tiết khuyễn mãi"
         width={720}
         onClose={onClose}
         open={showModalAddCustomer}
@@ -69,29 +126,54 @@ const ModelAddPromoLine = ({
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                name="category"
-                label="Chọn phim"
+                name=""
+                label="Mã Code"
                 rules={[
                   {
                     required: true,
-                    message: "Hãy chọn bộ phim...",
+                    message: "Hãy nhập mã code...",
+                  },
+                ]}
+              >
+                <Input placeholder="Hãy nhập mã code.." />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="note" label="Ghi chú">
+                <Input.TextArea rows={4} placeholder="Nhập ghi chú..." />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="category"
+                label="Chọn loại khuyến mãi "
+                rules={[
+                  {
+                    required: true,
+                    message: "Hãy chọn loại khuyến mãi...",
                   },
                 ]}
               >
                 <Select
-                  placeholder="Chọn phim"
+                  placeholder="Chọn loại KM"
                   style={{
                     width: "100%",
                   }}
-                  // onChange={handleChangePosition}
+                  onChange={handleChangeTypePro}
                   options={[
                     {
-                      value: "film01",
-                      label: "Hành động hay",
+                      value: "1",
+                      label: "Khuyến mãi tặng tiền",
                     },
                     {
-                      value: "film02",
-                      label: "Người sói 2",
+                      value: "2",
+                      label: "Khuyễn mãi tặng đồ",
+                    },
+                    {
+                      value: "3",
+                      label: "Khuyễn mãi phần trăm",
                     },
                   ]}
                 />
@@ -99,29 +181,29 @@ const ModelAddPromoLine = ({
             </Col>
             <Col span={12}>
               <Form.Item
-                name="category"
-                label="Chọn phòng chiếu"
+                name="status"
+                label="Chọn trạng thái"
                 rules={[
                   {
                     required: true,
-                    message: "Hãy chọn phòng chiếu...",
+                    message: "Hãy chọn trạng thái...",
                   },
                 ]}
               >
                 <Select
-                  placeholder="Chọn phòng chiếu"
+                  placeholder="Chọn trạng thái"
                   style={{
                     width: "100%",
                   }}
                   // onChange={handleChangePosition}
                   options={[
                     {
-                      value: "room012D",
-                      label: "room01-2D",
+                      value: "1",
+                      label: "Họat động",
                     },
                     {
-                      value: "room023D",
-                      label: "room02-3D",
+                      value: "2",
+                      label: "Hết hạn",
                     },
                   ]}
                 />
@@ -132,46 +214,120 @@ const ModelAddPromoLine = ({
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                name="releaseDate"
-                label="Ngày chiếu"
+                name=""
+                label="Số lượng trên ngày"
                 rules={[
                   {
                     required: true,
-                    message: "Hãy chọn ngày chiếu bộ phim...",
+                    message: "Nhập số lần được sử dụng trên ngày...",
+                  },
+                ]}
+              >
+                <InputNumber
+                  style={{ width: "100%" }}
+                  min={1}
+                  max={10}
+                  defaultValue={1}
+                  placeholder="Nhập số lần được sử dụng trên ngày.."
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name=""
+                label="Số lượng trên khách hàng"
+                rules={[
+                  {
+                    required: true,
+                    message: "Nhập số lần được sử dụng trên KH...",
+                  },
+                ]}
+              >
+                <InputNumber
+                  style={{ width: "100%" }}
+                  min={1}
+                  max={10}
+                  defaultValue={1}
+                  placeholder="Nhập số lần được sử dụng trên KH..."
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="releaseDate"
+                label="Ngày bắt đầu"
+                rules={[
+                  {
+                    required: true,
+                    message: "Hãy chọn ngày bắt đầu...",
                   },
                 ]}
               >
                 <DatePicker
                   onChange={onChangeDate}
                   style={{ width: "100%" }}
-                  placeholder="Chọn ngày chiếu"
+                  placeholder="Chọn ngày bắt đầu"
                 />
               </Form.Item>
             </Col>
-            <Col
-              span={12}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
+            <Col span={12} style={{}}>
               <Form.Item
-                name="date"
-                label="Chọn khung giờ"
+                name="releaseDate"
+                label="Ngày kết thúc"
                 rules={[
                   {
                     required: true,
-                    message: "Hãy chọn khung giờ bộ phim...",
+                    message: "Hãy chọn ngày kết thúc...",
                   },
                 ]}
               >
-                <TimePicker.RangePicker style={{ width: "100%" }} />
+                <DatePicker
+                  onChange={onChangeDate}
+                  style={{ width: "100%" }}
+                  placeholder="Chọn ngày kết thúc"
+                />
               </Form.Item>
-              {/* <Radio>Khung giờ trống</Radio> */}
+            </Col>
+          </Row>
+          <Row>
+            <Col span={12}>
+              <Form.Item
+                name="image"
+                label="Hình ảnh"
+                valuePropName="fileList"
+                extra="Chỉ chấp nhận file ảnh"
+                type="file"
+              >
+                <Upload
+                  action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                  listType="picture-card"
+                  fileList={fileList}
+                  onPreview={handlePreview}
+                  onChange={handleChange}
+                >
+                  {fileList.length >= 1 ? null : uploadButton}
+                </Upload>
+                <Modal
+                  open={previewOpen}
+                  title={previewTitle}
+                  footer={null}
+                  onCancel={handleCancel}
+                >
+                  <img
+                    alt="example"
+                    style={{
+                      width: "100%",
+                    }}
+                    src={previewImage}
+                  />
+                </Modal>
+              </Form.Item>
             </Col>
           </Row>
         </Form>
+        <RenderType />
       </Drawer>
     </>
   );

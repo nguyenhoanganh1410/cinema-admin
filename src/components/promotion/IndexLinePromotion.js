@@ -87,6 +87,8 @@ const IndexLinePromotion = () => {
   const [promotionHeader, setPromotionHeader] = useState(null);
   const idHeaderPromotion = useSelector((state) => state.promotionHeaderId);
 
+  const [form] = Form.useForm();
+
   const handleCancel = () => setPreviewOpen(false);
   const handlePreview = async (file) => {
     if (!file.url && !file.preview) {
@@ -132,17 +134,20 @@ const IndexLinePromotion = () => {
       try {
         const response = await promotionApi.getPromotionLineByHeader(id);
 
-        console.log(response);
-        //set user info
         if (response) {
           //handle data
-          setPromotionLine(response);
+          const newList = response.map((item) => {
+            item.startDate = item.startDate.substring(0, 10);
+            item.endDate = item.endDate.substring(0, 10);
+
+            return item;
+          });
+          setPromotionLine(newList);
         }
       } catch (error) {
         console.log("Failed to login ", error);
       }
     };
-    getPromotionLineByHeader(idHeaderPromotion);
 
     //load movies
     const getPromotionHeaderById = async (id) => {
@@ -153,6 +158,9 @@ const IndexLinePromotion = () => {
         //set user info
         if (response) {
           //handle data
+          form.setFieldsValue({
+            promotionName: response.namePromotion,
+          });
           setPromotionHeader(response);
         }
       } catch (error) {
@@ -161,7 +169,7 @@ const IndexLinePromotion = () => {
     };
     getPromotionLineByHeader(idHeaderPromotion);
     getPromotionHeaderById(idHeaderPromotion);
-  }, []);
+  }, [idHeaderPromotion]);
 
   return (
     <div className="site-card-wrapper" style={{ minWidth: "100vh" }}>
@@ -182,12 +190,11 @@ const IndexLinePromotion = () => {
           marginBottom: "1rem",
         }}
         layout="vertical"
-        hideRequiredMark
       >
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              name="name"
+              name="promotionName"
               label="Tên CT Khuyến mãi"
               rules={[
                 {
@@ -196,10 +203,7 @@ const IndexLinePromotion = () => {
                 },
               ]}
             >
-              <Input
-                placeholder="Hãy nhập tên CT khuyến mãi..."
-                value={promotionHeader?.namePromotion}
-              />
+              <Input placeholder="Hãy nhập tên CT khuyến mãi..." />
             </Form.Item>
           </Col>
           <Col span={12}>
@@ -217,6 +221,7 @@ const IndexLinePromotion = () => {
                 onChange={onChangeDate}
                 style={{ width: "100%" }}
                 placeholder="Chọn ngày bắt đầu"
+                name="startDate"
               />
             </Form.Item>
           </Col>
@@ -235,7 +240,7 @@ const IndexLinePromotion = () => {
                 rows={4}
                 placeholder="Nhập chi tiết CTKM"
                 maxLength={6}
-                value={promotionHeader?.desc}
+                name="desc"
               />
             </Form.Item>
           </Col>
@@ -254,6 +259,7 @@ const IndexLinePromotion = () => {
                 onChange={onChangeDate}
                 style={{ width: "100%" }}
                 placeholder="Chọn ngày kết thúc"
+                name="endDate"
               />
             </Form.Item>
           </Col>
@@ -276,6 +282,7 @@ const IndexLinePromotion = () => {
                 style={{
                   width: "100%",
                 }}
+                name="status"
                 onChange={handleChangePosition}
                 options={[
                   {
@@ -322,9 +329,11 @@ const IndexLinePromotion = () => {
         </Row>
         <Row style={{ marginTop: "1rem" }}>
           <Col span={4}>
-            <Button type="primary" style={{ marginRight: "1rem" }}>
-              Cập nhật
-            </Button>
+            <Form.Item style={{ marginRight: "1rem" }}>
+              <Button type="primary" htmlType="submit">
+                Cập nhật
+              </Button>
+            </Form.Item>
           </Col>
         </Row>
       </Form>

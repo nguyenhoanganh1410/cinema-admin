@@ -102,7 +102,6 @@ const ModelDetailCustomer = ({
           setProvincePicked(Number(response.city_id));
           setDistrictPicked(Number(response.district_id));
           setWardPicked(Number(response.ward_id));
-          console.log("file", response.image);
           setFileList([
             {
               uid: "-1",
@@ -130,7 +129,6 @@ const ModelDetailCustomer = ({
       }
     };
     fetchCustomerInfo(selectedId);
-
   }, []);
   console.log("customerInfo", customerInfo);
   console.log("fileList", fileList);
@@ -216,9 +214,6 @@ const ModelDetailCustomer = ({
       onSuccess("ok");
     }, 0);
   };
-
-
- 
 
   return (
     <>
@@ -372,8 +367,6 @@ const ModelDetailCustomer = ({
                   maxCount={1}
                   accept=".jpg,.jpeg,.png"
                   fileList={fileList}
-
-                  
                 >
                   <Button icon={<UploadOutlined />}>Click to upload</Button>
                 </Upload>
