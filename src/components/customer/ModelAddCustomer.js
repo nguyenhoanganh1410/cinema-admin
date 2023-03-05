@@ -27,6 +27,7 @@ const ModelAddCustomer = ({
   const [provincePicked, setProvincePicked] = useState(0);
   const [districtPicked, setDistrictPicked] = useState(0);
   const [wardPicked, setWardPicked] = useState(0);
+  const [isExistPhone, setIsExistPhone] = useState(true);
   const [form] = Form.useForm();
 
 
@@ -60,6 +61,25 @@ const ModelAddCustomer = ({
     setShowModalAddCustomer(false);
   };
 
+  const onChangePhone = async(e) => {
+    console.log("phone:", e.target.value);
+    const phone = e.target.value;
+    if (phone.length === 10) {
+      const rs = await customerApi.getCustomerByPhone(phone);
+      console.log(rs);
+      if (rs.data !== null) {
+        setIsExistPhone(false);
+        console.log("exist");
+        message.error("Số điện thoại đã tồn tại!");
+      }else{
+        setIsExistPhone(true);
+        console.log("not exist");
+      }
+      
+    }
+
+  };
+
   //handle submit form create new customer...
   const handleSubmit = async(val) => {
     console.log("submit", val);
@@ -77,8 +97,10 @@ const ModelAddCustomer = ({
     data.append("ward_id", wardPicked);
     data.append("street", address);
     data.append("note", note);
-    data.append("image", image[0].originFileObj);  
-      
+    
+    if(image){
+      data.append("image", image[0].originFileObj);  
+    }
     const rs = await customerApi.createCustomer(data);
     console.log(rs);
     if (rs) {
@@ -174,6 +196,19 @@ const ModelAddCustomer = ({
 
   };
 
+  useEffect(()=>{
+    form.validateFields(['phone'])
+  },[isExistPhone])
+
+  const validateEmail = ( value) => {
+    if (value) {
+      const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
+      if (!emailRegex.test(value)) {
+        return Promise.reject("Email không hợp lệ!");
+      }
+    }
+    return Promise.resolve();
+  };
 
   return (
     <>
@@ -203,7 +238,7 @@ const ModelAddCustomer = ({
                 rules={[
                   {
                     required: true,
-                    message: "Hãy nhập tên khách hàng...",
+                   
                   },
                 ]}
               >
@@ -230,18 +265,37 @@ const ModelAddCustomer = ({
             <Col span={12}>
               <Form.Item 
                 name="phone" label="Hãy nhập số điện thoại"
+                hasFeedback
+                
                 rules={[
-                  {
-                    required: true,
-                    message: "Hãy nhập số điện thoại...",
-                  },
+                  ({getFieldValue}) => ({
+                    validator(rule, value) {
+                      if(value !== undefined && value.length < 10 ){
+                        return Promise.reject('Số điện thoại phải có 10 số');
+                      }else if(isExistPhone === false){
+                        return Promise.reject('Số điện thoại đã tồn tại');
+                      }
+                      return Promise.resolve();
+                    }
+                  }),
                 ]}
               >
-                <Input placeholder="Hãy nhập số điện thoại..." />
+                <Input onChange={onChangePhone} placeholder="Hãy nhập số điện thoại..."  />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="email" label="Hãy nhập email">
+              <Form.Item name="email" label="Hãy nhập email"
+                rules={[
+                  ({getFieldValue}) => ({
+                    validator(rule, value) {
+                      if(value !== undefined && value.length < 1){
+                        return Promise.reject('Email không hợp lệ');
+                      }
+                      return Promise.resolve();
+                    }
+                  }),
+                ]}
+              >
                 <Input placeholder="Hãy nhập email..." />
               </Form.Item>
             </Col>

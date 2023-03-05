@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Table, Modal, Select } from "antd";
+import { Button, Table, Modal, Select,Badge } from "antd";
 import {
   SearchOutlined,
   PlusSquareFilled,
@@ -8,48 +8,57 @@ import {
   DeleteOutlined,
 } from "@ant-design/icons";
 import showApi from "../../api/showApi";
-const columns = [
-  {
-    title: "Bộ phim",
-    dataIndex: "filmShow",
-  },
-  {
-    title: "Ngày chiếu",
-    dataIndex: "dateShow",
-  },
-  {
-    title: "Giờ chiếu",
-    dataIndex: "timeShow",
-  },
-  {
-    title: "Chi nhánh",
-    dataIndex: "locationShow",
-  },
-  {
-    title: "Phòng chiếu",
-    dataIndex: "roomShow",
-  },
-  {
-    title: "Trạng thái",
-    dataIndex: "status",
-  },
-];
-const data = [];
-for (let i = 0; i < 46; i++) {
-  data.push({
-    key: i,
-    filmShow: `Edward King ${i}`,
-    dateShow: "30/01/2023",
-    timeShow: "10h-12h",
-    locationShow: "Cinema Võ Văn Ngân",
-    roomShow: "Room 3D",
-    status: "Chưa công chiếu",
-  });
-}
+
 const TableShows = ({ setShowModalAddCustomer, setTab }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [listShow, setListShow] = useState([]);
+
+  const columns = [
+    {
+      title: "Id",
+      dataIndex: "id",
+    },
+    {
+      title: "Bộ phim",
+      dataIndex: "filmShow",
+    },
+    {
+      title: "Ngày chiếu",
+      dataIndex: "dateShow",
+    },
+    {
+      title: "Giờ chiếu",
+      dataIndex: "timeShow",
+    },
+    {
+      title: "Phòng chiếu",
+      dataIndex: "roomShow",
+    },
+    {
+      title: "Chi nhánh",
+      dataIndex: "locationShow",
+    },
+    {
+      title: "Trạng thái",
+      dataIndex: "status",
+      render: (val) => {
+        let color = "";
+        if(val === "Đang chiếu"){
+          color = "green";
+        }else if(val === "Sắp chiếu"){
+          color = "blue";
+        }else if(val === "Đã kết thúc"){
+          color = "red";
+        }
+        return (
+          <Badge color={color} text={val} />
+        );
+      }
+    },
+  ];
+
+
 
   const onSelectChange = (newSelectedRowKeys) => {
     console.log("selectedRowKeys changed: ", newSelectedRowKeys);
@@ -112,7 +121,30 @@ const TableShows = ({ setShowModalAddCustomer, setTab }) => {
         console.log(response);
         //set user info
         if (response) {
-          setListShow(response);
+          const data = response.map((item, index) => {
+            let statusName = "";
+            if (item.status === 1) {
+              statusName = "Đang chiếu";
+            } else if (item.status === 2) {
+              statusName = "Sắp chiếu";
+            } else if (item.status === 3) {
+              statusName = "Đã kết thúc";
+            }
+            return{
+              key: index,
+              id: item.id,
+              filmShow: item.Movie.nameMovie,
+              dateShow: item.showDate.substring(0, 10),
+              timeShow: `${item.showTime} - ${item.endTime}`,
+              locationShow: item.Cinema.name,
+              roomShow: item.CinemaHall.name,
+              status: statusName,
+
+            }
+
+          });
+
+          setListShow(data);
         }
       } catch (error) {
         console.log("Failed to login ", error);
@@ -230,7 +262,7 @@ const TableShows = ({ setShowModalAddCustomer, setTab }) => {
           />
         </div>
       </div>
-      <Table rowSelection={rowSelection} columns={columns} dataSource={data} />
+      <Table rowSelection={rowSelection} columns={columns} dataSource={listShow} />
       <Modal
         title="Xóa bộ phim"
         open={isModalOpen}

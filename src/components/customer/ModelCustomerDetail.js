@@ -7,6 +7,7 @@ import {
   Drawer,
   Form,
   Input,
+  message,
   Row,
   Select,
   Space,
@@ -32,6 +33,7 @@ const ModelDetailCustomer = ({
   const [customerInfo, setCustomerInfo] = useState({});
   const [fileList, setFileList] = useState([]);
   const [form] = Form.useForm();
+  const [image, setImage] = useState("");
 
   const normFile = (e) => {
     console.log("Upload event:", e);
@@ -63,28 +65,47 @@ const ModelDetailCustomer = ({
     setShowModalDetailCustomer(false);
   };
 
-  //handle submit form create new customer...
   const handleSubmit = async (val) => {
     console.log("submit", val);
-    const { id, firstname, lastname, phone, email, address, dob, note } = val;
-    const data = {
-      firstName: firstname,
-      lastName: lastname,
-      phone: phone,
-      email: email,
-      address: address,
-      dob: dob,
-      note: note,
-      city_id: provincePicked,
-      district_id: districtPicked,
-      ward_id: wardPicked,
-      street: address,
-    };
+    const { id, firstName, lastname, phone, email, address, dob, note,image } = val;
+    const data = new FormData();
+    data.append("firstName", firstName);
+    data.append("lastName", lastname);
+    data.append("phone", phone);
+    data.append("email", email);
+    data.append("address", address);
+    data.append("dob", dob);
+    data.append("note", note);
+    data.append("city_id", provincePicked);
+    data.append("district_id", districtPicked);
+    data.append("ward_id", wardPicked);
+    data.append("street", address);
+    console.log("data", image);
+    if(image){
+      data.append("image", image[0].originFileObj);
+    }
+
+    // const data = {
+    //   firstName: firstName,
+    //   lastName: lastname,
+    //   phone: phone,
+    //   email: email,
+    //   address: address,
+    //   dob: dob,
+    //   note: note,
+    //   city_id: provincePicked,
+    //   district_id: districtPicked,
+    //   ward_id: wardPicked,
+    //   street: address,
+    // };
     try {
       const response = await customerApi.updateCustomer(id, data);
       console.log(response);
       if (response) {
         onClose();
+        setTimeout(() => {
+          message.success("Cập nhật thành công");
+        }, 1000);
       }
     } catch (error) {
       console.log(error);
@@ -102,18 +123,12 @@ const ModelDetailCustomer = ({
           setProvincePicked(Number(response.city_id));
           setDistrictPicked(Number(response.district_id));
           setWardPicked(Number(response.ward_id));
+          setImage(response.image);
           console.log("file", response.image);
-          setFileList([
-            {
-              uid: "-1",
-              name: "image.png",
-              status: "done",
-              url: response.image,
-            },
-          ]);
+          
           form.setFieldsValue({
             id: response.id,
-            fristname: response.firstName,
+            firstName: response.firstName,
             lastname: response.lastName,
             phone: response.phone,
             email: response.email,
@@ -122,7 +137,14 @@ const ModelDetailCustomer = ({
             province: response.province,
             district: response.district,
             ward: response.ward,
-            // image: response.image,
+            image: [
+              {
+                uid: "-1",
+                name: response.image,
+                status: "done",
+                url: response?.image,
+              },
+            ]
           });
         }
       } catch (error) {
@@ -212,6 +234,7 @@ const ModelDetailCustomer = ({
   }, [districtPicked]);
 
   const dummyRequest = ({ file, onSuccess }) => {
+    setImage(file);
     setTimeout(() => {
       onSuccess("ok");
     }, 0);
@@ -244,7 +267,6 @@ const ModelDetailCustomer = ({
           onFinish={handleSubmit}
           id="myForm"
           layout="vertical"
-          hideRequiredMark
         >
           <Row gutter={16}>
             <Col span={12}>
@@ -257,7 +279,7 @@ const ModelDetailCustomer = ({
           </Row>
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item name="fristname" label="Họ">
+              <Form.Item name="firstName" label="Họ">
                 <Input />
               </Form.Item>
             </Col>
@@ -366,12 +388,11 @@ const ModelDetailCustomer = ({
                 type="file"
               >
                 <Upload
-                  name="logo"
+                  name="image"
                   customRequest={dummyRequest}
                   listType="picture"
                   maxCount={1}
                   accept=".jpg,.jpeg,.png"
-                  fileList={fileList}
 
                   
                 >

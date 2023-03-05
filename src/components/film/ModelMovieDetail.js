@@ -21,6 +21,7 @@ import categoryMovie from "../../api/categoryMovie";
 import { fimlValidator } from "./FilmSchema";
 import cinameApi from "../../api/cinemaApi";
 import movieApi from "../../api/movieApi";
+import moment from "moment";
 const { Option } = Select;
 
 const getBase64 = (file) =>
@@ -31,7 +32,7 @@ const getBase64 = (file) =>
     reader.onerror = (error) => reject(error);
   });
 
-const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
+const ModelDetailMovie = ({ showModalDetailMovie, setShowModalDetailMovie,selectedId }) => {
   const [listCategory, setListCategory] = useState([]);
   const [listCinema, setListCinema] = useState([]);
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -57,6 +58,8 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
   const [endDate, setEndDate] = useState("");
   const [status, setStatus] = useState("");
   const [image, setImage] = useState("");
+  const [movieInfo, setMovieInfo] = useState({});
+  const [form] = Form.useForm();
 
   const handleCancel = () => setPreviewOpen(false);
   const handlePreview = async (file) => {
@@ -94,7 +97,7 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
   };
 
   const onClose = () => {
-    setShowModalAddCustomer(false);
+    setShowModalDetailMovie(false);
   };
 
   //change position
@@ -124,35 +127,94 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
     setStatus(value);
   };
 
+  useEffect(() => {
+    const fetchMovieInfo = async () => {
+      const response = await movieApi.getMovieById(selectedId);
+      console.log(response);
+      setMovieInfo(response);
+      setNameMovie(response.nameMovie);
+      setCast(response.cast);
+      setDirector(response.director);
+      setLinkTrailer(response.linkTrailer);
+      setCategory(response.idCategoryMovie);
+      setTime(response.duration);
+      setReleaseDate(response.releaseDate);
+      setDesc(response.desc);
+      setClassify(response.classify);
+      setEndDate(response.endDate);
+      setStatus(response.status);
+      setImage(response.image);
+      form.setFieldsValue({
+        id: response.id,
+        nameMovie: response.nameMovie,
+        cast: response.cast,
+        director: response.director,
+        linkTrailer: response.linkTrailer,
+        category: response.idCategoryMovie,
+        time: response.duration,
+        releaseDate: moment(response.releaseDate),
+        desc: response.desc,
+        classify: response.classify,
+        endDate: moment(response.endDate),
+        status: response.status,
+        cinema:response.idCinema,
+        image: [{
+          uid: "-1",
+          name: "image.png",
+          status: "done",
+          url: response?.image,
+        }]
+      });
+    };
+    fetchMovieInfo();
+  }, []);
+
 
 
 
 
   const handleSubmit = async() => {
     //call api create a new movie
-    const data = new FormData();
-    data.append("nameMovie", nameMovie);
-    data.append("cast", cast);
-    data.append("director", director);
-    data.append("linkTrailer", linkTrailer);
-    data.append("idCategoryMovie", category);
-    data.append("duration", time);
-    data.append("releaseDate", releaseDate);
-    data.append("idCinema", 1);
-    data.append("desc", desc);
-    data.append("classify", classify);
-    data.append("endDate", endDate);
-    data.append("status", status);
-    console.log(image);
-    if(image){
-      data.append("image", image);
-    }
-    const rs = await movieApi.createMovie(data);
+    // const data = new FormData();
+    // data.append("nameMovie", nameMovie);
+    // data.append("cast", cast);
+    // data.append("director", director);
+    // data.append("linkTrailer", linkTrailer);
+    // data.append("idCategoryMovie", category);
+    // data.append("duration", time);
+    // data.append("releaseDate", releaseDate);
+    // data.append("idCinema", 1);
+    // data.append("desc", desc);
+    // data.append("classify", classify);
+    // data.append("endDate", endDate);
+    // data.append("status", status);
+    // if(image){
+    //   data.append("image", image);
+    // }
+
+    
+    const data = {
+      nameMovie: nameMovie,
+      cast: cast,
+      director: director,
+      linkTrailer: linkTrailer,
+      idCategoryMovie: category,
+      duration: time,
+      releaseDate: releaseDate,
+      idCinema: 1,
+      desc: desc,
+      classify: classify,
+      endDate: endDate,
+      status: status,
+      image: image,
+    };
+    console.log(data);
+    const rs = await movieApi.updateMovie(selectedId,data);
     console.log(rs);
     if(rs){
-      setShowModalAddCustomer(false);
+      setShowModalDetailMovie(false);
       setTimeout(() => {
-        message.success("Thêm phim thành công");
+        message.success("Cập nhật phim thành công");
       }, 500);
     }
   };
@@ -215,13 +277,14 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
 
   };
 
+
   return (
     <>
       <Drawer
         title="Thêm bộ phim"
         width={720}
         onClose={onClose}
-        open={showModalAddCustomer}
+        open={showModalDetailMovie}
         bodyStyle={{
           paddingBottom: 80,
         }}
@@ -234,12 +297,20 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
           </Space>
         }
       >
-        <Form layout="vertical" hideRequiredMark>
+        <Form form={form} layout="vertical" hideRequiredMark>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="id" label="ID" >
+                <Input disabled={true}  />
+              </Form.Item>
+            </Col>
+          </Row>
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                name="name"
+                name="nameMovie"
                 label="Tên bộ phim"
+                
                 rules={[
                   {
                     required: true,
@@ -250,6 +321,7 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
                 <Input
                   onChange={(e) => setNameMovie(e.target.value)}
                   placeholder="Hãy nhập tên bộ phim..."
+                  
                 />
               </Form.Item>
             </Col>
@@ -370,6 +442,7 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
                   onChange={onChangeDate}
                   style={{ width: "100%" }}
                   placeholder="Chọn ngày phát hành"
+                  value={moment(movieInfo?.releaseDate)}
                 />
               </Form.Item>
             </Col>
@@ -388,6 +461,7 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
                   onChange={onChangeEndDate}
                   style={{ width: "100%" }}
                   placeholder="Chọn ngày kết thúc"
+                  value={moment(movieInfo?.endDate)}
                 />
               </Form.Item>
             </Col>
@@ -395,7 +469,7 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
           <Row style={{ marginBottom: "26px" }} gutter={16}>
             <Col span={12}>
               <Form.Item
-                name="daoDien"
+                name="director"
                 label="Đạo diễn"
                 rules={[
                   {
@@ -412,7 +486,7 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
             </Col>
             <Col span={12}>
               <Form.Item
-                name="dienVien"
+                name="cast"
                 label="Diễn viên"
                 rules={[
                   {
@@ -431,7 +505,7 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
           <Row style={{ marginBottom: "26px" }} gutter={16}>
             <Col span={12}>
               <Form.Item
-                name="link"
+                name="linkTrailer"
                 label="Link trailer"
                 rules={[
                   {
@@ -448,7 +522,7 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
             </Col>
             <Col span={12}>
               <Form.Item
-                name="chonRap"
+                name="cinema"
                 label="Chọn rạp"
                 rules={[
                   {
@@ -522,7 +596,7 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
           </Row>
           <Row style={{ marginTop: "16px" }} gutter={16}>
             <Col span={24}>
-              <Form.Item name="description" label="Miêu tả">
+              <Form.Item name="desc" label="Miêu tả">
                 <Input.TextArea
                   onChange={(e) => setDesc(e.target.value)}
                   rows={4}
@@ -538,4 +612,4 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
     </>
   );
 };
-export default ModelAddFilm;
+export default ModelDetailMovie;

@@ -21,8 +21,16 @@ const customerApi = {
         return axiosApi.delete(`/customer/${id}`);
     },
     updateCustomer: (id, data) => {
-        return axiosApi.put(`/customer/${id}`, data);
-    }
+        return axiosApi.put(`/customer/${id}`, data,{
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+    },
+
+    getCustomerByPhone: (phone) => {
+        return axiosApi.get(`/customer/phone/${phone}`);
+    },
 };
 
 export default customerApi;

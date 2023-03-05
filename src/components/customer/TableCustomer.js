@@ -131,7 +131,7 @@ const TableCustomer = () => {
       }
     };
     fetchListCustomer();
-  }, []);
+  }, [refreshKey]);
 
 
   const onSelectChange = (selectedId) => {

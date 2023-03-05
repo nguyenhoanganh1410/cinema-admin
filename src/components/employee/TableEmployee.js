@@ -26,8 +26,8 @@ const columns = [
     dataIndex: "phone",
   },
   {
-    title: "Giới Tính",
-    dataIndex: "gender",
+    title: "Giới tính",
+    dataIndex:"gender",
   },
   {
     title: "Ngày sinh",

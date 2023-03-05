@@ -43,6 +43,22 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
   const onChangeDate = (date, dateString) => {
     console.log(date, dateString);
   };
+
+  useEffect(() => {
+    //load movies
+    const getMovies = async () => {
+      try {
+        // const response = await moviesApi.getAll();
+        // setMovies(response.data);
+      } catch (error) {
+        console.log("Failed to fetch movies list: ", error);
+      }
+    };
+  }, []);
+
+
+
+
   return (
     <>
       <Drawer
