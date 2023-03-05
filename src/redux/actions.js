@@ -11,3 +11,10 @@ export const setPromotionHeader = (data) => {
     payload: data,
   };
 };
+
+export const setReload = (data) => {
+  return {
+    type: "reload/reloadWhenAdd",
+    payload: data,
+  };
+};

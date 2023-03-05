@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { PlusOutlined,UploadOutlined } from "@ant-design/icons";
+import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import {
   Button,
   Col,
@@ -15,12 +15,17 @@ import {
 } from "antd";
 import openAddressApi from "../../api/openApi";
 import customerApi from "../../api/customerApi";
+import { useDispatch, useSelector } from "react-redux";
+import { setReload } from "../../redux/actions";
 const { Option } = Select;
 
 const ModelAddCustomer = ({
   showModalAddCustomer,
   setShowModalAddCustomer,
 }) => {
+  const depatch = useDispatch();
+  const reload = useSelector((state) => state.reload);
+
   const [province, setProvince] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
@@ -30,9 +35,8 @@ const ModelAddCustomer = ({
   const [isExistPhone, setIsExistPhone] = useState(true);
   const [form] = Form.useForm();
 
-
   const normFile = (e) => {
-    console.log('Upload event:', e);
+    console.log("Upload event:", e);
     if (Array.isArray(e)) {
       return e;
     }
@@ -61,7 +65,7 @@ const ModelAddCustomer = ({
     setShowModalAddCustomer(false);
   };
 
-  const onChangePhone = async(e) => {
+  const onChangePhone = async (e) => {
     console.log("phone:", e.target.value);
     const phone = e.target.value;
     if (phone.length === 10) {
@@ -71,19 +75,18 @@ const ModelAddCustomer = ({
         setIsExistPhone(false);
         console.log("exist");
         message.error("Số điện thoại đã tồn tại!");
-      }else{
+      } else {
         setIsExistPhone(true);
         console.log("not exist");
       }
-      
     }
-
   };
 
   //handle submit form create new customer...
-  const handleSubmit = async(val) => {
+  const handleSubmit = async (val) => {
     console.log("submit", val);
-    const { firstname,lastname, phone, email, address, dob, note,image } = val;
+    const { firstname, lastname, phone, email, address, dob, note, image } =
+      val;
     const date = new Date(dob?.$d).toISOString();
     const data = new FormData();
     data.append("firstName", firstname);
@@ -97,22 +100,22 @@ const ModelAddCustomer = ({
     data.append("ward_id", wardPicked);
     data.append("street", address);
     data.append("note", note);
-    
-    if(image){
-      data.append("image", image[0].originFileObj);  
+
+    if (image) {
+      data.append("image", image[0].originFileObj);
     }
     const rs = await customerApi.createCustomer(data);
     console.log(rs);
     if (rs) {
       setShowModalAddCustomer(false);
+      depatch(setReload(!reload));
       form.resetFields();
       setTimeout(() => {
         message.success("Thêm khách hàng thành công!");
       }, 500);
-    }  
+    }
   };
 
-  
   useEffect(() => {
     const fetchConversations = async () => {
       try {
@@ -138,7 +141,7 @@ const ModelAddCustomer = ({
 
   useEffect(() => {
     if (provincePicked !== 0) {
-      console.log("run");
+      //console.log("run");
       const fetchConversations = async (id) => {
         try {
           const response = await openAddressApi.getList(`/p/${id}?depth=2`);
@@ -193,14 +196,13 @@ const ModelAddCustomer = ({
     setTimeout(() => {
       onSuccess("ok");
     }, 0);
-
   };
 
-  useEffect(()=>{
-    form.validateFields(['phone'])
-  },[isExistPhone])
+  useEffect(() => {
+    form.validateFields(["phone"]);
+  }, [isExistPhone]);
 
-  const validateEmail = ( value) => {
+  const validateEmail = (value) => {
     if (value) {
       const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
       if (!emailRegex.test(value)) {
@@ -223,13 +225,19 @@ const ModelAddCustomer = ({
         extra={
           <Space>
             <Button onClick={onClose}>Cancel</Button>
-            <Button form="myForm" htmlType="submit"  type="primary" >
+            <Button form="myForm" htmlType="submit" type="primary">
               Submit
             </Button>
           </Space>
         }
       >
-        <Form form={form} onFinish={handleSubmit} id="myForm" layout="vertical" hideRequiredMark>
+        <Form
+          form={form}
+          onFinish={handleSubmit}
+          id="myForm"
+          layout="vertical"
+          hideRequiredMark
+        >
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
@@ -238,7 +246,6 @@ const ModelAddCustomer = ({
                 rules={[
                   {
                     required: true,
-                   
                   },
                 ]}
               >
@@ -263,36 +270,41 @@ const ModelAddCustomer = ({
           </Row>
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item 
-                name="phone" label="Hãy nhập số điện thoại"
+              <Form.Item
+                name="phone"
+                label="Hãy nhập số điện thoại"
                 hasFeedback
-                
                 rules={[
-                  ({getFieldValue}) => ({
+                  ({ getFieldValue }) => ({
                     validator(rule, value) {
-                      if(value !== undefined && value.length < 10 ){
-                        return Promise.reject('Số điện thoại phải có 10 số');
-                      }else if(isExistPhone === false){
-                        return Promise.reject('Số điện thoại đã tồn tại');
+                      if (value !== undefined && value.length < 10) {
+                        return Promise.reject("Số điện thoại phải có 10 số");
+                      } else if (isExistPhone === false) {
+                        return Promise.reject("Số điện thoại đã tồn tại");
                       }
                       return Promise.resolve();
-                    }
+                    },
                   }),
                 ]}
               >
-                <Input onChange={onChangePhone} placeholder="Hãy nhập số điện thoại..."  />
+                <Input
+                  onChange={onChangePhone}
+                  placeholder="Hãy nhập số điện thoại..."
+                />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="email" label="Hãy nhập email"
+              <Form.Item
+                name="email"
+                label="Hãy nhập email"
                 rules={[
-                  ({getFieldValue}) => ({
+                  ({ getFieldValue }) => ({
                     validator(rule, value) {
-                      if(value !== undefined && value.length < 1){
-                        return Promise.reject('Email không hợp lệ');
+                      if (value !== undefined && value.length < 1) {
+                        return Promise.reject("Email không hợp lệ");
                       }
                       return Promise.resolve();
-                    }
+                    },
                   }),
                 ]}
               >
@@ -353,9 +365,7 @@ const ModelAddCustomer = ({
               />
             </Col>
             <Col span={12}>
-              <Form.Item
-                name="address"
-              >
+              <Form.Item name="address">
                 <Input
                   style={{
                     width: "100%",
@@ -365,33 +375,34 @@ const ModelAddCustomer = ({
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item
-                name="dob"
-                label="Ngày sinh"
-              >
+              <Form.Item name="dob" label="Ngày sinh">
                 <DatePicker
                   style={{
                     width: "100%",
                   }}
                   format="YYYY-MM-DD"
-                  />
+                />
               </Form.Item>
             </Col>
             <Col span={12}>
-            <Form.Item
-              name="image"
-              label="Hình ảnh"
-              valuePropName="fileList"
-              getValueFromEvent={normFile}
-              extra="Chỉ chấp nhận file ảnh"
-              type="file"
-            >
-              <Upload name="logo" customRequest={dummyRequest}
-                 listType="picture" maxCount={1} accept=".jpg,.jpeg,.png"
+              <Form.Item
+                name="image"
+                label="Hình ảnh"
+                valuePropName="fileList"
+                getValueFromEvent={normFile}
+                extra="Chỉ chấp nhận file ảnh"
+                type="file"
               >
-                <Button  icon={<UploadOutlined />}>Click to upload</Button>
-              </Upload>
-            </Form.Item>
+                <Upload
+                  name="logo"
+                  customRequest={dummyRequest}
+                  listType="picture"
+                  maxCount={1}
+                  accept=".jpg,.jpeg,.png"
+                >
+                  <Button icon={<UploadOutlined />}>Click to upload</Button>
+                </Upload>
+              </Form.Item>
             </Col>
             <Col span={12}></Col>
           </Row>

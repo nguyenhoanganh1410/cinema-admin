@@ -1,6 +1,7 @@
 const initValue = {
   user: {},
   promotionHeaderId: null,
+  reload: false,
 };
 
 const rootReducer = (state = initValue, action) => {
@@ -14,6 +15,11 @@ const rootReducer = (state = initValue, action) => {
       return {
         ...state,
         promotionHeaderId: action.payload,
+      };
+    case "reload/reloadWhenAdd":
+      return {
+        ...state,
+        reload: action.payload,
       };
     default:
       return state;

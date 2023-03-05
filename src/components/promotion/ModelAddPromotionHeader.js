@@ -34,6 +34,8 @@ const ModelAddPromotionHeader = ({
   const [previewTitle, setPreviewTitle] = useState("");
   const [fileList, setFileList] = useState([]);
   const handleCancel = () => setPreviewOpen(false);
+  const [form] = Form.useForm();
+
   const handlePreview = async (file) => {
     if (!file.url && !file.preview) {
       file.preview = await getBase64(file.originFileObj);
@@ -79,9 +81,20 @@ const ModelAddPromotionHeader = ({
 
   //choise date start worling
   const onChangeDate = (date, dateString) => {
-    console.log(date, dateString);
+    console.log(dateString);
   };
 
+  //choise date start worling
+  const onChangeEndDate = (date, dateString) => {
+    console.log(dateString);
+  };
+
+  useEffect(() => {
+    form.setFieldsValue({
+      namePromotion: "",
+      desc: "",
+    });
+  }, []);
   return (
     <>
       <Drawer
@@ -101,11 +114,11 @@ const ModelAddPromotionHeader = ({
           </Space>
         }
       >
-        <Form layout="vertical" hideRequiredMark>
+        <Form layout="vertical" onFinish={handleSubmit} form={form}>
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                name="name"
+                name="namePromotion"
                 label="Tên CT Khuyến mãi"
                 rules={[
                   {
@@ -119,7 +132,7 @@ const ModelAddPromotionHeader = ({
             </Col>
             <Col span={12}>
               <Form.Item
-                name="name"
+                name="desc"
                 label="Chi tiết CTKM"
                 rules={[
                   {
@@ -136,7 +149,7 @@ const ModelAddPromotionHeader = ({
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                name="releaseDate"
+                name="startDate"
                 label="Ngày bắt đầu"
                 rules={[
                   {
@@ -154,7 +167,7 @@ const ModelAddPromotionHeader = ({
             </Col>
             <Col span={12}>
               <Form.Item
-                name="releaseDate"
+                name="endDate"
                 label="Ngày kết thúc"
                 rules={[
                   {
@@ -164,7 +177,7 @@ const ModelAddPromotionHeader = ({
                 ]}
               >
                 <DatePicker
-                  onChange={onChangeDate}
+                  onChange={onChangeEndDate}
                   style={{ width: "100%" }}
                   placeholder="Chọn ngày kết thúc"
                 />
@@ -175,7 +188,7 @@ const ModelAddPromotionHeader = ({
           <Row style={{ marginBottom: "26px" }} gutter={16}>
             <Col span={12}>
               <Form.Item
-                name="status"
+                name="statusPromotion"
                 label="Trạng thái"
                 rules={[
                   {
@@ -193,15 +206,11 @@ const ModelAddPromotionHeader = ({
                   options={[
                     {
                       value: "0",
-                      label: "Hoạt động",
-                    },
-                    {
-                      value: "1",
                       label: "Ngưng hoạt động",
                     },
                     {
-                      value: "2",
-                      label: "Hết hạn",
+                      value: "1",
+                      label: "Hoạt động",
                     },
                   ]}
                 />

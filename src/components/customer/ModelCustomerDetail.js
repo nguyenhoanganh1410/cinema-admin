@@ -67,7 +67,8 @@ const ModelDetailCustomer = ({
 
   const handleSubmit = async (val) => {
     console.log("submit", val);
-    const { id, firstName, lastname, phone, email, address, dob, note,image } = val;
+    const { id, firstName, lastname, phone, email, address, dob, note, image } =
+      val;
     const data = new FormData();
     data.append("firstName", firstName);
     data.append("lastName", lastname);
@@ -81,7 +82,7 @@ const ModelDetailCustomer = ({
     data.append("ward_id", wardPicked);
     data.append("street", address);
     console.log("data", image);
-    if(image){
+    if (image) {
       data.append("image", image[0].originFileObj);
     }
 
@@ -125,7 +126,7 @@ const ModelDetailCustomer = ({
           setWardPicked(Number(response.ward_id));
           setImage(response.image);
           console.log("file", response.image);
-          
+
           form.setFieldsValue({
             id: response.id,
             firstName: response.firstName,
@@ -144,7 +145,7 @@ const ModelDetailCustomer = ({
                 status: "done",
                 url: response?.image,
               },
-            ]
+            ],
           });
         }
       } catch (error) {
@@ -152,7 +153,6 @@ const ModelDetailCustomer = ({
       }
     };
     fetchCustomerInfo(selectedId);
-
   }, []);
   console.log("customerInfo", customerInfo);
   console.log("fileList", fileList);
@@ -240,9 +240,6 @@ const ModelDetailCustomer = ({
     }, 0);
   };
 
-
- 
-
   return (
     <>
       <Drawer
@@ -262,12 +259,7 @@ const ModelDetailCustomer = ({
           </Space>
         }
       >
-        <Form
-          form={form}
-          onFinish={handleSubmit}
-          id="myForm"
-          layout="vertical"
-        >
+        <Form form={form} onFinish={handleSubmit} id="myForm" layout="vertical">
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item name="id" label="ID">
@@ -393,8 +385,6 @@ const ModelDetailCustomer = ({
                   listType="picture"
                   maxCount={1}
                   accept=".jpg,.jpeg,.png"
-
-                  
                 >
                   <Button icon={<UploadOutlined />}>Click to upload</Button>
                 </Upload>

@@ -94,7 +94,12 @@ const dropList = [
 ];
 const items = [
   getItem("Dashboard", "1", <DashboardTwoTone />),
-  getItem("Đặt vé", "2", <DesktopOutlined />),
+  getItem("Đặt vé", "sub00", <DesktopOutlined />, [
+    getItem("Đặt vé", "3"),
+    getItem("Vé đã đặt", "9"),
+    getItem("Vé đặt online", "10"),
+  ]),
+
   getItem("Quản lý phim", "sub1", <UserOutlined />, [
     getItem("Danh sách phim", "3"),
     getItem("Quản lý suất chiếu", "4"),
@@ -105,16 +110,18 @@ const items = [
   ]),
 
   getItem("Quản lý khuyến mãi", "19", <ThunderboltOutlined />),
-  getItem("Quản lý vé", "sub3", <ProjectOutlined />, [
-    getItem("Vé đã đặt", "9"),
-    getItem("Các đơn đặt online", "10"),
-  ]),
 
   getItem("Quản lý khách hàng", "11", <TeamOutlined />),
-  getItem("Quản lý đơn giá", "12", <DesktopOutlined />),
-  getItem("Quản lý nhân viên", "15", <UserOutlined />),
-  getItem("Quản lý tài khoản", "16", <DesktopOutlined />),
-  getItem("Quản lý thu chi", "17", <DesktopOutlined />),
+
+  getItem("Sản phẩm", "12", <ProjectOutlined />, [
+    getItem("Sản phẩm", "19"),
+    getItem("Bảng giá", "20"),
+  ]),
+  getItem("Hệ thống", "sub100", <ProjectOutlined />, [
+    getItem("Nhân viên", "15"),
+    getItem("Tài khoản", "16"),
+    getItem("Thu chi", "17"),
+  ]),
   getItem("Thống kê", "18", <PieChartOutlined />),
 ];
 const HomePage = () => {
@@ -130,8 +137,6 @@ const HomePage = () => {
     setIsModalOpen(false);
     handleLogout();
     //handle code for log out in here
-
-    ////////
   };
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -163,7 +168,6 @@ const HomePage = () => {
   }
 
   const onClickMenuUser = (info) => {
-    //console.log(info);
     //if user click logout
     if (info.key === "logout") {
       //show model
@@ -173,7 +177,7 @@ const HomePage = () => {
     }
   };
 
-  //// console.log("home page");
+  // console.log("home page");
   const RenderHome = () => {
     console.log(itemClicked);
     if (itemClicked === 1) {
@@ -188,7 +192,6 @@ const HomePage = () => {
     } else if (itemClicked === 4) {
       return <IndexRouter />;
     } else if (itemClicked === 100) {
-      //info user
       return <UserInfo />;
     } else if (itemClicked === 19) {
       return <IndexRoutePro />;

@@ -25,22 +25,6 @@ const { Title, Text } = Typography;
 const dateFormat = "YYYY/MM/DD";
 const IndexPromotion = ({ setTab }) => {
   const [showModalAddCustomer, setShowModalAddCustomer] = useState(false);
-  // //model
-  // const [isModalOpen, setIsModalOpen] = useState(false);
-  // const showModal = () => {
-  //   setIsModalOpen(true);
-  // };
-  // const handleOk = () => {
-  //   setIsModalOpen(false);
-
-  //   //handle code for log out in here
-
-  //   ////////
-  // };
-  // const handleCancel = () => {
-  //   setIsModalOpen(false);
-  // };
-  // /////
 
   const showModal = () => {
     setShowModalAddCustomer(true);

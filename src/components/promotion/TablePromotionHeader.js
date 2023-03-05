@@ -11,28 +11,6 @@ import { useDispatch } from "react-redux";
 import movieApi from "../../api/movieApi";
 import promotionApi from "../../api/promotionApi";
 import { setPromotionHeader } from "../../redux/actions";
-// const columns = [
-//   {
-//     title: "Tên CT khuyễn mãi",
-//     dataIndex: "namePromotion",
-//   },
-//   {
-//     title: "Mô tả",
-//     dataIndex: "title",
-//   },
-//   {
-//     title: "Ngày bắt đầu",
-//     dataIndex: "startDate",
-//   },
-//   {
-//     title: "Ngày kết thúc",
-//     dataIndex: "endDate",
-//   },
-//   {
-//     title: "Trạng thái",
-//     dataIndex: "statusPromotion",
-//   },
-// ];
 
 const TablePromotionHeader = ({ setTab }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -47,7 +25,6 @@ const TablePromotionHeader = ({ setTab }) => {
     selectedRowKeys,
     onChange: onSelectChange,
   };
-  console.log(rowSelection);
   const hasSelected = selectedRowKeys.length > 0;
   const selectedOne = selectedRowKeys.length === 1;
 
@@ -62,7 +39,6 @@ const TablePromotionHeader = ({ setTab }) => {
   //   setTab(1);
   // };
 
-  ///
   //model
   const [isModalOpen, setIsModalOpen] = useState(false);
   const showModal = () => {
@@ -72,22 +48,16 @@ const TablePromotionHeader = ({ setTab }) => {
     setIsModalOpen(false);
 
     //handle code for log out in here
-
-    ////////
   };
   const handleCancel = () => {
     setIsModalOpen(false);
   };
-  /////
 
   useEffect(() => {
-    //load movies
+    //load
     const getListPromotionHeader = async () => {
       try {
         const response = await promotionApi.getPromotionHeader();
-
-        console.log(response);
-        //set user info
         if (response) {
           //handle data
           const newList = response.map((item) => {
@@ -170,15 +140,6 @@ const TablePromotionHeader = ({ setTab }) => {
         >
           Xóa
         </Button>
-        {/* <Button
-          type="primary"
-          onClick={handeShowDetailsPromotion}
-          disabled={!selectedOne}
-          loading={loading}
-          icon={<ToolOutlined />}
-        >
-          Chi tiết
-        </Button> */}
         <span
           style={{
             marginLeft: 8,

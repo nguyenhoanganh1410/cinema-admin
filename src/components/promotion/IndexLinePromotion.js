@@ -22,6 +22,8 @@ import { PlusOutlined } from "@ant-design/icons";
 import ModelAddPromoLine from "./ModelAddPromoLine";
 import { useSelector } from "react-redux";
 import promotionApi from "../../api/promotionApi";
+import moment from "moment";
+
 const { TextArea } = Input;
 const getBase64 = (file) =>
   new Promise((resolve, reject) => {
@@ -34,6 +36,7 @@ const { Option } = Select;
 
 const { Title, Text } = Typography;
 const dateFormat = "YYYY/MM/DD";
+const newDateFormat = "YYYY-MM-DD";
 const columns = [
   {
     title: "Mã Code",
@@ -87,6 +90,10 @@ const IndexLinePromotion = () => {
   const [promotionHeader, setPromotionHeader] = useState(null);
   const idHeaderPromotion = useSelector((state) => state.promotionHeaderId);
 
+  const [changeImage, setChangeImage] = useState(false);
+
+  const [form] = Form.useForm();
+
   const handleCancel = () => setPreviewOpen(false);
   const handlePreview = async (file) => {
     if (!file.url && !file.preview) {
@@ -98,7 +105,10 @@ const IndexLinePromotion = () => {
       file.name || file.url.substring(file.url.lastIndexOf("/") + 1)
     );
   };
-  const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
+  const handleChange = ({ fileList: newFileList }) => {
+    setFileList(newFileList);
+    setChangeImage(true);
+  };
   const uploadButton = (
     <div>
       <PlusOutlined />
@@ -126,33 +136,82 @@ const IndexLinePromotion = () => {
     console.log(date, dateString);
   };
 
+  const handleSubmit = async (val) => {
+    console.log(val);
+    const { startDate, endDate, desc, statusPromotion, id, namePromotion } =
+      val;
+    // if (endDate.diff(startDate, "days") > 0) {
+    //   alert("Ngày không hợp lý");
+    //   return;
+    // }
+
+    //2 trường hợp
+    //TH1: image thay đổi
+    if (changeImage) {
+    } else {
+      //TH2: image không đổi
+      try {
+        const newData = {
+          namePromotion,
+          statusPromotion,
+          // endDate: moment(val.endDate, newDateFormat),
+          // startDate: moment(val.startDate, newDateFormat),
+          id,
+          desc,
+        };
+        console.log(newData);
+        const response = await promotionApi.updatePromotionHeader(newData);
+        alert("updated promotion header");
+      } catch (error) {
+        console.log("update failed : ", error);
+      }
+    }
+  };
   useEffect(() => {
     //load movies
     const getPromotionLineByHeader = async (id) => {
       try {
         const response = await promotionApi.getPromotionLineByHeader(id);
 
-        console.log(response);
-        //set user info
         if (response) {
           //handle data
-          setPromotionLine(response);
+          const newList = response.map((item) => {
+            item.startDate = item.startDate.substring(0, 10);
+            item.endDate = item.endDate.substring(0, 10);
+
+            return item;
+          });
+          setPromotionLine(newList);
         }
       } catch (error) {
         console.log("Failed to login ", error);
       }
     };
-    getPromotionLineByHeader(idHeaderPromotion);
 
     //load movies
     const getPromotionHeaderById = async (id) => {
       try {
         const response = await promotionApi.getPromotionHeaderById(id);
-
         console.log(response);
-        //set user info
         if (response) {
           //handle data
+          const crrImg = [
+            {
+              uid: "-1",
+              name: "image.png",
+              status: "done",
+              url: response.image,
+            },
+          ];
+          setFileList(crrImg);
+          form.setFieldsValue({
+            id: response.id,
+            namePromotion: response.namePromotion,
+            desc: response.desc,
+            startDate: moment(response.startDate, dateFormat),
+            endDate: moment(response.endDate, dateFormat),
+            statusPromotion: response.statusPromotion ? "1" : "0",
+          });
           setPromotionHeader(response);
         }
       } catch (error) {
@@ -161,7 +220,7 @@ const IndexLinePromotion = () => {
     };
     getPromotionLineByHeader(idHeaderPromotion);
     getPromotionHeaderById(idHeaderPromotion);
-  }, []);
+  }, [idHeaderPromotion]);
 
   return (
     <div className="site-card-wrapper" style={{ minWidth: "100vh" }}>
@@ -181,13 +240,17 @@ const IndexLinePromotion = () => {
           borderRadius: "8px",
           marginBottom: "1rem",
         }}
+        onFinish={handleSubmit}
+        form={form}
         layout="vertical"
-        hideRequiredMark
       >
         <Row gutter={16}>
           <Col span={12}>
+            <Form.Item name="id" hidden={true}>
+              <Input placeholder="Hãy nhập tên CT khuyến mãi..." />
+            </Form.Item>
             <Form.Item
-              name="name"
+              name="namePromotion"
               label="Tên CT Khuyến mãi"
               rules={[
                 {
@@ -196,16 +259,13 @@ const IndexLinePromotion = () => {
                 },
               ]}
             >
-              <Input
-                placeholder="Hãy nhập tên CT khuyến mãi..."
-                value={promotionHeader?.namePromotion}
-              />
+              <Input placeholder="Hãy nhập tên CT khuyến mãi..." />
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item
-              name="releaseDate"
               label="Ngày bắt đầu"
+              name="startDate"
               rules={[
                 {
                   required: true,
@@ -222,7 +282,7 @@ const IndexLinePromotion = () => {
           </Col>
           <Col span={12}>
             <Form.Item
-              name="name"
+              name="desc"
               label="Chi tiết CTKM"
               rules={[
                 {
@@ -235,13 +295,12 @@ const IndexLinePromotion = () => {
                 rows={4}
                 placeholder="Nhập chi tiết CTKM"
                 maxLength={6}
-                value={promotionHeader?.desc}
               />
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item
-              name="releaseDate"
+              name="endDate"
               label="Ngày kết thúc"
               rules={[
                 {
@@ -262,7 +321,7 @@ const IndexLinePromotion = () => {
         <Row gutter={16}>
           <Col span={4}>
             <Form.Item
-              name="status"
+              name="statusPromotion"
               label="Trạng thái"
               rules={[
                 {
@@ -280,15 +339,11 @@ const IndexLinePromotion = () => {
                 options={[
                   {
                     value: "0",
-                    label: "Hoạt động",
-                  },
-                  {
-                    value: "1",
                     label: "Ngưng hoạt động",
                   },
                   {
-                    value: "2",
-                    label: "Hết hạn",
+                    value: "1",
+                    label: "Hoạt động",
                   },
                 ]}
               />
@@ -303,7 +358,7 @@ const IndexLinePromotion = () => {
             onPreview={handlePreview}
             onChange={handleChange}
           >
-            {fileList.length >= 8 ? null : uploadButton}
+            {fileList.length >= 1 ? null : uploadButton}
           </Upload>
           <Modal
             open={previewOpen}
@@ -322,9 +377,11 @@ const IndexLinePromotion = () => {
         </Row>
         <Row style={{ marginTop: "1rem" }}>
           <Col span={4}>
-            <Button type="primary" style={{ marginRight: "1rem" }}>
-              Cập nhật
-            </Button>
+            <Form.Item style={{ marginRight: "1rem" }}>
+              <Button type="primary" htmlType="submit">
+                Cập nhật
+              </Button>
+            </Form.Item>
           </Col>
         </Row>
       </Form>

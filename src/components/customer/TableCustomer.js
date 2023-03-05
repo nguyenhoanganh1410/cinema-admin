@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Table, Modal, Tag, Image,Alert,Space,message } from "antd";
+import { Button, Table, Modal, Tag, Image, Alert, Space, message } from "antd";
 import {
   SearchOutlined,
   PlusSquareFilled,
@@ -12,23 +12,23 @@ import customerApi from "../../api/customerApi";
 import ModelAddCustomer from "./ModelAddCustomer";
 import ModelDetailCustomer from "./ModelCustomerDetail";
 import openAddressApi from "../../api/openApi";
+import { useDispatch, useSelector } from "react-redux";
+import { setReload } from "../../redux/actions";
 
-
-
-const TableCustomer = () => {  
+const TableCustomer = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [listCustomer, setListCustomer] = useState([]);
   const [selectedId, setSelectedId] = useState([]);
   const [showModalDetailCustomer, setShowModalDetailCustomer] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-  
+  const depatch = useDispatch();
+  const reload = useSelector((state) => state.reload);
 
   const showModalDetail = (e) => {
     setShowModalDetailCustomer(true);
     setSelectedId(e);
   };
-
 
   const columns = [
     {
@@ -36,15 +36,20 @@ const TableCustomer = () => {
       dataIndex: "id",
 
       render: (val) => {
-        return <a onClick={()=>{
-          showModalDetail(val);
-        }}>{val}</a>;
-      }
+        return (
+          <a
+            onClick={() => {
+              showModalDetail(val);
+            }}
+          >
+            {val}
+          </a>
+        );
+      },
     },
     {
       title: "Họ và Tên",
       dataIndex: "name",
-  
     },
     {
       title: "Số điện thoại",
@@ -53,7 +58,6 @@ const TableCustomer = () => {
     {
       title: "Địa chỉ",
       dataIndex: "address",
-      
     },
     {
       title: "Email",
@@ -63,7 +67,7 @@ const TableCustomer = () => {
       title: "Ngày sinh",
       dataIndex: "dob",
     },
-     {
+    {
       title: "Rank",
       dataIndex: "rank",
       key: "rank",
@@ -91,13 +95,8 @@ const TableCustomer = () => {
     {
       title: "Hình ảnh",
       dataIndex: "image",
-      render: (image) => (
-        <Image
-          width={50}
-          src={image}
-        />
-      ),
-    }
+      render: (image) => <Image width={50} src={image} />,
+    },
   ];
 
   useEffect(() => {
@@ -105,37 +104,41 @@ const TableCustomer = () => {
     const fetchListCustomer = async () => {
       try {
         const response = await customerApi.getCustomers();
-        console.log(response);
-        const data = await Promise.all(response.map(async (item, index) => {
-          const ward = await openAddressApi.getWardByCode(item.ward_id);
-          const district = await openAddressApi.getDistrictByCode(item.district_id);
-          const city = await openAddressApi.getProvinceByCode(item.city_id);
-          item.ward_id = ward.name;
-          item.district_id = district.name;
-          item.city_id = city.name;
-          return {
-            key: index,
-            id: item.id,
-            name: `${item.firstName} ${item.lastName}`,
-            phone: item.phone,
-            address: ` ${item?.ward_id+' /'} ${item?.district_id+' /'} ${item?.city_id}`,
-            email: item.email,
-            dob: item.dob,
-            rank: item.Rank?.nameRank,
-            image: item.image,
-          };
-        }));
-        setListCustomer(data);
+
+        const data = await Promise.all(
+          response.map(async (item, index) => {
+            const ward = await openAddressApi.getWardByCode(item.ward_id);
+            const district = await openAddressApi.getDistrictByCode(
+              item.district_id
+            );
+            const city = await openAddressApi.getProvinceByCode(item.city_id);
+            item.ward_id = ward.name;
+            item.district_id = district.name;
+            item.city_id = city.name;
+            return {
+              key: index,
+              id: item.id,
+              name: `${item.firstName} ${item.lastName}`,
+              phone: item.phone,
+              address: ` ${item?.ward_id + " /"} ${item?.district_id + " /"} ${
+                item?.city_id
+              }`,
+              email: item.email,
+              dob: item.dob,
+              rank: item.Rank?.nameRank,
+              image: item.image,
+            };
+          })
+        );
+        setListCustomer(data.reverse());
       } catch (error) {
         console.log("Failed to fetch product list: ", error);
       }
     };
     fetchListCustomer();
-  }, [refreshKey]);
-
+  }, [reload]);
 
   const onSelectChange = (selectedId) => {
-    console.log("selectedRowKeys changed: ", selectedId);
     setSelectedRowKeys(selectedId);
   };
   const rowSelection = {
@@ -149,14 +152,14 @@ const TableCustomer = () => {
   const handleDelete = () => {
     showModal();
   };
-  
+
   const handleRefresh = () => {
     setLoading(true);
     // ajax request after empty completing
     setTimeout(() => {
       setSelectedRowKeys([]);
       setLoading(false);
-      setRefreshKey(oldKey => oldKey + 1)
+      setRefreshKey((oldKey) => oldKey + 1);
       message.success("Tải lại thành công");
     }, 1000);
   };
@@ -171,20 +174,24 @@ const TableCustomer = () => {
     }, 500);
   };
 
-  ///
   //model
   const [isModalOpen, setIsModalOpen] = useState(false);
   const showModal = () => {
     setIsModalOpen(true);
   };
+
   const handleOk = () => {
     setIsModalOpen(false);
-    console.log("selectedId", selectedId);
     const fetchDeleteCustomer = async () => {
       try {
         const response = await customerApi.deleteCustomer(selectedId);
-        console.log(response);
-        setRefreshKey(oldKey => oldKey + 1)
+        if (response == 1) {
+          depatch(setReload(!reload));
+        } else {
+          setTimeout(() => {
+            message.success("Xóa thất bại");
+          }, 1000);
+        }
       } catch (error) {
         console.log("Failed to fetch product list: ", error);
       }
@@ -193,14 +200,11 @@ const TableCustomer = () => {
     setTimeout(() => {
       message.success("Xóa thành công");
     }, 1000);
-
   };
+
   const handleCancel = () => {
     setIsModalOpen(false);
   };
-  /////
-
-
 
   return (
     <div>
@@ -237,16 +241,17 @@ const TableCustomer = () => {
           {hasSelected ? `Selected ${selectedRowKeys.length} items` : ""}
         </span>
       </div>
-      <Table  rowSelection={
-        {
+      <Table
+        rowSelection={{
           selectedRowKeys,
           onChange: onSelectChange,
-          onSelect:(record) => {
-            setSelectedId(record.id)
-          }
-        }
-      } 
-      columns={columns} dataSource={listCustomer} />
+          onSelect: (record) => {
+            setSelectedId(record.id);
+          },
+        }}
+        columns={columns}
+        dataSource={listCustomer}
+      />
       <Modal
         title="Xóa khách hàng"
         open={isModalOpen}
@@ -262,7 +267,6 @@ const TableCustomer = () => {
           selectedId={selectedId}
         />
       ) : null}
-
     </div>
   );
 };

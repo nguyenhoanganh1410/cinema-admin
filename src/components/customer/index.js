@@ -15,22 +15,6 @@ import ModelAddCustomer from "./ModelAddCustomer";
 const { Title, Text } = Typography;
 const IndexCustomer = () => {
   const [showModalAddCustomer, setShowModalAddCustomer] = useState(false);
-  // //model
-  // const [isModalOpen, setIsModalOpen] = useState(false);
-  // const showModal = () => {
-  //   setIsModalOpen(true);
-  // };
-  // const handleOk = () => {
-  //   setIsModalOpen(false);
-
-  //   //handle code for log out in here
-
-  //   ////////
-  // };
-  // const handleCancel = () => {
-  //   setIsModalOpen(false);
-  // };
-  // /////
 
   const showModal = () => {
     setShowModalAddCustomer(true);
