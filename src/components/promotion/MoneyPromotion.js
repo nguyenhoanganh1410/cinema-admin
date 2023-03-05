@@ -24,7 +24,7 @@ const { Option } = Select;
 const MoneyPromotion = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
   return (
     <>
-      <Form layout="vertical" hideRequiredMark>
+      <Form layout="vertical">
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item

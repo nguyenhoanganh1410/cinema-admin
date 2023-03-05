@@ -4,6 +4,9 @@ const promotionApi = {
   getPromotionHeader: () => {
     return axiosApi.get("/promotionHeader");
   },
+  updatePromotionHeader: (data) => {
+    return axiosApi.put(`/promotionHeader/${data.id}`, data);
+  },
   getPromotionHeaderById: (id) => {
     return axiosApi.get(`/promotionHeader/${id}`);
   },

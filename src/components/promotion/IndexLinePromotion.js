@@ -22,6 +22,8 @@ import { PlusOutlined } from "@ant-design/icons";
 import ModelAddPromoLine from "./ModelAddPromoLine";
 import { useSelector } from "react-redux";
 import promotionApi from "../../api/promotionApi";
+import moment from "moment";
+
 const { TextArea } = Input;
 const getBase64 = (file) =>
   new Promise((resolve, reject) => {
@@ -34,6 +36,7 @@ const { Option } = Select;
 
 const { Title, Text } = Typography;
 const dateFormat = "YYYY/MM/DD";
+const newDateFormat = "YYYY-MM-DD";
 const columns = [
   {
     title: "Mã Code",
@@ -87,6 +90,8 @@ const IndexLinePromotion = () => {
   const [promotionHeader, setPromotionHeader] = useState(null);
   const idHeaderPromotion = useSelector((state) => state.promotionHeaderId);
 
+  const [changeImage, setChangeImage] = useState(false);
+
   const [form] = Form.useForm();
 
   const handleCancel = () => setPreviewOpen(false);
@@ -100,7 +105,10 @@ const IndexLinePromotion = () => {
       file.name || file.url.substring(file.url.lastIndexOf("/") + 1)
     );
   };
-  const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
+  const handleChange = ({ fileList: newFileList }) => {
+    setFileList(newFileList);
+    setChangeImage(true);
+  };
   const uploadButton = (
     <div>
       <PlusOutlined />
@@ -128,6 +136,37 @@ const IndexLinePromotion = () => {
     console.log(date, dateString);
   };
 
+  const handleSubmit = async (val) => {
+    console.log(val);
+    const { startDate, endDate, desc, statusPromotion, id, namePromotion } =
+      val;
+    // if (endDate.diff(startDate, "days") > 0) {
+    //   alert("Ngày không hợp lý");
+    //   return;
+    // }
+
+    //2 trường hợp
+    //TH1: image thay đổi
+    if (changeImage) {
+    } else {
+      //TH2: image không đổi
+      try {
+        const newData = {
+          namePromotion,
+          statusPromotion,
+          // endDate: moment(val.endDate, newDateFormat),
+          // startDate: moment(val.startDate, newDateFormat),
+          id,
+          desc,
+        };
+        console.log(newData);
+        const response = await promotionApi.updatePromotionHeader(newData);
+        alert("updated promotion header");
+      } catch (error) {
+        console.log("update failed : ", error);
+      }
+    }
+  };
   useEffect(() => {
     //load movies
     const getPromotionLineByHeader = async (id) => {
@@ -153,13 +192,25 @@ const IndexLinePromotion = () => {
     const getPromotionHeaderById = async (id) => {
       try {
         const response = await promotionApi.getPromotionHeaderById(id);
-
         console.log(response);
-        //set user info
         if (response) {
           //handle data
+          const crrImg = [
+            {
+              uid: "-1",
+              name: "image.png",
+              status: "done",
+              url: response.image,
+            },
+          ];
+          setFileList(crrImg);
           form.setFieldsValue({
-            promotionName: response.namePromotion,
+            id: response.id,
+            namePromotion: response.namePromotion,
+            desc: response.desc,
+            startDate: moment(response.startDate, dateFormat),
+            endDate: moment(response.endDate, dateFormat),
+            statusPromotion: response.statusPromotion ? "1" : "0",
           });
           setPromotionHeader(response);
         }
@@ -189,12 +240,17 @@ const IndexLinePromotion = () => {
           borderRadius: "8px",
           marginBottom: "1rem",
         }}
+        onFinish={handleSubmit}
+        form={form}
         layout="vertical"
       >
         <Row gutter={16}>
           <Col span={12}>
+            <Form.Item name="id" hidden={true}>
+              <Input placeholder="Hãy nhập tên CT khuyến mãi..." />
+            </Form.Item>
             <Form.Item
-              name="promotionName"
+              name="namePromotion"
               label="Tên CT Khuyến mãi"
               rules={[
                 {
@@ -208,8 +264,8 @@ const IndexLinePromotion = () => {
           </Col>
           <Col span={12}>
             <Form.Item
-              name="releaseDate"
               label="Ngày bắt đầu"
+              name="startDate"
               rules={[
                 {
                   required: true,
@@ -221,13 +277,12 @@ const IndexLinePromotion = () => {
                 onChange={onChangeDate}
                 style={{ width: "100%" }}
                 placeholder="Chọn ngày bắt đầu"
-                name="startDate"
               />
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item
-              name="name"
+              name="desc"
               label="Chi tiết CTKM"
               rules={[
                 {
@@ -240,13 +295,12 @@ const IndexLinePromotion = () => {
                 rows={4}
                 placeholder="Nhập chi tiết CTKM"
                 maxLength={6}
-                name="desc"
               />
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item
-              name="releaseDate"
+              name="endDate"
               label="Ngày kết thúc"
               rules={[
                 {
@@ -259,7 +313,6 @@ const IndexLinePromotion = () => {
                 onChange={onChangeDate}
                 style={{ width: "100%" }}
                 placeholder="Chọn ngày kết thúc"
-                name="endDate"
               />
             </Form.Item>
           </Col>
@@ -268,7 +321,7 @@ const IndexLinePromotion = () => {
         <Row gutter={16}>
           <Col span={4}>
             <Form.Item
-              name="status"
+              name="statusPromotion"
               label="Trạng thái"
               rules={[
                 {
@@ -282,20 +335,15 @@ const IndexLinePromotion = () => {
                 style={{
                   width: "100%",
                 }}
-                name="status"
                 onChange={handleChangePosition}
                 options={[
                   {
                     value: "0",
-                    label: "Hoạt động",
-                  },
-                  {
-                    value: "1",
                     label: "Ngưng hoạt động",
                   },
                   {
-                    value: "2",
-                    label: "Hết hạn",
+                    value: "1",
+                    label: "Hoạt động",
                   },
                 ]}
               />
@@ -310,7 +358,7 @@ const IndexLinePromotion = () => {
             onPreview={handlePreview}
             onChange={handleChange}
           >
-            {fileList.length >= 8 ? null : uploadButton}
+            {fileList.length >= 1 ? null : uploadButton}
           </Upload>
           <Modal
             open={previewOpen}
