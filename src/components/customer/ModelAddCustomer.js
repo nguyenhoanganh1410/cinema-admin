@@ -84,7 +84,6 @@ const ModelAddCustomer = ({
 
   //handle submit form create new customer...
   const handleSubmit = async (val) => {
-    console.log("submit", val);
     const { firstname, lastname, phone, email, address, dob, note, image } =
       val;
     const date = new Date(dob?.$d).toISOString();
@@ -104,14 +103,16 @@ const ModelAddCustomer = ({
     if (image) {
       data.append("image", image[0].originFileObj);
     }
+
+    console.log(data);
     const rs = await customerApi.createCustomer(data);
-    console.log(rs);
+
     if (rs) {
       setShowModalAddCustomer(false);
       depatch(setReload(!reload));
       form.resetFields();
       setTimeout(() => {
-        message.success("Thêm khách hàng thành công!");
+        message.success("Thêm nhân viên thành công!");
       }, 500);
     }
   };
@@ -231,13 +232,7 @@ const ModelAddCustomer = ({
           </Space>
         }
       >
-        <Form
-          form={form}
-          onFinish={handleSubmit}
-          id="myForm"
-          layout="vertical"
-          hideRequiredMark
-        >
+        <Form form={form} onFinish={handleSubmit} id="myForm" layout="vertical">
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item

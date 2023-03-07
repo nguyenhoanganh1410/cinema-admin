@@ -41,6 +41,7 @@ import tokenService from "../service/token.service";
 import { useNavigate } from "react-router-dom";
 import IndexPromotion from "../components/promotion/IndexPromotion";
 import IndexRoutePro from "../components/promotion/IndexRoutePro";
+import IndexRouteHall from "../components/cinemahall/IndexRoute";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -195,6 +196,9 @@ const HomePage = () => {
       return <UserInfo />;
     } else if (itemClicked === 19) {
       return <IndexRoutePro />;
+    }
+    else if (itemClicked === 13) {
+      return <IndexRouteHall />;
     }
     return <IndexDashboard />;
   };
