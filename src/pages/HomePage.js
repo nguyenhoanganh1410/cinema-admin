@@ -41,6 +41,8 @@ import tokenService from "../service/token.service";
 import { useNavigate } from "react-router-dom";
 import IndexPromotion from "../components/promotion/IndexPromotion";
 import IndexRoutePro from "../components/promotion/IndexRoutePro";
+import IndexProduct from "../components/product";
+import IndexPrice from "../components/price";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -114,8 +116,8 @@ const items = [
   getItem("Quản lý khách hàng", "11", <TeamOutlined />),
 
   getItem("Sản phẩm", "12", <ProjectOutlined />, [
-    getItem("Sản phẩm", "19"),
-    getItem("Bảng giá", "20"),
+    getItem("Sản phẩm", "20"),
+    getItem("Bảng giá", "21"),
   ]),
   getItem("Hệ thống", "sub100", <ProjectOutlined />, [
     getItem("Nhân viên", "15"),
@@ -195,7 +197,11 @@ const HomePage = () => {
       return <UserInfo />;
     } else if (itemClicked === 19) {
       return <IndexRoutePro />;
-    }
+    } else if (itemClicked === 20) {
+      return <IndexProduct />;
+    } else if (itemClicked === 21) {
+      return <IndexPrice />;
+    } 
     return <IndexDashboard />;
   };
 

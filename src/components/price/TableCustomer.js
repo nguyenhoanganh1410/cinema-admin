@@ -1,29 +1,29 @@
-import React, { useEffect,useState } from "react";
-import { Button, Table, Modal, Tag, Image, message,Badge } from "antd";
+import React, { useEffect, useState } from "react";
+import { Button, Table, Modal, Tag, Image, Alert, Space, message } from "antd";
 import {
   SearchOutlined,
   PlusSquareFilled,
   UserAddOutlined,
   ToolOutlined,
   DeleteOutlined,
+  ReloadOutlined,
 } from "@ant-design/icons";
-import staffApi from "../../api/staffApi";
+import customerApi from "../../api/customerApi";
+import ModelAddCustomer from "./ModelAddCustomer";
+import ModelDetailCustomer from "./ModelCustomerDetail";
 import openAddressApi from "../../api/openApi";
 import { useDispatch, useSelector } from "react-redux";
 import { setReload } from "../../redux/actions";
-import roleApi from "../../api/roleApi";
-const onClick=(e)=>{
-  console.log("evet",e)
-}
 
-
-const TableEmployee = () => {
+const TableCustomer = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [listStaff, setListStaff] = useState([]);
+  const [listCustomer, setListCustomer] = useState([]);
+  const [selectedId, setSelectedId] = useState([]);
+  const [showModalDetailCustomer, setShowModalDetailCustomer] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
   const depatch = useDispatch();
   const reload = useSelector((state) => state.reload);
-  const [selectedId, setSelectedId] = useState([]);
 
   const showModalDetail = (e) => {
     setShowModalDetailCustomer(true);
@@ -34,6 +34,7 @@ const TableEmployee = () => {
     {
       title: "Id",
       dataIndex: "id",
+
       render: (val) => {
         return (
           <a
@@ -55,15 +56,6 @@ const TableEmployee = () => {
       dataIndex: "phone",
     },
     {
-      title: "Giới tính",
-      dataIndex:"gender",
-      width: 30,
-    },
-    {
-      title: "Ngày sinh",
-      dataIndex: "dob",
-    },
-    {
       title: "Địa chỉ",
       dataIndex: "address",
     },
@@ -72,99 +64,78 @@ const TableEmployee = () => {
       dataIndex: "email",
     },
     {
-      title: "Chức vụ",
-      dataIndex: "position",
-      render: (position) => {
-        let color = "green";
-        let roleName ='';
-        if (position === "NV") {
-          color = "green";
-          roleName = "Nhân viên"
-        }if (position === "HC") {
-          color = "cyan";
-          roleName = "Hậu cần"
-        }
-        if (position === "QL") {
-          color = "blue";
-          roleName = "Quản lý"
-        }
-        return (
-          <Tag color={color} key={position}>
-            {roleName}
-          </Tag>
-        );
-      },
+      title: "Ngày sinh",
+      dataIndex: "dob",
     },
     {
-      title: "Trạng thái",
-      dataIndex: "status",
-      render: (status) => {
+      title: "Rank",
+      dataIndex: "rank",
+      key: "rank",
+      render: (rank) => {
         let color = "green";
-        let statusName ='';
-        if (status === "1") {
+        if (rank === "Start") {
           color = "green";
-          statusName = "Hoạt động"
-        }if (status === "0") {
-          color = "red";
-          statusName = "Không hoạt động"
+        }
+        if (rank === "Gold") {
+          color = "gold";
+        }
+        if (rank === "Silver") {
+          color = "silver";
+        }
+        if (rank === "Diamond") {
+          color = "blue";
         }
         return (
-          <Badge text={statusName} color={color}
-          />
+          <Tag color={color} key={rank}>
+            {rank?.toUpperCase()}
+          </Tag>
         );
       },
     },
     {
       title: "Hình ảnh",
       dataIndex: "image",
-      render: (image) => <Image width={30} src={image} />,
-      width: 50,
+      render: (image) => <Image width={50} src={image} />,
     },
   ];
 
   useEffect(() => {
-    const fetchListStaff = async () => {
+    //get list customer in here
+    const fetchListCustomer = async () => {
       try {
-        const response = await staffApi.getStaffs();
-        console.log(response);
+        const response = await customerApi.getCustomers();
 
         const data = await Promise.all(
-          response.map(async(item, index) => {
+          response.map(async (item, index) => {
             const ward = await openAddressApi.getWardByCode(item.ward_id);
             const district = await openAddressApi.getDistrictByCode(
               item.district_id
             );
             const city = await openAddressApi.getProvinceByCode(item.city_id);
-            const role = await roleApi.getRoleById(item.position);
             item.ward_id = ward.name;
             item.district_id = district.name;
             item.city_id = city.name;
-            item.position = role.nameRole;
             return {
               key: index,
               id: item.id,
               name: `${item.firstName} ${item.lastName}`,
               phone: item.phone,
-              gender: item.gender,
-              dob: item.dob.substring(0, 10),
               address: ` ${item?.ward_id + " /"} ${item?.district_id + " /"} ${
                 item?.city_id
               }`,
               email: item.email,
-              position: item.position,
-              status: item.status,
-              // maneger: `${item.Staffs[0]?.firstName} ${item.Staffs[0]?.lastName}`,
-              maneger: item.Staffs[0]?.firstName + item.Staffs[0]?.lastName,
+              dob: item.dob,
+              rank: item.Rank?.nameRank,
               image: item.image,
             };
           })
         );
-        setListStaff(data);
+        setListCustomer(data.reverse());
       } catch (error) {
         console.log("Failed to fetch product list: ", error);
       }
     };
-    fetchListStaff();
+    fetchListCustomer();
   }, [reload]);
 
   const onSelectChange = (selectedId) => {
@@ -182,6 +153,17 @@ const TableEmployee = () => {
     showModal();
   };
 
+  const handleRefresh = () => {
+    setLoading(true);
+    // ajax request after empty completing
+    setTimeout(() => {
+      setSelectedRowKeys([]);
+      setLoading(false);
+      setRefreshKey((oldKey) => oldKey + 1);
+      message.success("Tải lại thành công");
+    }, 1000);
+  };
+
   //handle update customer in here ....
   const handleUpdate = () => {
     setLoading(true);
@@ -189,20 +171,20 @@ const TableEmployee = () => {
     setTimeout(() => {
       setSelectedRowKeys([]);
       setLoading(false);
-    }, 1000);
+    }, 500);
   };
 
-  ///
   //model
   const [isModalOpen, setIsModalOpen] = useState(false);
   const showModal = () => {
     setIsModalOpen(true);
   };
+
   const handleOk = () => {
     setIsModalOpen(false);
-    const fetchDeleteStaff = async () => {
+    const fetchDeleteCustomer = async () => {
       try {
-        const response = await staffApi.deleteStaff(selectedId);
+        const response = await customerApi.deleteCustomer(selectedId);
         if (response == 1) {
           depatch(setReload(!reload));
         } else {
@@ -214,15 +196,15 @@ const TableEmployee = () => {
         console.log("Failed to fetch product list: ", error);
       }
     };
-    fetchDeleteStaff();
+    fetchDeleteCustomer();
     setTimeout(() => {
       message.success("Xóa thành công");
     }, 1000);
   };
+
   const handleCancel = () => {
     setIsModalOpen(false);
   };
-  /////
 
   return (
     <div>
@@ -244,12 +226,12 @@ const TableEmployee = () => {
         </Button>
         <Button
           type="primary"
-          onClick={handleUpdate}
-          disabled={!selectedOne}
+          onClick={handleRefresh}
           loading={loading}
-          icon={<ToolOutlined />}
+          icon={<ReloadOutlined />}
+          style={{ marginRight: "1rem" }}
         >
-          Cập nhật
+          Làm mới
         </Button>
         <span
           style={{
@@ -259,23 +241,33 @@ const TableEmployee = () => {
           {hasSelected ? `Selected ${selectedRowKeys.length} items` : ""}
         </span>
       </div>
-      <Table rowSelection={{
+      <Table
+        rowSelection={{
           selectedRowKeys,
           onChange: onSelectChange,
           onSelect: (record) => {
             setSelectedId(record.id);
           },
-        }} 
-        columns={columns} dataSource={listStaff} />
+        }}
+        columns={columns}
+        dataSource={listCustomer}
+      />
       <Modal
-        title="Xóa nhân viên"
+        title="Xóa khách hàng"
         open={isModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
       >
-        <p>Bạn muốn xóa nhân viên không?</p>
+        <p>Bạn muốn xóa khách hàng không?</p>
       </Modal>
+      {showModalDetailCustomer ? (
+        <ModelDetailCustomer
+          showModalDetailCustomer={showModalDetailCustomer}
+          setShowModalDetailCustomer={setShowModalDetailCustomer}
+          selectedId={selectedId}
+        />
+      ) : null}
     </div>
   );
 };
-export default TableEmployee;
+export default TableCustomer;

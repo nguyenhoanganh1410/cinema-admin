@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Table, Modal,Image,message,Badge, } from "antd";
+import { Button, Table, Modal,Image,message,Badge,Tag, } from "antd";
 import {
   SearchOutlined,
   PlusSquareFilled,
@@ -27,8 +27,23 @@ const TableFilms = () => {
 
   const columns = [
     {
+      title: "Delete",
+      dataIndex: "delete",
+      render: (val) => {
+        return (
+          <Button
+            danger
+            icon={<DeleteOutlined />}
+            onClick={handleDelete}
+          >
+          </Button>
+        );
+      },
+    },
+    {
       title: "Id",
       dataIndex: "id",
+      key: "id",
       render: (val) => {
         return <a onClick={()=>{
           showModalDetail(val);
@@ -83,7 +98,26 @@ const TableFilms = () => {
           src={image}
         />
       ),
-    }
+    },
+    {
+      title: "Active",
+      dataIndex: "active",
+      render: (active) => {
+        let color = "green";
+        if (active === "Hoạt động") {
+          color = "green";
+        }
+        if (active === "Ngừng hoạt động") {
+          color = "blue";
+        }
+        return (
+          <Tag color={color} key={active}>
+            {active.toUpperCase()}
+          </Tag>
+        );
+      },
+    },
+
   ];
 
   
@@ -169,6 +203,16 @@ const TableFilms = () => {
             }
             movie.status = statusName;
 
+            const active = movie?.isActived;
+            console.log('ac',active);
+            let activeName = "";
+            if (active === true) {
+              activeName = "Hoạt động";
+            } else if (active === false) {
+              activeName = "Ngừng hoạt động";
+            }
+            movie.active = activeName;
+
             return movie;
           });
           setListMovie(response);
@@ -187,17 +231,7 @@ const TableFilms = () => {
           marginBottom: 16,
         }}
       >
-        <Button
-          type="primary"
-          danger
-          onClick={handleDelete}
-          // disabled={!hasSelected}
-          loading={loading}
-          icon={<DeleteOutlined />}
-          style={{ marginRight: "1rem" }}
-        >
-          Xóa
-        </Button>
+        
         <Button
           type="primary"
           onClick={handleRefresh}
@@ -214,13 +248,8 @@ const TableFilms = () => {
           {/* {hasSelected ? `Selected ${selectedRowKeys.length} items` : ""} */}
         </span>
       </div>
-      <Table columns={columns} dataSource={listMovie} 
-        rowSelection={{
-          type:'checkbox',
-          onSelect: (record, selected, selectedRows) => {
-            console.log(record, selected, selectedRows);
-          },
-        }} 
+      <Table columns={columns} dataSource={listMovie}
+       
       />
       <Modal
         title="Xóa bộ phim"
