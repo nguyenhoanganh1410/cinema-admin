@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Input,
   Col,
@@ -10,21 +10,12 @@ import {
   DatePicker,
   Select,
 } from "antd";
-
-import {
-  SearchOutlined,
-  PlusSquareFilled,
-  UserAddOutlined,
-  ToolOutlined,
-  DeleteOutlined,
-  DownloadOutlined,
-} from "@ant-design/icons";
-import TablePromotionHeader from "./TablePromotionHeader";
-import moment from "moment";
-import ModelAddPromotionHeader from "./ModelAddPromotionHeader";
-import { MdOutlineChair } from "react-icons/md";
-
 import "./IndexRoomMap.scss";
+import cinemaHallApi from "../../api/cinemaHallApi";
+import { MdChair, MdOutlineSignalCellularNull } from "react-icons/md";
+import { useSelector } from "react-redux";
+import ModelSeat from "./ModelSeat";
+
 const { Title, Text } = Typography;
 const dateFormat = "YYYY/MM/DD";
 
@@ -32,19 +23,49 @@ const arrColumn = ["B", "C", "D", "E", "F", "G", "H", "I", "K"];
 
 const arrRow = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 const IndexCinemaMap = ({ setTab }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [seats, setSeats] = useState([]);
+  const idCinemaHall = useSelector((state) => state.cinemaHallId);
+  const [seat, setSeat] = useState(null);
   const [possition, setPossition] = useState("");
-  const showModal = (val, idx) => {
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const getSeats = async () => {
+      try {
+        const response = await cinemaHallApi.getCinemaHallSeatById(
+          idCinemaHall
+        );
+        if (response) {
+          setSeats(response);
+        }
+      } catch (error) {
+        console.log("Featch erro: ", error);
+      }
+    };
+    getSeats(idCinemaHall);
+  }, []);
+
+  const handleShowModel = (val, idx, seat) => {
+    //call api get seat
+    const getSeatById = async (id) => {
+      try {
+        const response = await cinemaHallApi.getSeatById(id);
+        if (response) {
+          setSeat(response);
+        }
+      } catch (error) {
+        console.log("Featch erro: ", error);
+      }
+    };
+    getSeatById(seat.id);
     setPossition(val + "-" + idx);
-    setIsModalOpen(true);
-  };
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
-  const handleCancel = () => {
-    setIsModalOpen(false);
+    setOpen(true);
   };
 
+  const handleLogic = () =>{
+    setSeat(null);
+    setOpen(false)
+  }
   return (
     <div className="site-card-wrapper">
       <Breadcrumb style={{ marginBottom: "1rem", marginTop: "1rem" }}>
@@ -111,82 +132,40 @@ const IndexCinemaMap = ({ setTab }) => {
                 {arrColumn.map((val, idx) => {
                   let number = 1;
                   let agg = 1;
+                  const newArr = seats.filter((seat) => {
+                    if (seat.seatColumn === val) {
+                      return seat;
+                    }
+                  });
+
                   return (
                     <>
                       <tr>
-                        <td
-                          onClick={() => showModal(val, agg)}
-                          title={val + number}
-                        >
-                          <span>
-                            <MdOutlineChair />
-                          </span>
-                        </td>
-                        <td
-                          onClick={() => showModal(val, agg + 1)}
-                          title={val + ++number}
-                        >
-                          <span>
-                            <MdOutlineChair />
-                          </span>
-                        </td>
-                        <td
-                          onClick={() => showModal(val, agg + 2)}
-                          title={val + ++number}
-                        >
-                          <span>
-                            <MdOutlineChair />
-                          </span>
-                        </td>
-                        <td
-                          onClick={() => showModal(val, agg + 3)}
-                          title={val + ++number}
-                        >
-                          <span>
-                            <MdOutlineChair />
-                          </span>
-                        </td>
-                        <td
-                          onClick={() => showModal(val, agg + 4)}
-                          title={val + ++number}
-                        >
-                          <span>
-                            <MdOutlineChair />
-                          </span>
-                        </td>
-                        <td
-                          onClick={() => showModal(val, agg + 5)}
-                          title={val + ++number}
-                        >
-                          <span>
-                            <MdOutlineChair />
-                          </span>
-                        </td>
-                        <td
-                          onClick={() => showModal(val, agg + 6)}
-                          title={val + ++number}
-                        >
-                          <span>
-                            <MdOutlineChair />
-                          </span>
-                        </td>
-                        <td
-                          onClick={() => showModal(val, agg + 7)}
-                          title={val + ++number}
-                        >
-                          <span>
-                            <MdOutlineChair />
-                          </span>
-                        </td>
-                        <td
-                          onClick={() => showModal(val, agg + 8)}
-                          title={val + ++number}
-                        >
-                          <span>
-                            <MdOutlineChair />
-                          </span>
-                        </td>
+                        {newArr.map((seat, idx) => {
+                          let tmp = idx + 1
+                          if (seat.seatColumn === val) {
+                            return (
+                              <td
+                                onClick={() => handleShowModel(val, idx + 1, seat)}
+                                title={val + tmp}
+                                key={seat.createdAt}
+                                style={!seat?.status ? {background:"red"} : {}}
+                              >
+                                <span>
+                                  <MdChair />
+                                </span>
+                              </td>
+                            );
+                          }
+                          return (
+                            <td
+                              onClick={() => handleShowModel(val, agg++)}
+                              title={val + number}
+                            ></td>
+                          );
+                        })}
                       </tr>
+                     
                     </>
                   );
                 })}
@@ -214,7 +193,7 @@ const IndexCinemaMap = ({ setTab }) => {
           <Row>
             <Col span={10}>
               <p style={{ fontSize: "16px", color: "blue" }}>
-                <MdOutlineChair />
+              <MdChair />
               </p>{" "}
             </Col>
             <Col span={14} className="block-span">
@@ -224,7 +203,7 @@ const IndexCinemaMap = ({ setTab }) => {
           <Row>
             <Col span={10}>
               <p style={{ fontSize: "16px", color: "red" }}>
-                <MdOutlineChair />
+              <MdChair />
               </p>{" "}
             </Col>
             <Col span={14} className="block-span">
@@ -233,62 +212,11 @@ const IndexCinemaMap = ({ setTab }) => {
           </Row>
         </Col>
       </Row>
-
-      <Modal
-        title="Thông tin ghế"
-        open={isModalOpen}
-        onOk={handleOk}
-        onCancel={handleCancel}
-      >
-        <Row style={{ marginBottom: "16px" }}>
-          <Col span={4}>Vị trí:</Col>
-          <Col span={20}>{possition}</Col>
-        </Row>
-        <Row style={{ marginBottom: "16px" }}>
-          <Col span={4}>Trạng thái:</Col>
-          <Col span={20}>
-            {" "}
-            <Select
-              placeholder="Trạng thái"
-              style={{
-                width: "100%",
-              }}
-              options={[
-                {
-                  value: "1",
-                  label: "Có ghế",
-                },
-                {
-                  value: "2",
-                  label: "Trống",
-                },
-              ]}
-            />
-          </Col>
-        </Row>
-        <Row style={{ marginBottom: "16px" }}>
-          <Col span={4}>Loại ghế:</Col>
-          <Col span={20}>
-            {" "}
-            <Select
-              placeholder="Loại ghế"
-              style={{
-                width: "100%",
-              }}
-              options={[
-                {
-                  value: "1",
-                  label: "Ghế đơn",
-                },
-                {
-                  value: "2",
-                  label: "Ghế đôi",
-                },
-              ]}
-            />
-          </Col>
-        </Row>
-      </Modal>
+      
+      {
+        open ? <ModelSeat seat={seat} possition={possition} handleLogic={handleLogic}/> : null
+      }
+      
     </div>
   );
 };

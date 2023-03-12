@@ -10,7 +10,7 @@ import {
 import { useDispatch } from "react-redux";
 import movieApi from "../../api/movieApi";
 import promotionApi from "../../api/promotionApi";
-import { setPromotionHeader } from "../../redux/actions";
+import { setCinemaHall, setPromotionHeader } from "../../redux/actions";
 import cinemaHallApi from "../../api/cinemaHallApi";
 
 const TablePromotionHeader = ({ setTab }) => {
@@ -72,8 +72,7 @@ const TablePromotionHeader = ({ setTab }) => {
   }, []);
 
   const handleOnclik = (id) => {
-    //set id in headerId;
-    dispatch(setPromotionHeader(id));
+    dispatch(setCinemaHall(id));
     setTab(1);
   };
 

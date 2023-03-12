@@ -127,7 +127,7 @@ const ModelAddPromotionHeader = ({
   return (
     <>
       <Drawer
-        title="Thêm CT Khuyến mãi"
+        title="Tạo rạp"
         width={720}
         onClose={onClose}
         open={showModalAddCustomer}
@@ -147,70 +147,22 @@ const ModelAddPromotionHeader = ({
         <Form layout="vertical" onFinish={handleSubmit} id="myForm" form={form}>
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item
-                name="namePromotion"
-                label="Tên CT Khuyến mãi"
-                rules={[
-                  {
-                    required: true,
-                    message: "Hãy nhập tên CT khuyến mãi...",
-                  },
-                ]}
-              >
-                <Input placeholder="Hãy nhập tên CT khuyến mãi..." />
+              <Form.Item name="namePromotion" label="Chi nhánh">
+                <Input placeholder="Cinema Võ văn ngân" disabled />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
-                name="desc"
-                label="Chi tiết CTKM"
+                name="name"
+                label="Tên phòng chiếu"
                 rules={[
                   {
                     required: true,
-                    message: "Hãy nhập chi tiết CTKH...",
+                    message: "Hãy nhập tên phòng chiếu...",
                   },
                 ]}
               >
-                <Input placeholder="Hãy nhập chi tiết CTKM..." />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name="startDate"
-                label="Ngày bắt đầu"
-                rules={[
-                  {
-                    required: true,
-                    message: "Hãy chọn ngày bắt đầu...",
-                  },
-                ]}
-              >
-                <DatePicker
-                  onChange={onChangeDate}
-                  style={{ width: "100%" }}
-                  placeholder="Chọn ngày bắt đầu"
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="endDate"
-                label="Ngày kết thúc"
-                rules={[
-                  {
-                    required: true,
-                    message: "Hãy chọn ngày kết thúc...",
-                  },
-                ]}
-              >
-                <DatePicker
-                  onChange={onChangeEndDate}
-                  style={{ width: "100%" }}
-                  placeholder="Chọn ngày kết thúc"
-                />
+                <Input placeholder="Hãy nhập tên phòng chiếu..." />
               </Form.Item>
             </Col>
           </Row>
@@ -218,17 +170,17 @@ const ModelAddPromotionHeader = ({
           <Row style={{ marginBottom: "26px" }} gutter={16}>
             <Col span={12}>
               <Form.Item
-                name="statusPromotion"
-                label="Trạng thái"
+                name="type"
+                label="Loại phòng"
                 rules={[
                   {
                     required: true,
-                    message: "Hãy chọn trạng thái...",
+                    message: "Hãy chọn loại phòng...",
                   },
                 ]}
               >
                 <Select
-                  placeholder="Chọn trạng thái"
+                  placeholder="Chọn loại phòng"
                   style={{
                     width: "100%",
                   }}
@@ -236,42 +188,16 @@ const ModelAddPromotionHeader = ({
                   options={[
                     {
                       value: "0",
-                      label: "Ngưng hoạt động",
+                      label: "Phòng 2D",
                     },
                     {
                       value: "1",
-                      label: "Hoạt động",
+                      label: "Phòng 3D",
                     },
                   ]}
                 />
               </Form.Item>
             </Col>
-          </Row>
-          <Row>
-            <Upload
-              action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-              listType="picture-card"
-              fileList={fileList}
-              onPreview={handlePreview}
-              onChange={handleChange}
-              name="image"
-            >
-              {fileList.length >= 8 ? null : uploadButton}
-            </Upload>
-            <Modal
-              open={previewOpen}
-              title={previewTitle}
-              footer={null}
-              onCancel={handleCancel}
-            >
-              <img
-                alt="example"
-                style={{
-                  width: "100%",
-                }}
-                src={previewImage}
-              />
-            </Modal>
           </Row>
         </Form>
       </Drawer>
