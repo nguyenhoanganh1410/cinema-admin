@@ -1,6 +1,7 @@
 const initValue = {
   user: {},
   promotionHeaderId: null,
+  cinemaHallId: null,
   reload: false,
 };
 
@@ -21,6 +22,11 @@ const rootReducer = (state = initValue, action) => {
         ...state,
         reload: action.payload,
       };
+    case "update/cinemaHall":
+        return {
+          ...state,
+          cinemaHallId: action.payload,
+        };
     default:
       return state;
   }

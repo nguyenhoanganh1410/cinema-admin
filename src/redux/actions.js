@@ -18,3 +18,10 @@ export const setReload = (data) => {
     payload: data,
   };
 };
+
+export const setCinemaHall = (data) => {
+  return {
+    type: "update/cinemaHall",
+    payload: data,
+  };
+};

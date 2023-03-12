@@ -43,6 +43,8 @@ import IndexPromotion from "../components/promotion/IndexPromotion";
 import IndexRoutePro from "../components/promotion/IndexRoutePro";
 import IndexProduct from "../components/product";
 import IndexPrice from "../components/price";
+import IndexRouteHall from "../components/cinemahall/IndexRoute";
+import IndexRouteBooking from "../components/booking/IndexRouteBooking";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -190,7 +192,7 @@ const HomePage = () => {
     } else if (itemClicked === 15) {
       return <IndexEmployee />;
     } else if (itemClicked === 3) {
-      return <IndexFilm />;
+      return <IndexRouteBooking />
     } else if (itemClicked === 4) {
       return <IndexRouter />;
     } else if (itemClicked === 100) {
@@ -202,6 +204,10 @@ const HomePage = () => {
     } else if (itemClicked === 21) {
       return <IndexPrice />;
     } 
+    }
+    else if (itemClicked === 13) {
+      return <IndexRouteHall />;
+    }
     return <IndexDashboard />;
   };
 
