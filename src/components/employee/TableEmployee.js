@@ -26,7 +26,7 @@ const TableEmployee = () => {
   const [selectedId, setSelectedId] = useState([]);
 
   const showModalDetail = (e) => {
-    setShowModalDetailCustomer(true);
+    //setShowModalDetailCustomer(true);
     setSelectedId(e);
   };
 

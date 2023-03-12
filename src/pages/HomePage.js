@@ -203,9 +203,7 @@ const HomePage = () => {
       return <IndexProduct />;
     } else if (itemClicked === 21) {
       return <IndexPrice />;
-    } 
-    }
-    else if (itemClicked === 13) {
+    } else if (itemClicked === 13) {
       return <IndexRouteHall />;
     }
     return <IndexDashboard />;

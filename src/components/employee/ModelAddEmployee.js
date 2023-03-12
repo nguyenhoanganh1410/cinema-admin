@@ -12,9 +12,11 @@ import {
   Space,
 } from "antd";
 import openAddressApi from "../../api/openApi";
-const { Option } = Select;
 import { useDispatch, useSelector } from "react-redux";
 import { setReload } from "../../redux/actions";
+
+
+const { Option } = Select;
 
 const ModelAddEmployee = ({
   showModalAddCustomer,

@@ -9,7 +9,6 @@ import {
   ReloadOutlined,
 } from "@ant-design/icons";
 import productApi from "../../api/productApi";
-import ModelAddProduct from "./ModelAddProduct-1";
 import ModelDetailProduct from "./ModelProductDetail";
 import openAddressApi from "../../api/openApi";
 import { useDispatch, useSelector } from "react-redux";
