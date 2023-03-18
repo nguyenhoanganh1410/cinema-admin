@@ -16,10 +16,11 @@ import {
   Tag,
   Table,
   Breadcrumb,
-  Badge,
 } from "antd";
 
-import { PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined,
+  MinusCircleOutlined,
+ } from "@ant-design/icons";
 import ModelAddPromoLine from "./ModelAddPromoLine";
 import { useSelector } from "react-redux";
 import promotionApi from "../../api/promotionApi";
@@ -40,54 +41,36 @@ const dateFormat = "YYYY/MM/DD";
 const newDateFormat = "YYYY-MM-DD";
 const columns = [
   {
-    title: "Mã Code",
-    dataIndex: "promotionCode",
-    key: "promotionCode",
+    title: "Mã Sản phẩm",
+    dataIndex: "priceCode",
+    key: "priceCode",
     render: (text) => <a>{text}</a>,
   },
   {
-    title: "Miêu tả",
-    dataIndex: "mieuTa",
-    key: "age",
+    title: "Tên Sản phẩm",
+    dataIndex: "name",
+    key: "name",
   },
   {
-    title: "Loại khuyến mãi",
-    dataIndex: "type",
-    key: "type",
+    title: "Phòng chiếu",
+    dataIndex: "typeHall",
   },
   {
-    title: "Ngày bắt đầu",
-    dataIndex: "startDate",
-    key: "startDate",
-  },
-  {
-    title: "Ngày kết thức",
+    title: "Giá bán",
     dataIndex: "endDate",
     key: "endDate",
   },
   {
-    title: "Trạng thái",
-    key: "status",
-    dataIndex: "status",
-    render: (status) => {
-      let color;
-      let text;
-      if (status === 1) {
-        color = "green";
-        text = "Hoạt động";
-      } else {
-        color = "red";
-        text = "Ngưng hoạt động";
-      }
-      return (
-        <Badge status={color} text={text} />
-      );
-
-    }
+    render: (text, record) => (
+      <Button 
+      icon={<MinusCircleOutlined />}
+      >
+      </Button>
+    ),
   },
 ];
 
-const IndexLinePromotion = ({setTab}) => {
+const IndexLinePrice = ({ setTab }) => {
   const [showModalAddCustomer, setShowModalAddCustomer] = useState(false);
 
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -130,6 +113,10 @@ const IndexLinePromotion = ({setTab}) => {
       </div>
     </div>
   );
+
+  const handleRouter = (value) => {
+    setTab(0);
+  };
 
   const handleOpenModel = () => {
     setShowModalAddCustomer(true);
@@ -197,8 +184,6 @@ const IndexLinePromotion = ({setTab}) => {
       }
     };
 
-    
-
     //load movies
     const getPromotionHeaderById = async (id) => {
       try {
@@ -233,13 +218,10 @@ const IndexLinePromotion = ({setTab}) => {
     getPromotionHeaderById(idHeaderPromotion);
   }, [idHeaderPromotion]);
 
-  const handleRouter = (value) => {
-    setTab(0);
-  };
-
   return (
     <div className="site-card-wrapper" style={{ minWidth: "100vh" }}>
-      <div
+      <div>
+        <div
           style={{
             display: "flex",
             justifyContent: "space-between",
@@ -247,7 +229,7 @@ const IndexLinePromotion = ({setTab}) => {
         >
           <Breadcrumb style={{ marginBottom: "1rem", marginTop: "1rem" }}>
             <Breadcrumb.Item>
-              <a onClick={handleRouter}>Chương trình khuyến mãi</a>
+              <a onClick={handleRouter}>Bảng giá</a>
             </Breadcrumb.Item>
             <Breadcrumb.Item>Chỉnh sửa</Breadcrumb.Item>
           </Breadcrumb>
@@ -264,6 +246,8 @@ const IndexLinePromotion = ({setTab}) => {
             Cập nhật
           </Button>
         </div>
+      </div>
+
       <Form
         style={{
           background: "white",
@@ -276,38 +260,34 @@ const IndexLinePromotion = ({setTab}) => {
         layout="vertical"
       >
         <Row gutter={16}>
-        <Col span={12}>
+          <Col span={12}>
             <Form.Item name="id" hidden={true}>
-              <Input  />
+              <Input />
             </Form.Item>
-            <Form.Item
-              name="codePromotion"
-              label="Mã CT Khuyến mãi"
-            >
-              <Input disabled={true} />
+            <Form.Item name="codePrice" label="Mã bảng giá">
+              <Input
+                disabled={true}
+                placeholder="Hãy nhập tên CT khuyến mãi..."
+              />
             </Form.Item>
           </Col>
-          
-        </Row>
-        <Row gutter={16}>
+          <Col span={12}></Col>
+
           <Col span={12}>
             <Form.Item
-              name="namePromotion"
-              label="Tên CT Khuyến mãi"
+              name="namePrice"
+              label="Tên bảng giá"
               rules={[
                 {
                   required: true,
-                  message: "Hãy nhập tên CT khuyến mãi...",
+                  message: "Hãy nhập chi tiết CTKH...",
                 },
               ]}
             >
-              <Input placeholder="Hãy nhập tên CT khuyến mãi..." />
+              <Input placeholder="Hãy nhập tên bảng giá..." />
             </Form.Item>
           </Col>
-          <Col span={2}>
-          </Col>
-          
-          <Col span={10}>
+          <Col span={12}>
             <Form.Item
               label="Ngày bắt đầu"
               name="startDate"
@@ -325,41 +305,9 @@ const IndexLinePromotion = ({setTab}) => {
               />
             </Form.Item>
           </Col>
-         </Row>
-
+        </Row>
         <Row gutter={16}>
-        <Col span={6}>
-          <Form.Item
-              name="image"
-              label="Hình ảnh"
-            >
-          <Upload
-            action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-            listType="picture-card"
-            fileList={fileList}
-            onPreview={handlePreview}
-            onChange={handleChange}
-          >
-            {fileList.length >= 1 ? null : uploadButton}
-          </Upload>
-          <Modal
-            open={previewOpen}
-            title={previewTitle}
-            footer={null}
-            onCancel={handleCancel}
-          >
-            <img
-              alt="example"
-              style={{
-                width: "100%",
-              }}
-              src={previewImage}
-            />
-          </Modal>
-          </Form.Item>
-          </Col>
-
-          <Col span={6}>
+          <Col span={4}>
             <Form.Item
               name="statusPromotion"
               label="Trạng thái"
@@ -388,12 +336,9 @@ const IndexLinePromotion = ({setTab}) => {
                 ]}
               />
             </Form.Item>
-          </Col> 
-        
-        <Col span={2}>
-        </Col>
-
-        <Col span={10}>
+          </Col>
+          <Col span={8}></Col>
+          <Col span={12}>
             <Form.Item
               name="endDate"
               label="Ngày kết thúc"
@@ -412,43 +357,15 @@ const IndexLinePromotion = ({setTab}) => {
             </Form.Item>
           </Col>
         </Row>
-        <Row gutter={16}>
-
-        <Col span={12}>
-            <Form.Item
-              name="desc"
-              label="Chi tiết CTKM"
-              rules={[
-                {
-                  required: true,
-                  message: "Hãy nhập chi tiết CTKH...",
-                },
-              ]}
-            >
-              <TextArea
-                rows={7}
-                placeholder="Nhập chi tiết CTKM"
-                maxLength={6}
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-    
       </Form>
       {/* table */}
       <div>
         <div
           style={{
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent: "flex-end",
           }}
-        > 
-          <Space>
-            <span style={{ 
-              fontSize: "1rem",
-              fontWeight: "bold",
-            }}>Dòng khuyến mãi</span>
-          </Space>
+        >
           <Button
             type="primary"
             onClick={() => handleOpenModel()}
@@ -472,4 +389,4 @@ const IndexLinePromotion = ({setTab}) => {
     </div>
   );
 };
-export default IndexLinePromotion;
+export default IndexLinePrice;

@@ -45,6 +45,8 @@ import IndexProduct from "../components/product";
 import IndexPrice from "../components/price";
 import IndexRouteHall from "../components/cinemahall/IndexRoute";
 import IndexRouteBooking from "../components/booking/IndexRouteBooking";
+import IndexRoutePrice from "../components/price/IndexRoutePrice";
+
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -99,7 +101,7 @@ const dropList = [
 const items = [
   getItem("Dashboard", "1", <DashboardTwoTone />),
   getItem("Đặt vé", "sub00", <DesktopOutlined />, [
-    getItem("Đặt vé", "3"),
+    getItem("Đặt vé", "2"),
     getItem("Vé đã đặt", "9"),
     getItem("Vé đặt online", "10"),
   ]),
@@ -110,7 +112,6 @@ const items = [
   ]),
   getItem("Quản lý rạp", "sub4", <HomeOutlined />, [
     getItem("Rạp", "13"),
-    getItem("Ghế", "14"),
   ]),
 
   getItem("Quản lý khuyến mãi", "19", <ThunderboltOutlined />),
@@ -192,7 +193,7 @@ const HomePage = () => {
     } else if (itemClicked === 15) {
       return <IndexEmployee />;
     } else if (itemClicked === 3) {
-      return <IndexRouteBooking />
+      return <IndexFilm />
     } else if (itemClicked === 4) {
       return <IndexRouter />;
     } else if (itemClicked === 100) {
@@ -202,10 +203,10 @@ const HomePage = () => {
     } else if (itemClicked === 20) {
       return <IndexProduct />;
     } else if (itemClicked === 21) {
-      return <IndexPrice />;
+      return <IndexRoutePrice />;
     } else if (itemClicked === 13) {
       return <IndexRouteHall />;
-    }
+    } 
     return <IndexDashboard />;
   };
 

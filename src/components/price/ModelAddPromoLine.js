@@ -18,9 +18,9 @@ import {
 } from "antd";
 
 import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
-import ProductPromotion from "./ProductPromotion";
-import MoneyPromotion from "./MoneyPromotion";
-import PercentPromotion from "./PercentPromotion";
+// import ProductPromotion from "./ProductPromotion";
+// import MoneyPromotion from "./MoneyPromotion";
+// import PercentPromotion from "./PercentPromotion";
 
 const { Option } = Select;
 
@@ -91,18 +91,18 @@ const ModelAddPromoLine = ({
     console.log(date, dateString);
   };
 
-  const RenderType = () => {
-    switch (type) {
-      case 1:
-        return <MoneyPromotion />;
-      case 2:
-        return <ProductPromotion />;
-      case 3:
-        return <PercentPromotion />;
-      default:
-        return <PercentPromotion />;
-    }
-  };
+  // const RenderType = () => {
+  //   switch (type) {
+  //     case 1:
+  //       return <MoneyPromotion />;
+  //     case 2:
+  //       return <ProductPromotion />;
+  //     case 3:
+  //       return <PercentPromotion />;
+  //     default:
+  //       return <PercentPromotion />;
+  //   }
+  // };
   return (
     <>
       <Drawer
@@ -126,16 +126,16 @@ const ModelAddPromoLine = ({
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                name="promotionCode"
-                label="Mã áp dụng"
+                name=""
+                label="Mã Code"
                 rules={[
                   {
                     required: true,
-                    message: "Hãy nhập mã áp dụng...",
+                    message: "Hãy nhập mã code...",
                   },
                 ]}
               >
-                <Input placeholder="Hãy nhập mã áp dụng..." />
+                <Input placeholder="Hãy nhập mã code.." />
               </Form.Item>
             </Col>
             <Col span={12}>
