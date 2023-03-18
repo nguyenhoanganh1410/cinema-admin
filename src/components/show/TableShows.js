@@ -1,18 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { Button, Table, Modal, Select,Badge } from "antd";
+import { Button, Table, Modal, Select, Badge,Tag } from "antd";
 import {
   SearchOutlined,
   PlusSquareFilled,
   UserAddOutlined,
   ToolOutlined,
   DeleteOutlined,
+  MinusSquareOutlined,
+  PlusSquareOutlined,
 } from "@ant-design/icons";
 import showApi from "../../api/showApi";
+import showTimeApi from "../../api/showTimeApi";
+import moment from "moment/moment";
+import TableShowTime from "./TableShowTime";
 
 const TableShows = ({ setShowModalAddCustomer, setTab }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [listShow, setListShow] = useState([]);
+  const [selectedId, setSelectedId] = useState(0);
+  const [listShowTime, setListShowTime] = useState([]);
 
   const columns = [
     {
@@ -24,12 +31,12 @@ const TableShows = ({ setShowModalAddCustomer, setTab }) => {
       dataIndex: "filmShow",
     },
     {
-      title: "Ngày chiếu",
-      dataIndex: "dateShow",
+      title: "Ngày bắt đầu",
+      dataIndex: "startDate",
     },
     {
-      title: "Giờ chiếu",
-      dataIndex: "timeShow",
+      title: "Ngày kết thúc",
+      dataIndex: "endDate",
     },
     {
       title: "Phòng chiếu",
@@ -44,25 +51,50 @@ const TableShows = ({ setShowModalAddCustomer, setTab }) => {
       dataIndex: "status",
       render: (val) => {
         let color = "";
-        if(val === "Đang chiếu"){
+        if (val === "Đang chiếu") {
           color = "green";
-        }else if(val === "Sắp chiếu"){
+        } else if (val === "Sắp chiếu") {
           color = "blue";
-        }else if(val === "Đã kết thúc"){
+        } else if (val === "Đã kết thúc") {
           color = "red";
         }
-        return (
-          <Badge color={color} text={val} />
-        );
-      }
+        return <Badge color={color} text={val} />;
+      },
     },
   ];
 
+  useEffect(() => {
+    const fetchShowTimeByShowId = async () => {
+      const response = await showTimeApi.getShowTimeByShowId(selectedId);
+      let data = [];
+      if (response) {
+        for (const index in response) {
+          data.push({
+            showDate: index,
+            showTime: response[index].map((item, index) => {
+              return item.showTime;
+            }),
+            status: response[index].map((item, index) => {
+              return item.status;
+            }),
+          });
+        }
+      }
+      setListShowTime(data);
+    };
+    
+    if(selectedId !== 0){
+      fetchShowTimeByShowId();
+    }
+
+  }, [selectedId]);
+
+  
 
 
-  const onSelectChange = (newSelectedRowKeys) => {
-    console.log("selectedRowKeys changed: ", newSelectedRowKeys);
-    setSelectedRowKeys(newSelectedRowKeys);
+
+  const onSelectChange = (selectedId) => {
+    setSelectedRowKeys(selectedId);
   };
   const rowSelection = {
     selectedRowKeys,
@@ -130,18 +162,16 @@ const TableShows = ({ setShowModalAddCustomer, setTab }) => {
             } else if (item.status === 3) {
               statusName = "Đã kết thúc";
             }
-            return{
+            return {
               key: index,
               id: item.id,
               filmShow: item.Movie.nameMovie,
-              dateShow: item.showDate.substring(0, 10),
-              timeShow: `${item.showTime} - ${item.endTime}`,
+              startDate: item.startDate,
+              endDate: item.endDate,
               locationShow: item.Cinema.name,
               roomShow: item.CinemaHall.name,
               status: statusName,
-
-            }
-
+            };
           });
 
           setListShow(data);
@@ -262,7 +292,18 @@ const TableShows = ({ setShowModalAddCustomer, setTab }) => {
           />
         </div>
       </div>
-      <Table rowSelection={rowSelection} columns={columns} dataSource={listShow} />
+      <Table
+        columns={columns}
+        expandable={{
+          expandedRowRender:(record) =>( <TableShowTime record={record} />),
+          defaultExpandedRowKeys: [listShow.map((item) => item.id)],
+          expandRowByClick: true,
+          onExpand: (expanded, record) => {
+            setSelectedId(record.id);
+          },
+        }}
+        dataSource={listShow}
+      />
       <Modal
         title="Xóa bộ phim"
         open={isModalOpen}

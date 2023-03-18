@@ -7,6 +7,9 @@ const showTimeApi = {
     getListShowTime() {
         return axiosApi.get("/showTime");
     },
+    getShowTimeByShowId(id) {
+        return axiosApi.get(`/showTimesMovie/${id}`);
+    },
 };
 
 export default showTimeApi;

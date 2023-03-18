@@ -198,6 +198,36 @@ const ModelAddPromotionHeader = ({
                 />
               </Form.Item>
             </Col>
+            <Col span={12}>
+              <Form.Item
+                name="seats"
+                label="Số ghế"
+                rules={[
+                  {
+                    required: true,
+                    message: "Hãy chọn số ghế...",
+                  },
+                ]}
+              >
+                <Select
+                  placeholder="Chọn số ghế"
+                  style={{
+                    width: "100%",
+                  }}
+                  // onChange={handleChangePosition}
+                  options={[
+                    {
+                      value: "0",
+                      label: "Big - 80 ghế(10-20-50)",
+                    },
+                    {
+                      value: "1",
+                      label: "Medium - 50 ghế(5-20-25)",
+                    },
+                  ]}
+                />
+              </Form.Item>
+            </Col>
           </Row>
         </Form>
       </Drawer>
