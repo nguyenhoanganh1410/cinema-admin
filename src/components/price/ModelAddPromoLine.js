@@ -327,7 +327,7 @@ const ModelAddPromoLine = ({
             </Col>
           </Row>
         </Form>
-        <RenderType />
+        {/* <RenderType /> */}
       </Drawer>
     </>
   );

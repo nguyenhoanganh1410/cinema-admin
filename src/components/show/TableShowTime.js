@@ -177,14 +177,14 @@ const TableShowTime = ({ record }) => {
   };
   /////
 
-  const handleOpenAddShow = () => {
-    setShowModalAddCustomer(true);
-  };
+  // const handleOpenAddShow = () => {
+  //   setShowModalAddCustomer(true);
+  // };
 
-  //show chart
-  const handleShowChart = () => {
-    setTab(1);
-  };
+  // //show chart
+  // const handleShowChart = () => {
+  //   setTab(1);
+  // };
 
   useEffect(() => {
     //load movies
