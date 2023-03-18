@@ -17,10 +17,6 @@ import cinemaHallApi from "../../api/cinemaHallApi";
 import { MdChair, MdOutlineSignalCellularNull } from "react-icons/md";
 import { useSelector } from "react-redux";
 
-const arrColumn = ["B", "C", "D", "E", "F", "G", "H", "I", "K"];
-
-const arrRow = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-
 const initValue = {
   status:"",
   statusSeat:""
@@ -32,30 +28,27 @@ const ModelSeat = ({possition, seat, handleLogic }) => {
   const [statusSeatState, setStatusSeatState] = useState(null)
   const [statusState, setStatusState] = useState(null)
 
-  const handleOk = () => {
-    console.log(statusSeatState);
-    console.log(statusState);
-    handleLogic()
-    //handleSubmit();
-    // //submit
-    // console.log(statusState);
-    // console.log(statusSeatState);
+  
 
-    // const update = async (id, data) => {
-    //   try {
-    //     const response = await cinemaHallApi.updateSeat(
-    //       id, data
-    //     );
-    //     if (response) {
-    //       console.log("update success");
-    //       setStatusSeatState(null)
-    //       setStatusState(null)
-    //     }
-    //   } catch (error) {
-    //     console.log("Featch erro: ", error);
-    //   }
-    // };
-    // update(seat.id, {state: statusState, statusSeat: statusSeatState});
+  const handleOk = () => {
+   
+    
+    const update = async (id, data) => {
+      try {
+        const response = await cinemaHallApi.updateSeat(
+          id, data
+        );
+        if (response) {
+          console.log("update success");
+          setStatusSeatState(null)
+          setStatusState(null)
+           handleLogic();
+        }
+      } catch (error) {
+        console.log("Featch erro: ", error);
+      }
+    };
+    update(seat.id, {status: statusState, statusSeat: statusSeatState});
   };
   const handleCancel = () => {
     handleLogic()
@@ -67,10 +60,13 @@ const ModelSeat = ({possition, seat, handleLogic }) => {
   };
 
   const handleChangeStatusSeat = (value) => {
-  
     setStatusSeatState(value)
   };
-
+  
+  useEffect(()=>{
+    setStatusSeatState(seat?.statusSeat);
+    setStatusState(seat?.status)
+  },[])
  
   return (
       <Modal
@@ -96,27 +92,53 @@ const ModelSeat = ({possition, seat, handleLogic }) => {
             },
           ]}
         >
-         
-            <Select
-               placeholder="Trạng thái"
-               onChange={handleChange}
-               name="status"
-               style={{
-                 width: "100%",
-               }}
-               labelInValue
-               defaultValue={statusState}
-               options={[
-                 {
-                   value: "1",
-                   label: "Sẵn sàng",
-                 },
-                 {
-                   value: "0",
-                   label: "Bảo trì",
-                 },
-               ]}
-             /> 
+         {
+          seat.status === 1 ? 
+          <Select
+             placeholder="Trạng thái"
+             onChange={handleChange}
+             name="status"
+             style={{
+               width: "100%",
+             }}
+             defaultValue={{
+              value: "1",
+              label: "Sẵn sàng",
+            }}
+             options={[
+               {
+                 value: "1",
+                 label: "Sẵn sàng",
+               },
+               {
+                 value: "0",
+                 label: "Bảo trì",
+               },
+             ]}
+           /> : 
+           <Select
+             placeholder="Trạng thái"
+             onChange={handleChange}
+             name="status"
+             style={{
+               width: "100%",
+             }}
+             defaultValue={{
+              value: "0",
+              label: "Bảo trì",
+            }}
+             options={[
+               {
+                 value: "1",
+                 label: "Sẵn sàng",
+               },
+               {
+                 value: "0",
+                 label: "Bảo trì",
+               },
+             ]}
+           /> 
+         }
           </Form.Item>     
           </Col>
         </Row>
@@ -131,24 +153,53 @@ const ModelSeat = ({possition, seat, handleLogic }) => {
             },
           ]}
         >
-              <Select
-              placeholder="Loại ghế"
-              onChange={handleChangeStatusSeat}
-              name="statusSeat"
-                style={{
-                  width: "100%",
-                }}
-                options={[
-                  {
-                    value: "false",
-                    label: "Ghế đơn",
-                  },
-                  {
-                    value: "true",
-                    label: "Ghế đôi",
-                  },
-                ]}
-              /> 
+          {
+            seat?.statusSeat ? 
+            <Select
+            placeholder="Loại ghế"
+            onChange={handleChangeStatusSeat}
+            name="statusSeat"
+            defaultValue={{
+              value: "true",
+              label: "Ghế đôi",
+            }}
+              style={{
+                width: "100%",
+              }}
+              options={[
+                {
+                  value: "false",
+                  label: "Ghế đơn",
+                },
+                {
+                  value: "true",
+                  label: "Ghế đôi",
+                },
+              ]}
+            />  : 
+            <Select
+            placeholder="Loại ghế"
+            onChange={handleChangeStatusSeat}
+            name="statusSeat"
+            defaultValue={{
+              value: "false",
+                  label: "Ghế đơn",
+            }}
+              style={{
+                width: "100%",
+              }}
+              options={[
+                {
+                  value: "false",
+                  label: "Ghế đơn",
+                },
+                {
+                  value: "true",
+                  label: "Ghế đôi",
+                },
+              ]}
+            /> 
+          }
 
         </Form.Item>
           </Col>

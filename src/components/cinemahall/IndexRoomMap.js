@@ -28,6 +28,7 @@ const IndexCinemaMap = ({ setTab }) => {
   const [seat, setSeat] = useState(null);
   const [possition, setPossition] = useState("");
   const [open, setOpen] = useState(false);
+  const [changeSeat, setChangeSeat] = useState(false);
 
   useEffect(() => {
     const getSeats = async () => {
@@ -43,7 +44,7 @@ const IndexCinemaMap = ({ setTab }) => {
       }
     };
     getSeats(idCinemaHall);
-  }, []);
+  }, [changeSeat]);
 
   const handleShowModel = (val, idx, seat) => {
     //call api get seat
@@ -52,19 +53,21 @@ const IndexCinemaMap = ({ setTab }) => {
         const response = await cinemaHallApi.getSeatById(id);
         if (response) {
           setSeat(response);
+          setPossition(val + "-" + idx);
+          setOpen(true);
         }
       } catch (error) {
         console.log("Featch erro: ", error);
       }
     };
     getSeatById(seat.id);
-    setPossition(val + "-" + idx);
-    setOpen(true);
+   
   };
 
   const handleLogic = () =>{
     setSeat(null);
     setOpen(false)
+    setChangeSeat(!changeSeat)
   }
   return (
     <div className="site-card-wrapper">
@@ -145,16 +148,35 @@ const IndexCinemaMap = ({ setTab }) => {
                           let tmp = idx + 1
                           if (seat.seatColumn === val) {
                             return (
+                              <>
+                              {
+                                seat.statusSeat ? 
                               <td
                                 onClick={() => handleShowModel(val, idx + 1, seat)}
-                                title={val + tmp}
+                                title={seat?.status ? val + tmp : val + tmp + " ghế bảo trì"}
                                 key={seat.createdAt}
                                 style={!seat?.status ? {background:"red"} : {}}
                               >
                                 <span>
                                   <MdChair />
+                                  <MdChair />
                                 </span>
-                              </td>
+                              </td> : 
+                               <td
+                               onClick={() => handleShowModel(val, idx + 1, seat)}
+                               title={seat?.status ? val + tmp : val + tmp + " ghế bảo trì"}
+                               key={seat.createdAt}
+                               style={!seat?.status ? {background:"red"} : {}}
+                             >
+                               <span>
+                                 <MdChair />
+                               
+                               </span>
+                             </td>
+                              }
+                              
+                              </>
+                          
                             );
                           }
                           return (
@@ -187,7 +209,7 @@ const IndexCinemaMap = ({ setTab }) => {
               <p>Tổng số ghế:</p>{" "}
             </Col>
             <Col span={8} className="block-span">
-              <span>70</span>
+              <span>{seats.length}</span>
             </Col>
           </Row>
           <Row>
@@ -202,7 +224,8 @@ const IndexCinemaMap = ({ setTab }) => {
           </Row>
           <Row>
             <Col span={10}>
-              <p style={{ fontSize: "16px", color: "red" }}>
+              <p style={{ fontSize: "16px", color: "blue" }}>
+              <MdChair />
               <MdChair />
               </p>{" "}
             </Col>
@@ -214,7 +237,7 @@ const IndexCinemaMap = ({ setTab }) => {
       </Row>
       
       {
-        open ? <ModelSeat seat={seat} possition={possition} handleLogic={handleLogic}/> : null
+        open ? <ModelSeat  seat={seat} possition={possition} handleLogic={handleLogic}/> : null
       }
       
     </div>

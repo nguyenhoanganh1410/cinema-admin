@@ -14,11 +14,7 @@ const cinemaHallApi = {
   },
 
   updateSeat: (id, data) => {
-    return axiosApi.put(`/cinemaHallSeat/${id}`, data,{
-        headers: {
-            'Content-Type': 'multipart/form-data'
-        }
-    });
+    return axiosApi.put(`/cinemaHallSeat/${id}`, data);
 },
 };
 
