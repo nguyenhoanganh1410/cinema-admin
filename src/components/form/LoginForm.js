@@ -55,6 +55,7 @@ const LoginForm = () => {
         }
       } catch (error) {
         console.log("Failed to login ", error);
+        alert("Failed to login")
         setLoadingStatus(false);
       }
     };
@@ -74,69 +75,51 @@ const LoginForm = () => {
               alignItems: "center",
             }}
           >
-            <h1 style={{ color: "#0068ff", fontSize: "3rem", margin: 0 }}>
-              CineStar
+            <h1 style={{ color: "white", fontSize: "2.2rem", margin: 0 }}>
+              CineStar Hub
             </h1>
             <p
               style={{
-                fontSize: "18px",
+                fontSize: "14px",
+                fontWeight: "500",
                 textAlign: "center",
-                color: "#31465e",
-                marginBottom: "2rem",
+                color: "#9f9f9f",
+               
               }}
             >
-              Đăng nhập hệ thống quản lý rạp để tối ưu hóa{" "}
-              <span
-                style={{
-                  color: "#0068ff",
-                  fontSize: "20px",
-                  fontWeight: "600",
-                }}
-              >
-                công việc
-              </span>{" "}
-              hiệu quả
+            SPECIAL ACCESS REQUIRED
             </p>
           </div>
           <form
             onSubmit={() => handleSubmitForm()}
             style={{
-              backgroundColor: "white",
-              borderRadius: "8px",
+              //backgroundColor: "white",
+              borderRadius: "",
               padding: "2rem 2rem",
             }}
           >
-            <p
-              style={{
-                fontSize: "24px",
-                fontWeight: "500",
-                textAlign: "center",
-                color: "#0068ff",
-                margin: 0,
-                marginBottom: "2rem",
-              }}
-            >
-              Đăng Nhập
-            </p>
+            
+           
             <Input
               size="large"
               placeholder="Nhập tên tài khoản"
               onChange={(e) => setOnChangeUserName(e)}
               prefix={<UserOutlined />}
+              style={{fontSize:"14px", padding:"10px"}}
             />
-
+           
             <Input.Password
               size="large"
               placeholder="Nhập mật khẩu"
               onChange={(e) => setOnChangePass(e)}
               prefix={<LockOutlined />}
-              style={{ marginTop: "1.5rem", marginBottom: "1.5rem" }}
+              style={{ marginTop: "1.5rem", marginBottom: "1.5rem", fontSize:"14px", padding:"10px" }}
             />
             {userName && password ? (
               <Button
                 onClick={() => handleSubmitForm()}
                 type="primary"
-                style={{ width: "100%", height: "40px", marginBottom: "1rem" }}
+                style={{ width: "100%",color:"white", borderColor:"#058dd9",backgroundColor:"#058dd9", height: "40px", marginBottom: "1rem" }}
                 loading={loadingStatus}
               >
                 Đăng Nhập
@@ -146,13 +129,13 @@ const LoginForm = () => {
                 onClick={() => handleSubmitForm()}
                 disabled
                 type="primary"
-                style={{ width: "100%", height: "40px", marginBottom: "1rem" }}
+                style={{ width: "100%", color:"white", borderColor:"#058dd9", backgroundColor:"#058dd9", height: "40px", marginBottom: "1rem" }}
               >
                 Đăng Nhập
               </Button>
             )}
             <p className="forgetPassword">
-              Quên mật khẩu? <span> Lấy lại mật khẩu</span>
+              Quên mật khẩu?
             </p>
           </form>
         </div>
