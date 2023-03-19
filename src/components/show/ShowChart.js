@@ -9,6 +9,7 @@ import {
   Breadcrumb,
   Card,
   DatePicker,
+  Select,
 } from "antd";
 import "./ShowChart.scss";
 import moment from "moment";
@@ -53,43 +54,71 @@ const ShowChart = ({ setTab }) => {
   return (
     <div className="site-card-wrapper">
       <Breadcrumb style={{ marginBottom: "1rem", marginTop: "1rem" }}>
-        <Breadcrumb.Item>Home</Breadcrumb.Item>
-        <Breadcrumb.Item>
-          <a href="">Quản lý phim</a>
-        </Breadcrumb.Item>
-
         <Breadcrumb.Item onClick={() => handleReturn()}>
           {" "}
-          <a>Xuất chiếu</a>
+          <a>Lịch chiếu</a>
         </Breadcrumb.Item>
         <Breadcrumb.Item>Biểu đồ lịch</Breadcrumb.Item>
       </Breadcrumb>
 
       <div
         style={{
-          marginBottom: "0.5rem",
           display: "flex",
-          justifyContent: "flex-end",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "1rem",
         }}
       >
-        <DatePicker
-          defaultValue={moment()}
-          format={dateFormat}
-          style={{ margin: "0 0.5rem" }}
-        />
-        <Button type="primary" title="Lịch hiện tại">
-          Hiện tại
-        </Button>
-        <Button
-          type="primary"
-          title="Lịch hiện tại"
-          style={{ margin: "0 0.5rem" }}
+        <div>
+          <Select
+            placeholder="Chọn chi nhánh"
+            style={{ width:150}}
+          >
+            <Option value="jack">Jack</Option>
+            <Option value="lucy">Lucy</Option>
+            <Option value="disabled" disabled>
+              Disabled
+            </Option>
+            <Option value="Yiminghe">yiminghe</Option>
+          </Select>
+
+          <Select
+            style={{ margin: "0 0.5rem", width: 300 }}
+            placeholder="Chọn phim"
+          >
+            <Option value="jack">Jack</Option>
+            <Option value="lucy">Lucy</Option>
+            <Option value="disabled" disabled>
+              Disabled
+            </Option>
+            <Option value="Yiminghe">yiminghe</Option>
+          </Select>
+        </div>
+        <div
+          style={{
+            justifyContent: "flex-end",
+          }}
+
         >
-          Trở về
-        </Button>
-        <Button type="primary" title="Lịch hiện tại">
-          Tiếp
-        </Button>
+          <DatePicker
+            defaultValue={moment()}
+            format={dateFormat}
+            style={{ margin: "0 0.5rem" }}
+          />
+          <Button type="primary" title="Lịch hiện tại">
+            Hiện tại
+          </Button>
+          <Button
+            type="primary"
+            title="Lịch hiện tại"
+            style={{ margin: "0 0.5rem" }}
+          >
+            Trở về
+          </Button>
+          <Button type="primary" title="Lịch hiện tại">
+            Tiếp
+          </Button>
+        </div>
       </div>
 
       <Row

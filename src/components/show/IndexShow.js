@@ -40,14 +40,9 @@ const IndexShow = ({ setTab }) => {
 
   return (
     <div className="site-card-wrapper">
-      <Breadcrumb style={{ marginBottom: "1rem", marginTop: "1rem" }}>
-        <Breadcrumb.Item>Home</Breadcrumb.Item>
-        <Breadcrumb.Item>
-          <a href="">Quản lý phim</a>
-        </Breadcrumb.Item>
-
-        <Breadcrumb.Item>Suất chiếu</Breadcrumb.Item>
-      </Breadcrumb>
+      <Title level={5} style={{ marginBottom: "1rem" }}>
+        Lịch chiếu
+      </Title>
       {/* <Row
         gutter={{
           xs: 8,

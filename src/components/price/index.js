@@ -13,7 +13,7 @@ import TableCustomer from "./TableCustomer";
 import ModelAddCustomer from "./ModelAddCustomer";
 
 const { Title, Text } = Typography;
-const IndexCustomer = ({ setTab }) => {
+const IndexCustomer = ({ setTab ,setSelectedIdHeader}) => {
   const [showModalAddCustomer, setShowModalAddCustomer] = useState(false);
 
   const showModal = () => {
@@ -68,7 +68,7 @@ const IndexCustomer = ({ setTab }) => {
         }}
       >
         <Col span={24}>
-          <TableCustomer setTab={setTab} />
+          <TableCustomer setTab={setTab} setSelectedIdHeader={setSelectedIdHeader} />
         </Col>
       </Row>
       {showModalAddCustomer ? (
