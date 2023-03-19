@@ -4,6 +4,10 @@ const showApi = {
   getShow: () => {
     return axiosApi.get("/show");
   },
+
+  getShowByMovieAndDate: (idMovie, date) => {
+    return axiosApi.get(`/showTimesMovie/show/movie/${idMovie}/date/${date}`);
+  },
   createShow: (data) => {
     return axiosApi.post("/show", data);
   },

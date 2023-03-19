@@ -11,15 +11,13 @@ import {
   Select,
   notification
 } from "antd";
-import "./IndexRoomMap.scss";
+import "../cinemahall/IndexRoomMap.scss";
+import './index.scss'
+import { useDispatch, useSelector } from "react-redux";
 import cinemaHallApi from "../../api/cinemaHallApi";
 import { MdChair, MdOutlineSignalCellularNull } from "react-icons/md";
-import { useSelector } from "react-redux";
-import ModelSeat from "./ModelSeat";
 
 
-const { Title, Text } = Typography;
-const dateFormat = "YYYY/MM/DD";
 
 const openNotification = () => {
   notification.open({
@@ -35,32 +33,31 @@ const openNotification = () => {
 const arrColumn = ["B", "C", "D", "E", "F", "G", "H", "I", "K"];
 
 const arrRow = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-const IndexCinemaMap = ({ setTab }) => {
+const PickSeatComponent = ({ setTab }) => {
   const [seats, setSeats] = useState([]);
   const idCinemaHall = useSelector((state) => state.cinemaHallId);
   const [seat, setSeat] = useState(null);
   const [possition, setPossition] = useState("");
   const [open, setOpen] = useState(false);
-  const [changeSeat, setChangeSeat] = useState(false);
-
+  const booking = useSelector((state) => state.booking);
+  console.log(booking);
 
 
   useEffect(() => {
-    const getSeats = async () => {
+    const getSeats = async (_id) => {
       try {
         const response = await cinemaHallApi.getCinemaHallSeatById(
-          idCinemaHall
+          _id
         );
         if (response) {
-         
           setSeats(response);
         }
       } catch (error) {
         console.log("Featch erro: ", error);
       }
     };
-    getSeats(idCinemaHall);
-  }, [changeSeat]);
+    getSeats(booking?.show?.Show?.idCinemaHall);
+  }, []);
 
   const handleShowModel = (val, idx, seat) => {
     //call api get seat
@@ -69,8 +66,6 @@ const IndexCinemaMap = ({ setTab }) => {
         const response = await cinemaHallApi.getSeatById(id);
         if (response) {
           setSeat(response);
-          setPossition(val + "-" + idx);
-          setOpen(true);
         }
       } catch (error) {
         console.log("Featch erro: ", error);
@@ -79,34 +74,45 @@ const IndexCinemaMap = ({ setTab }) => {
     getSeatById(seat.id);
    
   };
-
-  const handleLogic = () =>{
-    setSeat(null);
-    setOpen(false)
-    setChangeSeat(!changeSeat)
-    openNotification()
-  }
   return (
-    <div className="site-card-wrapper">
-      <Breadcrumb style={{ marginBottom: "1rem", marginTop: "1rem" }}>
-        <Breadcrumb.Item>Home</Breadcrumb.Item>
-        <Breadcrumb.Item>
-          <a href="">Quản lý rạp</a>
-        </Breadcrumb.Item>
-        <Breadcrumb.Item>
-          <a href="">Sơ đồ rạp</a>
-        </Breadcrumb.Item>
-      </Breadcrumb>
-
+    <div className="pick_seat site-card-wrapper">
+      
       <Row
         gutter={{
           xs: 8,
           lg: 32,
         }}
-        style={{ minHeight: "100vh", background: "", padding: "1rem" }}
+        style={{  padding: "1rem", height:"80vh" }}
       >
+        <div style={{display:"flex", alignItems:"center", marginLeft:"1rem"}}>
+         <div className="blocks-remine">
+            <div className="blocks-remine">
+            <span className="block-remine_block" style={{backgroundColor:"red"}}></span>
+            <span className="blocks-remine_text">Ghế bảo trì</span>
+            </div>
+          </div>
+          <div className="blocks-remine">
+            <div className="blocks-remine">
+            <span className="block-remine_block" style={{backgroundColor:"gray"}}></span>
+            <span className="blocks-remine_text">Ghế đã đặt</span>
+            </div>
+          </div>
+          <div className="blocks-remine">
+            <div className="blocks-remine">
+            <MdChair />
+            <span className="blocks-remine_text">Ghế đơn</span>
+            </div>
+          </div>
+          <div className="blocks-remine">
+            <div className="blocks-remine">
+            <MdChair />
+            <MdChair />
+            <span className="blocks-remine_text">Ghế đôi</span>
+            </div>
+          </div>
+        </div>
         <Col
-          span={20}
+          span={24}
           style={{
             background: "",
             display: "flex",
@@ -114,6 +120,7 @@ const IndexCinemaMap = ({ setTab }) => {
             alignItems: "center",
           }}
         >
+         
           <div
             style={{
               width: "80%",
@@ -180,7 +187,7 @@ const IndexCinemaMap = ({ setTab }) => {
                                 </span>
                               </td> : 
                                <td
-                               onClick={() => handleShowModel(val, idx + 1, seat)}
+                                onClick={() => handleShowModel(val, idx + 1, seat)}
                                title={seat?.status ? val + tmp : val + tmp + " ghế bảo trì"}
                                key={seat.createdAt}
                                style={!seat?.status ? {background:"red"} : {}}
@@ -198,7 +205,7 @@ const IndexCinemaMap = ({ setTab }) => {
                           }
                           return (
                             <td
-                              onClick={() => handleShowModel(val, agg++)}
+                               onClick={() => handleShowModel(val, agg++)}
                               title={val + number}
                             ></td>
                           );
@@ -212,52 +219,11 @@ const IndexCinemaMap = ({ setTab }) => {
             </table>
           </div>
         </Col>
-        <Col span={4} className="block-content-details">
-          <Row style={{ marginTop: "16px" }}>
-            <Col span={16}>
-              <p>Tổng số vị trí:</p>{" "}
-            </Col>
-            <Col span={8} className="block-span">
-              <span>81</span>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={16}>
-              <p>Tổng số ghế:</p>{" "}
-            </Col>
-            <Col span={8} className="block-span">
-              <span>{seats.length}</span>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={10}>
-              <p style={{ fontSize: "16px", color: "blue" }}>
-              <MdChair />
-              </p>{" "}
-            </Col>
-            <Col span={14} className="block-span">
-              <span>Ghế đơn</span>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={10}>
-              <p style={{ fontSize: "16px", color: "blue" }}>
-              <MdChair />
-              <MdChair />
-              </p>{" "}
-            </Col>
-            <Col span={14} className="block-span">
-              <span>Ghế đôi</span>
-            </Col>
-          </Row>
-        </Col>
+      
       </Row>
       
-      {
-        open ? <ModelSeat  seat={seat} possition={possition} handleLogic={handleLogic}/> : null
-      }
-      
+  
     </div>
   );
 };
-export default IndexCinemaMap;
+export default PickSeatComponent;

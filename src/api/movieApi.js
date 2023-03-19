@@ -4,6 +4,9 @@ const movieApi = {
   getMovies: () => {
     return axiosApi.get("/movie");
   },
+  searchMovies: () => {
+    return axiosApi.get("/movie");
+  },
 
   createMovie: (data) => {
     return axiosApi.post("/movie", data,{
@@ -14,6 +17,10 @@ const movieApi = {
   },
   getMovieById: (id)=>{
     return axiosApi.get(`/movie/${id}`);
+  },
+
+  getMovieByIdCinema: (id)=>{
+    return axiosApi.get(`/movie/cinema/${id}`);
   },
 
   updateMovie: (id, data) => {

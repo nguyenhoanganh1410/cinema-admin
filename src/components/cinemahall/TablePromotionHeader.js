@@ -58,7 +58,7 @@ const TablePromotionHeader = ({ setTab }) => {
     //load
     const getListPromotionHeader = async () => {
       try {
-        const response = await cinemaHallApi.getCinemaHalls(2)
+        const response = await cinemaHallApi.getCinemaHalls(1)
         if (response) {
           //handle data
         
@@ -72,6 +72,7 @@ const TablePromotionHeader = ({ setTab }) => {
   }, []);
 
   const handleOnclik = (id) => {
+    console.log(id);
     dispatch(setCinemaHall(id));
     setTab(1);
   };

@@ -25,3 +25,11 @@ export const setCinemaHall = (data) => {
     payload: data,
   };
 };
+
+
+export const setBooking = (data) => {
+  return {
+    type: "booking/setData",
+    payload: data,
+  };
+};
