@@ -3,6 +3,7 @@ const initValue = {
   promotionHeaderId: null,
   cinemaHallId: null,
   reload: false,
+  booking: null,
 };
 
 const rootReducer = (state = initValue, action) => {
@@ -27,6 +28,11 @@ const rootReducer = (state = initValue, action) => {
           ...state,
           cinemaHallId: action.payload,
         };
+    case "booking/setData":
+          return {
+            ...state,
+            booking: action.payload,
+          };
     default:
       return state;
   }

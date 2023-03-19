@@ -46,6 +46,7 @@ import IndexPrice from "../components/price";
 import IndexRouteHall from "../components/cinemahall/IndexRoute";
 import IndexRouteBooking from "../components/booking/IndexRouteBooking";
 import IndexRoutePrice from "../components/price/IndexRoutePrice";
+import IndexBooking from "../components/booking/IndexBooking";
 
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -187,7 +188,10 @@ const HomePage = () => {
     console.log(itemClicked);
     if (itemClicked === 1) {
       return <IndexDashboard />;
-    } else if (itemClicked === 11) {
+    }else if(itemClicked === 2){
+      return <IndexBooking />
+    } 
+    else if (itemClicked === 11) {
       return <IndexCustomer />;
     } else if (itemClicked === 11) {
     } else if (itemClicked === 15) {

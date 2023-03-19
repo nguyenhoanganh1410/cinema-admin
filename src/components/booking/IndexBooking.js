@@ -1,36 +1,69 @@
-import React, { useEffect, useState } from "react";
-import {
-  Input,
-  Col,
-  Row,
-  Typography,
-  Button,
-  Modal,
-  Breadcrumb,
-  DatePicker,
-  Select,
-} from "antd";
 
+import { Tabs } from 'antd';
+import { useRef, useState } from 'react';
+import BookingComponent from './BookingComponent';
+const initialItems = [
+  {
+    label: 'Booking',
+    children: <BookingComponent />,
+    key: '1',
+    closable: false,
+  },
+];
+const IndexBooking = () => {
+  const [activeKey, setActiveKey] = useState(initialItems[0].key);
+  const [items, setItems] = useState(initialItems);
+  const newTabIndex = useRef(0);
+  const onChange = (newActiveKey) => {
+    setActiveKey(newActiveKey);
+  };
 
+  const add = () => {
+    const newActiveKey = `newTab${newTabIndex.current++}`;
+    const newPanes = [...items];
+    newPanes.push({
+      label: 'New Tab',
+      children: <BookingComponent />,
+      key: newActiveKey,
+    });
+    setItems(newPanes);
+    setActiveKey(newActiveKey);
+  };
 
-const { Title, Text } = Typography;
-const dateFormat = "YYYY/MM/DD";
-
-const arrColumn = ["B", "C", "D", "E", "F", "G", "H", "I", "K"];
-
-const arrRow = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-
-const IndexBooking = ({ setTab }) => {
+  const remove = (targetKey) => {
+    let newActiveKey = activeKey;
+    let lastIndex = -1;
+    items.forEach((item, i) => {
+      if (item.key === targetKey) {
+        lastIndex = i - 1;
+      }
+    });
+    const newPanes = items.filter((item) => item.key !== targetKey);
+    if (newPanes.length && newActiveKey === targetKey) {
+      if (lastIndex >= 0) {
+        newActiveKey = newPanes[lastIndex].key;
+      } else {
+        newActiveKey = newPanes[0].key;
+      }
+    }
+    setItems(newPanes);
+    setActiveKey(newActiveKey);
+  };
+  const onEdit = (targetKey, action) => {
+    if (action === 'add') {
+      add();
+    } else {
+      remove(targetKey);
+    }
+  };
   return (
-    <div className="site-card-wrapper">
-      <Breadcrumb style={{ marginBottom: "1rem", marginTop: "1rem" }}>
-        <Breadcrumb.Item>Home</Breadcrumb.Item>
-        <Breadcrumb.Item>
-          <a href="">Đặt vé</a>
-        </Breadcrumb.Item>
-      </Breadcrumb>
-
-    </div>
+    <Tabs
+      type="editable-card"
+      onChange={onChange}
+      activeKey={activeKey}
+      onEdit={onEdit}
+      items={items}
+    />
   );
 };
 export default IndexBooking;
