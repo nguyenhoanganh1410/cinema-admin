@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Button, Table, Modal, Tag, Image, Alert, Space, message,Badge } from "antd";
+import {
+  Button,
+  Table,
+  Modal,
+  Tag,
+  Image,
+  Alert,
+  Space,
+  message,
+  Badge,
+} from "antd";
 import {
   SearchOutlined,
   PlusSquareFilled,
@@ -7,7 +17,7 @@ import {
   ToolOutlined,
   DeleteOutlined,
   ReloadOutlined,
-  EyeOutlined
+  EyeOutlined,
 } from "@ant-design/icons";
 import customerApi from "../../api/customerApi";
 import ModelAddCustomer from "./ModelAddCustomer";
@@ -18,7 +28,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setReload } from "../../redux/actions";
 import priceApi from "../../api/priceApi";
 
-const TableCustomer = ({ setTab,setSelectedIdHeader }) => {
+const TableCustomer = ({ setTab, setSelectedIdHeader }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [listCustomer, setListCustomer] = useState([]);
@@ -76,41 +86,36 @@ const TableCustomer = ({ setTab,setSelectedIdHeader }) => {
       dataIndex: "status",
       render: (status) => {
         console.log(status);
-        let color ;
+        let color;
         let name;
 
-        if (status === true ) {
+        if (status === true) {
           color = "green";
           name = "Hoạt động";
         } else if (status === false) {
           color = "red";
-          name = "Ngưng hoạt đọng";
-        }else if (status === 2) {
+          name = "Ngưng hoạt động";
+        } else if (status === 2) {
           color = "blue";
           name = "Sắp Chiếu";
         }
-        return (
-          <Badge status={color} text={name} />
-        );
+        return <Badge status={color} text={name} />;
       },
     },
     {
       title: "Action",
       dataIndex: "id",
       render: (val) => {
-        
         return (
           <Button
             icon={<EyeOutlined />}
-                onClick={() => {
-                  showModalPriceViewDetail(val);
-                }}
-          >
-          </Button>
+            onClick={() => {
+              showModalPriceViewDetail(val);
+            }}
+          ></Button>
         );
       },
-    }
-
+    },
   ];
 
   useEffect(() => {
@@ -126,11 +131,9 @@ const TableCustomer = ({ setTab,setSelectedIdHeader }) => {
     fetchListCustomer();
   }, [reload]);
 
-
   const handleShowDetail = (val) => {
     console.log(val);
   };
-
 
   //handle delete customer in here...
   const handleDelete = () => {
@@ -196,13 +199,8 @@ const TableCustomer = ({ setTab,setSelectedIdHeader }) => {
         style={{
           marginBottom: 16,
         }}
-      >
-      </div>
-      <Table
-        columns={columns}
-        dataSource={listCustomer}
-        
-      />
+      ></div>
+      <Table columns={columns} dataSource={listCustomer} />
       <Modal
         title="Xóa khách hàng"
         open={isModalOpen}
@@ -226,7 +224,6 @@ const TableCustomer = ({ setTab,setSelectedIdHeader }) => {
           selectedId={selectedId}
         />
       ) : null}
-      
     </div>
   );
 };

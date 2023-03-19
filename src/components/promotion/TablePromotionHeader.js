@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Table, Modal, Space } from "antd";
+import { Button, Table, Modal, Space, Badge } from "antd";
 import {
   SearchOutlined,
   PlusSquareFilled,
@@ -63,11 +63,13 @@ const TablePromotionHeader = ({ setTab }) => {
           const newList = response.map((item) => {
             item.startDate = item.startDate.substring(0, 10);
             item.endDate = item.endDate.substring(0, 10);
-            if (item.statusPromotion) {
-              item.statusPromotion = "Active";
-            } else {
-              item.statusPromotion = "Disabled";
-            }
+            // if (item.statusPromotion) {
+            //   item.statusPromotion = "Active";
+            // } else {
+            //   item.statusPromotion = "Disabled";
+            // }
+            item.statusPromotion = item.statusPromotion
+
             return item;
           });
           setPromotionHeaderList(newList);
@@ -109,6 +111,13 @@ const TablePromotionHeader = ({ setTab }) => {
     {
       title: "Trạng thái",
       dataIndex: "statusPromotion",
+      render: (text) => {
+        if( text === true){
+          return <Badge status="success" text="Hoạt động" />;
+        }else{
+          return <Badge status="error" text="Ngưng hoạt đông" />;
+        }
+      }
     },
 
     {

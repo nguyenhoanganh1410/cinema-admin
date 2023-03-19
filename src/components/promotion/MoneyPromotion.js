@@ -46,11 +46,11 @@ const MoneyPromotion = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
                 options={[
                   {
                     value: "1",
-                    label: "ve 3d",
+                    label: "Ghế Thường",
                   },
                   {
                     value: "2",
-                    label: "bap nuoc",
+                    label: "Ghế Đôi",
                   },
                 ]}
               />

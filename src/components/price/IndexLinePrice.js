@@ -180,7 +180,7 @@ const IndexLinePrice = ({ setTab,selectedIdHeader }) => {
           console.log(response);
           setApplyTo(response.applyTo);
           setStatus(response.status);
-          setStartDate(response.startDate);gi
+          setStartDate(response.startDate);
           setEndDate(response.endDate);
           setApplyToHall(response.applyToHall);
           form.setFieldsValue({

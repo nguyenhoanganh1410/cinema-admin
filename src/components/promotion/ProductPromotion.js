@@ -49,11 +49,11 @@ const ProductPromotion = ({
                 options={[
                   {
                     value: "1",
-                    label: "ve 3d",
+                    label: "Ghế Thường",
                   },
                   {
                     value: "2",
-                    label: "bap nuoc",
+                    label: "Ghế Đôi",
                   },
                 ]}
               />
@@ -79,11 +79,19 @@ const ProductPromotion = ({
                 options={[
                   {
                     value: "1",
-                    label: "Họat động",
+                    label: "Ghế Thường",
                   },
                   {
                     value: "2",
-                    label: "Hết hạn",
+                    label: "Ghế Đôi",
+                  },
+                  {
+                    value: "1",
+                    label: "Bắp rang bơ ",
+                  },
+                  {
+                    value: "2",
+                    label: "Pepsi vị chanh lớn",
                   },
                 ]}
               />
