@@ -5,12 +5,13 @@ import IndexLinePromotion from "./IndexLinePrice";
 
 const IndexRoutePrice = () => {
   const [tab, setTab] = useState(0);
+  const [selectedIdHeader, setSelectedIdHeader] = useState(0);
   return (
     <React.Fragment>
       {tab === 0 ? (
-        <IndexCustomer setTab={setTab} />
+        <IndexCustomer setTab={setTab} setSelectedIdHeader={setSelectedIdHeader} />
       ) : (
-        <IndexLinePrice setTab={setTab} />
+        <IndexLinePrice setTab={setTab} selectedIdHeader={selectedIdHeader} />
       )}
     </React.Fragment>
   );

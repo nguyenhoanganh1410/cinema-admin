@@ -18,7 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setReload } from "../../redux/actions";
 import priceApi from "../../api/priceApi";
 
-const TableCustomer = ({ setTab }) => {
+const TableCustomer = ({ setTab,setSelectedIdHeader }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [listCustomer, setListCustomer] = useState([]);
@@ -31,6 +31,7 @@ const TableCustomer = ({ setTab }) => {
 
   const showModalDetail = (e) => {
     setTab(1);
+    setSelectedIdHeader(e);
   };
 
   const showModalPriceViewDetail = (e) => {
@@ -80,10 +81,13 @@ const TableCustomer = ({ setTab }) => {
 
         if (status === true ) {
           color = "green";
-          name = "Đang hoạt động";
+          name = "Hoạt động";
         } else if (status === false) {
           color = "red";
-          name = "Ngừng hoạt động";
+          name = "Ngưng hoạt đọng";
+        }else if (status === 2) {
+          color = "blue";
+          name = "Sắp Chiếu";
         }
         return (
           <Badge status={color} text={name} />

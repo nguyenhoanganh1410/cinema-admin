@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Table, Modal, Select, Badge,Tag } from "antd";
+import { Button, Table, Modal, Select, Badge, Tag } from "antd";
 import {
   SearchOutlined,
   PlusSquareFilled,
@@ -8,7 +8,8 @@ import {
   DeleteOutlined,
   MinusSquareOutlined,
   PlusSquareOutlined,
-  PlusCircleOutlined
+  PlusCircleOutlined,
+  MinusCircleOutlined,
 } from "@ant-design/icons";
 import showApi from "../../api/showApi";
 import showTimeApi from "../../api/showTimeApi";
@@ -31,71 +32,81 @@ const TableShowTime = ({ record }) => {
       dataIndex: "showTime",
       render: (val) => {
         return val.map((item, index) => {
-          let color ='' ;
-            const timeCheck = moment(item, "HH:mm")
-            
-            if(timeCheck.isBetween(moment("06:00", "HH:mm"), moment("12:00", "HH:mm"))){
-              color = "volcano";
-            }else if(timeCheck.isBetween(moment("12:00", "HH:mm"), moment("18:00", "HH:mm"))){
-              color = "green";
-            }else if(timeCheck.isBetween(moment("18:00", "HH:mm"), moment("24:00", "HH:mm"))){
-              color = "geekblue";
-            }
+          let color = "";
+          const timeCheck = moment(item, "HH:mm");
+
+          if (
+            timeCheck.isBetween(
+              moment("06:00", "HH:mm"),
+              moment("12:00", "HH:mm")
+            )
+          ) {
+            color = "volcano";
+          } else if (
+            timeCheck.isBetween(
+              moment("12:00", "HH:mm"),
+              moment("18:00", "HH:mm")
+            )
+          ) {
+            color = "green";
+          } else if (
+            timeCheck.isBetween(
+              moment("18:00", "HH:mm"),
+              moment("24:00", "HH:mm")
+            )
+          ) {
+            color = "geekblue";
+          }
           return (
             <Tag color={color} key={index}>
               {item}
             </Tag>
           );
         });
-      }
+      },
     },
     {
       title: "Trạng thái",
       dataIndex: "status",
       render: (val) => {
-          let color = "";
-          let nameStatus = "";
-          if (val === 1) {
-            color = "green";
-            nameStatus = "Đang chiếu";
-          } else if (val === 2) {
-            color = "blue";
-            nameStatus = "Sắp chiếu";
-          } else if (val === 3) {
-            color = "red";
-            nameStatus = "Đã kết thúc";
-          }
-          return (
-            <Tag color={color} key={val}>
-              {nameStatus}
-            </Tag>
-          );
+        let color = "";
+        let nameStatus = "";
+        if (val === 1) {
+          color = "green";
+          nameStatus = "Đang chiếu";
+        } else if (val === 2) {
+          color = "blue";
+          nameStatus = "Sắp chiếu";
+        } else if (val === 3) {
+          color = "red";
+          nameStatus = "Đã kết thúc";
+        }
+        return (
+          <Badge status={color} text={nameStatus} />
+        );
       },
     },
     {
-      title: <>
-        <Button
-          type="primary"
-          icon={<PlusCircleOutlined  />}
-          onClick={() => {
-            console.log(record);
-          }}
-          
-        >
-        </Button>
-      </>,
+      dataIndex: "id",
+      render: (val) => {
+        return (
+          <MinusCircleOutlined
+            style={{
+              color: "#ff4d4f",
+              fontSize: "15px",
+            }}
+          />
+        );
+      },
       width: 30,
-    }
-
+    },
   ];
 
-  
   useEffect(() => {
     const fetchShowTimeByShowId = async () => {
       const response = await showTimeApi.getShowTimeByShowId(record.id);
       let data = [];
       if (response) {
-        
         for (const index in response) {
           console.log(response[index]);
           data.push({
@@ -111,24 +122,23 @@ const TableShowTime = ({ record }) => {
     };
 
     fetchShowTimeByShowId();
-
   }, []);
- 
-    // const response = showTimeApi.getShowTimeByShowId(selectedId).then((res) => {
-    //   let data = [];
-    //   if (res) {
-    //     for (const index in res) {
-    //       data.push({
-    //         showDate: index,
-    //         showTime: res[index].map((item, index) => {
-    //           return item.showTime;
-    //         }),
-    //       });
-    //     }
-    //   }
-    //   return Promise.resolve(data);
-    // });
-  
+
+  // const response = showTimeApi.getShowTimeByShowId(selectedId).then((res) => {
+  //   let data = [];
+  //   if (res) {
+  //     for (const index in res) {
+  //       data.push({
+  //         showDate: index,
+  //         showTime: res[index].map((item, index) => {
+  //           return item.showTime;
+  //         }),
+  //       });
+  //     }
+  //   }
+  //   return Promise.resolve(data);
+  // });
+
   //     console.log('listShowTime', listShowTime);
 
   //   return <Table columns={columns} pagination={false} dataSource={listShowTime} />;
@@ -226,16 +236,12 @@ const TableShowTime = ({ record }) => {
 
   return (
     <div
-    style={{
-      width: "80%",
-      margin: "0 auto",
-    }}
+      style={{
+        width: "80%",
+        margin: "0 auto",
+      }}
     >
-      <Table
-        columns={columns}
-        dataSource={listShowTime}
-        pagination={false}
-      />
+      <Table columns={columns} dataSource={listShowTime} pagination={false} />
     </div>
   );
 };

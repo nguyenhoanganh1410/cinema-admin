@@ -27,13 +27,11 @@ const TableFilms = () => {
 
   const columns = [
     {
-      title: "Delete",
-      dataIndex: "delete",
+      
       render: (val) => {
         return (
           <Button
-            danger
-            icon={<DeleteOutlined />}
+            icon={<DeleteOutlined  style={{ color: '#ff4d4f' }}/>}
             onClick={handleDelete}
           >
           </Button>
@@ -53,10 +51,6 @@ const TableFilms = () => {
     {
       title: "Tên phim",
       dataIndex: "nameMovie",
-    },
-    {
-      title: "Đạo diễn",
-      dataIndex: "director",
     },
     {
       title: "Thời lượng",
@@ -196,9 +190,9 @@ const TableFilms = () => {
             let statusName = "";
             if (status === 1) {
               statusName = "Đang chiếu";
-            } else if (status === 2) {
+            } else if (status === 0) {
               statusName = "Sắp chiếu";
-            } else if(status === 3) {
+            } else if(status === 2) {
               statusName = "Ngừng chiếu";
             }
             movie.status = statusName;

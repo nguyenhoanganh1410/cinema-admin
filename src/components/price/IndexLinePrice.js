@@ -18,13 +18,12 @@ import {
   Breadcrumb,
 } from "antd";
 
-import { PlusOutlined,
-  MinusCircleOutlined,
- } from "@ant-design/icons";
+import { PlusOutlined,MinusCircleOutlined } from "@ant-design/icons";
 import ModelAddPromoLine from "./ModelAddPromoLine";
 import { useSelector } from "react-redux";
-import promotionApi from "../../api/promotionApi";
+import priceApi from "../../api/priceApi";
 import moment from "moment";
+import cinemaApi from "../../api/cinemaApi";
 
 const { TextArea } = Input;
 const getBase64 = (file) =>
@@ -42,49 +41,39 @@ const newDateFormat = "YYYY-MM-DD";
 const columns = [
   {
     title: "Mã Sản phẩm",
-    dataIndex: "priceCode",
-    key: "priceCode",
+    dataIndex: "productCode",
     render: (text) => <a>{text}</a>,
   },
   {
     title: "Tên Sản phẩm",
     dataIndex: "name",
-    key: "name",
-  },
-  {
-    title: "Phòng chiếu",
-    dataIndex: "typeHall",
   },
   {
     title: "Giá bán",
-    dataIndex: "endDate",
-    key: "endDate",
+    dataIndex: "price",
   },
   {
     render: (text, record) => (
       <Button 
-      icon={<MinusCircleOutlined />}
+
+      icon={<MinusCircleOutlined color="#ff4d4f" />}
       >
       </Button>
     ),
   },
 ];
 
-const IndexLinePrice = ({ setTab }) => {
+const IndexLinePrice = ({ setTab,selectedIdHeader }) => {
   const [showModalAddCustomer, setShowModalAddCustomer] = useState(false);
 
-  const [previewOpen, setPreviewOpen] = useState(false);
-  const [previewImage, setPreviewImage] = useState("");
-  const [previewTitle, setPreviewTitle] = useState("");
-  const [fileList, setFileList] = useState([]);
-
-  const [listPromotionLine, setPromotionLine] = useState([]);
-  const [promotionHeader, setPromotionHeader] = useState(null);
-  const idHeaderPromotion = useSelector((state) => state.promotionHeaderId);
-
-  const [changeImage, setChangeImage] = useState(false);
-
   const [form] = Form.useForm();
+  const [status, setStatus] = useState(0);
+  const [applyTo, setApplyTo] = useState(0);
+  const [listCinema,setListCinema] = useState([]);
+  const [startDate,setStartDate] = useState("");
+  const [endDate,setEndDate] = useState("");
+  const [applyToHall,setApplyToHall] = useState([]);
+  const [listPriceLine,setListPriceLine] = useState([]);
 
   const handleCancel = () => setPreviewOpen(false);
   const handlePreview = async (file) => {
@@ -101,6 +90,27 @@ const IndexLinePrice = ({ setTab }) => {
     setFileList(newFileList);
     setChangeImage(true);
   };
+
+  const onChangeStatus = (value) => {
+    setStatus(value);
+  };
+
+  const onChangeApplyTo = (value) => {
+    setApplyTo(value);
+  };
+
+  const onChangeStartDate = (date, dateString) => {
+    setStartDate(dateString);
+  };
+
+  const onChangeEndDate = (date, dateString) => {
+    setEndDate(dateString);
+  };
+
+  const onChangeApplyToHall = (value) => {
+    setApplyToHall(value);
+  };
+
   const uploadButton = (
     <div>
       <PlusOutlined />
@@ -134,89 +144,79 @@ const IndexLinePrice = ({ setTab }) => {
 
   const handleSubmit = async (val) => {
     console.log(val);
-    const { startDate, endDate, desc, statusPromotion, id, namePromotion } =
-      val;
-    // if (endDate.diff(startDate, "days") > 0) {
-    //   alert("Ngày không hợp lý");
-    //   return;
-    // }
-
-    //2 trường hợp
-    //TH1: image thay đổi
-    if (changeImage) {
-    } else {
-      //TH2: image không đổi
-      try {
-        const newData = {
-          namePromotion,
-          statusPromotion,
-          // endDate: moment(val.endDate, newDateFormat),
-          // startDate: moment(val.startDate, newDateFormat),
-          id,
-          desc,
-        };
-        console.log(newData);
-        const response = await promotionApi.updatePromotionHeader(newData);
-        alert("updated promotion header");
-      } catch (error) {
-        console.log("update failed : ", error);
-      }
-    }
   };
+
+
+  
+
+  
+
+  // price detail
   useEffect(() => {
-    //load movies
-    const getPromotionLineByHeader = async (id) => {
+    const getPriceLine = async () => {
+      console.log(selectedIdHeader);
       try {
-        const response = await promotionApi.getPromotionLineByHeader(id);
-
-        if (response) {
-          //handle data
-          const newList = response.map((item) => {
-            item.startDate = item.startDate.substring(0, 10);
-            item.endDate = item.endDate.substring(0, 10);
-
-            return item;
+        const line = await priceApi.getPriceLineByHeader(selectedIdHeader)
+        if (line) {
+          console.log(line);
+          const data = line.map((item) => {
+            return{
+              productCode: item.Product.productCode,
+              name: item.Product.productName,
+              price: item.price,
+            }
           });
-          setPromotionLine(newList);
+          setListPriceLine(data)
         }
       } catch (error) {
         console.log("Failed to login ", error);
       }
     };
 
-    //load movies
-    const getPromotionHeaderById = async (id) => {
+    const getPriceHeaderDetail = async () => {
       try {
-        const response = await promotionApi.getPromotionHeaderById(id);
-        console.log(response);
+        const response = await priceApi.getPriceHeaderById(selectedIdHeader)
         if (response) {
-          //handle data
-          const crrImg = [
-            {
-              uid: "-1",
-              name: "image.png",
-              status: "done",
-              url: response.image,
-            },
-          ];
-          setFileList(crrImg);
+          console.log(response);
+          setApplyTo(response.applyTo);
+          setStatus(response.status);
+          setStartDate(response.startDate);
+          setEndDate(response.endDate);
+          setApplyToHall(response.applyToHall);
           form.setFieldsValue({
-            id: response.id,
-            namePromotion: response.namePromotion,
-            desc: response.desc,
-            startDate: moment(response.startDate, dateFormat),
-            endDate: moment(response.endDate, dateFormat),
-            statusPromotion: response.statusPromotion ? "1" : "0",
+            codePrice: response.id,
+            namePrice: response.name,
+            startDate: moment(response.startDate),
+            endDate: moment(response.endDate),
+            status: response.status,
+            applyTo: response.applyTo,
+            applyToHall: response.applyToHall,
           });
-          setPromotionHeader(response);
         }
       } catch (error) {
         console.log("Failed to login ", error);
       }
     };
-    getPromotionLineByHeader(idHeaderPromotion);
-    getPromotionHeaderById(idHeaderPromotion);
-  }, [idHeaderPromotion]);
+
+    const getCinema = async () => {
+      try {
+        const response = await cinemaApi.getCinemas();
+        if (response) {
+          const newArr = response.map((val) => {
+            return { value: val.id, label: val.name };
+          });
+          setListCinema(newArr);
+        }
+      } catch (error) {
+        console.log("Failed to login ", error);
+      }
+    };
+
+    getCinema();
+    getPriceHeaderDetail();
+    getPriceLine();
+
+  },[selectedIdHeader]);
 
   return (
     <div className="site-card-wrapper" style={{ minWidth: "100vh" }}>
@@ -299,7 +299,8 @@ const IndexLinePrice = ({ setTab }) => {
               ]}
             >
               <DatePicker
-                onChange={onChangeDate}
+                disabled={true}
+                onChange={onChangeStartDate}
                 style={{ width: "100%" }}
                 placeholder="Chọn ngày bắt đầu"
               />
@@ -309,7 +310,7 @@ const IndexLinePrice = ({ setTab }) => {
         <Row gutter={16}>
           <Col span={4}>
             <Form.Item
-              name="statusPromotion"
+              name="status"
               label="Trạng thái"
               rules={[
                 {
@@ -323,21 +324,68 @@ const IndexLinePrice = ({ setTab }) => {
                 style={{
                   width: "100%",
                 }}
-                onChange={handleChangePosition}
+                onChange={onChangeStatus}
                 options={[
                   {
-                    value: "0",
+                    value: false,
                     label: "Ngưng hoạt động",
                   },
                   {
-                    value: "1",
+                    value: true,
                     label: "Hoạt động",
                   },
                 ]}
               />
             </Form.Item>
           </Col>
-          <Col span={8}></Col>
+          <Col span={4}>
+            <Form.Item
+              name="applyTo"
+              label="Chi nhánh áp dụng"
+              rules={[
+                {
+                  required: true,
+                  message: "Áp dụng cho...",
+                },
+              ]}
+            >
+              <Select
+                placeholder="Chi nhánh áp dụng"
+                style={{
+                  width: "100%",
+                }}
+                onChange={onChangeApplyTo}
+                options={listCinema}
+
+              />
+            </Form.Item>
+          </Col>
+          <Col span={4}>
+          <Form.Item
+              name="applyToHall"
+              label="Loại phòng áp dụng"
+              
+            >
+              <Select
+                placeholder="Loại phòng áp dụng"
+                style={{
+                  width: "100%",
+                }}
+                onChange={onChangeApplyToHall}
+                options={[
+                  {
+                    value: "2D",
+                    label: "2D",
+                  },
+                  {
+                    value: "3D",
+                    label: "3D",
+                  },
+                ]}
+
+              />
+            </Form.Item>
+          </Col>
           <Col span={12}>
             <Form.Item
               name="endDate"
@@ -350,7 +398,7 @@ const IndexLinePrice = ({ setTab }) => {
               ]}
             >
               <DatePicker
-                onChange={onChangeDate}
+                onChange={onChangeEndDate}
                 style={{ width: "100%" }}
                 placeholder="Chọn ngày kết thúc"
               />
@@ -378,7 +426,7 @@ const IndexLinePrice = ({ setTab }) => {
             Thêm
           </Button>
         </div>
-        <Table columns={columns} dataSource={listPromotionLine} />;
+        <Table columns={columns} dataSource={listPriceLine} />;
       </div>
       {showModalAddCustomer ? (
         <ModelAddPromoLine

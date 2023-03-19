@@ -123,48 +123,16 @@ const ModelPriceView = ({
   };
 
   useEffect(() => {
-    const fetchCustomerInfo = async (id) => {
-      try {
-        const response = await customerApi.getCustomer(id);
+    const fetchPriceDetail = async (selectedId) => {
+      console.log("selectedId", selectedId);
+      // try {
+      //   const rep = await 
 
-        if (response) {
-          console.log("res", response);
-          setCustomerInfo(response);
-          setProvincePicked(Number(response.city_id));
-          setDistrictPicked(Number(response.district_id));
-          setWardPicked(Number(response.ward_id));
-          setImage(response.image);
-          console.log("file", response.image);
-
-          form.setFieldsValue({
-            id: response.id,
-            firstName: response.firstName,
-            lastname: response.lastName,
-            phone: response.phone,
-            email: response.email,
-            dob: response.dob,
-            address: response.address,
-            province: response.province,
-            district: response.district,
-            ward: response.ward,
-            image: [
-              {
-                uid: "-1",
-                name: response.image,
-                status: "done",
-                url: response?.image,
-              },
-            ],
-          });
-        }
-      } catch (error) {
-        console.log("Failed to fetch conversation list: ", error);
-      }
     };
+    
+    
     // fetchCustomerInfo(selectedId);
   }, []);
-  console.log("customerInfo", customerInfo);
-  console.log("fileList", fileList);
 
   useEffect(() => {
     const fetchConversations = async () => {
