@@ -65,27 +65,27 @@ const TableShowTime = ({ record }) => {
         });
       },
     },
-    {
-      title: "Trạng thái",
-      dataIndex: "status",
-      render: (val) => {
-        let color = "";
-        let nameStatus = "";
-        if (val === 1) {
-          color = "green";
-          nameStatus = "Đang chiếu";
-        } else if (val === 2) {
-          color = "blue";
-          nameStatus = "Sắp chiếu";
-        } else if (val === 3) {
-          color = "red";
-          nameStatus = "Đã kết thúc";
-        }
-        return (
-          <Badge status={color} text={nameStatus} />
-        );
-      },
-    },
+    // {
+    //   title: "Trạng thái",
+    //   dataIndex: "status",
+    //   render: (val) => {
+    //     let color = "";
+    //     let nameStatus = "";
+    //     if (val === 1) {
+    //       color = "green";
+    //       nameStatus = "Đang chiếu";
+    //     } else if (val === 2) {
+    //       color = "blue";
+    //       nameStatus = "Sắp chiếu";
+    //     } else if (val === 3) {
+    //       color = "red";
+    //       nameStatus = "Đã kết thúc";
+    //     }
+    //     return (
+    //       <Badge status={color} text={nameStatus} />
+    //     );
+    //   },
+    // },
     {
       dataIndex: "id",
       render: (val) => {
