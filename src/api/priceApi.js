@@ -19,7 +19,10 @@ const priceApi = {
     },
     getPriceLineByHeader: (_id) => {
         return axiosApi.get(`/priceLine/priceHeader/${_id}`);
-    }
+    },
+    getPriceProduct: () => {
+        return axiosApi.get("/product/list/price");
+    },
 };
 
 export default priceApi;

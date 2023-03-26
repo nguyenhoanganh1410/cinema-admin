@@ -14,6 +14,7 @@ import {
 import PickFilmComponent from "./PickFilmComponent";
 import PickSeatComponent from "./PickSeatComponent";
 import PickShowComponent from "./PickShowComponent";
+import PayComponent from "./PayComponent";
 
 
 const BookingComponent = ({ setTab }) => {
@@ -39,23 +40,11 @@ const BookingComponent = ({ setTab }) => {
     },
     {
       title: 'Chọn ghế',
-      content: <PickSeatComponent />
-    },
-    {
-      title: 'Chọn khuyến mãi',
-      content: 'Last-content',
-    },
-    {
-      title: 'Chọn bắp nước',
-      content: 'Last-content',
-    },
-    {
-      title: 'Khách hàng',
-      content: 'Last-content',
+      content: <PickSeatComponent next={next}/>
     },
     {
       title: 'Thanh toán',
-      content: 'Last-content',
+      content: <PayComponent next={next} />
     },
   ];
   const items = steps.map((item) => ({
@@ -89,16 +78,7 @@ const BookingComponent = ({ setTab }) => {
           marginTop: 24,
         }}
       >
-        {current < steps.length - 1 && (
-          <Button type="primary" onClick={() => next()}>
-            Next
-          </Button>
-        )}
-        {current === steps.length - 1 && (
-          <Button type="primary" onClick={() => message.success('Processing complete!')}>
-            Done
-          </Button>
-        )}
+ 
         {current > 0 && (
           <Button
             style={{

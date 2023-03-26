@@ -5,7 +5,8 @@ import { Routes, Route, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import React, { useState } from "react";
 import tokenService from "./service/token.service";
-import { setUser } from "./redux/actions";
+import { setCinema, setUser } from "./redux/actions";
+import cinameApi from "./api/cinemaApi";
 
 function App() {
   const navigator = useNavigate();
@@ -18,6 +19,11 @@ function App() {
     if (userInLocalStorage) {
       depatch(setUser(userInLocalStorage.staff));
       navigator("/");
+      const getCinemaId = async (id) =>{
+        const data = await cinameApi.getCinemaById(id);
+        depatch(setCinema(data))
+      } 
+      getCinemaId(userInLocalStorage?.staff?.cinema_id)
     } else {
       navigator("/login");
     }

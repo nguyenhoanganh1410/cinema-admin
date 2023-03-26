@@ -4,8 +4,8 @@ const movieApi = {
   getMovies: () => {
     return axiosApi.get("/movie");
   },
-  searchMovies: () => {
-    return axiosApi.get("/movie");
+  searchMovies: (nameMovie) => {
+    return axiosApi.get(`/movie/name/search/${nameMovie}`);
   },
 
   createMovie: (data) => {

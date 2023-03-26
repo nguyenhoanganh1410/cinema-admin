@@ -5,9 +5,10 @@ import movieApi from "../../api/movieApi";
 import { setBooking } from "../../redux/actions";
 import { useDispatch } from "react-redux";
 
-const { Meta } = Card;
 const PickFilmComponent = ({next}) => {
  const [films, setFilms] = useState([]);
+ const [trigger, setTrigger] = useState(false)
+ const [searchText, setSearchText] = useState('')
  const depatch = useDispatch();
  const handleClick = (film) =>{
     const resultData = {
@@ -19,16 +20,41 @@ const PickFilmComponent = ({next}) => {
  useEffect(()=>{
     const getFilms = async (_id) =>{
         const data = await movieApi.getMovieByIdCinema(_id);
-        setFilms(data);
+        if(data) setFilms(data);
     }
     getFilms(1)
- }, [])
+ }, [trigger])
+ const hanleSearch = (e) =>{
+    if(e.target.value === ""){
+        
+        setTrigger(!trigger)
+    }
+    // e.target.value
+    const searchFilm = async () =>{
+        try{
+            const data = await movieApi.searchMovies(e.target.value);
+            if(data){
+                console.log("search")
+                setFilms(data);
+              
+            }
+        }
+        catch{
+            setFilms([])
+        }
+    }
+    searchFilm()
+    setSearchText(e.target.value)
+ }
   return (
     <div className="pick-film">
-         <Input className="pick-film-search" placeholder="Nhập tên phim..." />;
+         <Input className="pick-film-search" onChange={hanleSearch} placeholder="Nhập tên phim..." />;
+         {
+            searchText ? <p>Kết quả tìm kiếm cho: <span>{searchText}</span></p> : null
+         } 
          <div className="cards">
-            {
-                films.map(film =>{
+            {   films &&
+                films?.map(film =>{
                     return (
                         <Card
                             hoverable

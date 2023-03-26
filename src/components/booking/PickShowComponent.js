@@ -27,6 +27,13 @@ const PickShowComponent = ({next, film}) => {
     const getShowByDate = async (idMovie, datatDate) =>{
         try {
           const data = await showApi.getShowByMovieAndDate(idMovie, datatDate);
+          console.log(data);
+
+          // const dataResult = data.map(val =>{
+          //   //val.ShowTime.showTime
+          //   const date1 = new Date('2020-01-01 ' + val.ShowTime.showTime);
+          //   const currentDate = new Date();
+          // })
           setShows(data);
           setTimeout(()=>{
             setLoading(false)
@@ -85,7 +92,7 @@ const PickShowComponent = ({next, film}) => {
 
   return (
     <div className="pick-shows">
-        <h3>Film: <span>{film?.nameMovie}</span></h3>
+        <h3>Film: <span>{booking?.film?.nameMovie}</span></h3>
         <div className="date-pick">
             {
                 date.map((val, idx) =>{
@@ -114,7 +121,7 @@ const PickShowComponent = ({next, film}) => {
         </div>
         <div className="time-pick">
             <div className="film-iamge">
-                <img src={film?.image}/>
+                <img src={booking?.film?.image}/>
             </div>
             <div className="times">
                 {

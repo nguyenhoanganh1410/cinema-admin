@@ -75,21 +75,21 @@ const IndexLinePrice = ({ setTab,selectedIdHeader }) => {
   const [applyToHall,setApplyToHall] = useState([]);
   const [listPriceLine,setListPriceLine] = useState([]);
 
-  const handleCancel = () => setPreviewOpen(false);
-  const handlePreview = async (file) => {
-    if (!file.url && !file.preview) {
-      file.preview = await getBase64(file.originFileObj);
-    }
-    setPreviewImage(file.url || file.preview);
-    setPreviewOpen(true);
-    setPreviewTitle(
-      file.name || file.url.substring(file.url.lastIndexOf("/") + 1)
-    );
-  };
-  const handleChange = ({ fileList: newFileList }) => {
-    setFileList(newFileList);
-    setChangeImage(true);
-  };
+  // const handleCancel = () => setPreviewOpen(false);
+  // const handlePreview = async (file) => {
+  //   if (!file.url && !file.preview) {
+  //     file.preview = await getBase64(file.originFileObj);
+  //   }
+  //   setPreviewImage(file.url || file.preview);
+  //   setPreviewOpen(true);
+  //   setPreviewTitle(
+  //     file.name || file.url.substring(file.url.lastIndexOf("/") + 1)
+  //   );
+  // };
+  // const handleChange = ({ fileList: newFileList }) => {
+  //   setFileList(newFileList);
+  //   setChangeImage(true);
+  // };
 
   const onChangeStatus = (value) => {
     setStatus(value);
@@ -180,7 +180,7 @@ const IndexLinePrice = ({ setTab,selectedIdHeader }) => {
           console.log(response);
           setApplyTo(response.applyTo);
           setStatus(response.status);
-          setStartDate(response.startDate);gi
+          setStartDate(response.startDate);
           setEndDate(response.endDate);
           setApplyToHall(response.applyToHall);
           form.setFieldsValue({
