@@ -1,33 +1,43 @@
 import React, { useEffect, useState } from "react";
-import { PlusOutlined } from '@ant-design/icons';
 import {
   Button,
-  Cascader,
-  Checkbox,
-  DatePicker,
   Form,
   Input,
   InputNumber,
-  Radio,
-  Select,
-  Switch,
-  TreeSelect,
-  Upload,
   Row ,
+  Select, Tag,
   Col
 } from 'antd';
 import "../cinemahall/IndexRoomMap.scss";
 import './index.scss'
 import { useDispatch, useSelector } from "react-redux";
-import cinemaHallApi from "../../api/cinemaHallApi";
-import { MdAlternateEmail, MdChair, MdOutlineSignalCellularNull } from "react-icons/md";
-import priceApi from "../../api/priceApi";
-import { GHE_DOI, GHE_THUONG, MESSAGE_PICK_SEAT, VND } from "../../constant";
-import ItemProduct from "./ItemProduct";
-import ModelCustomer from './ModelCustomer'
-import { notifyWarn } from "../../utils/Notifi";
-import { setBooking } from "../../redux/actions";
 import customerApi from "../../api/customerApi";
+import { getPromotion } from "../../services/PromotionFetch";
+import { MESSAGE_CUSTOMER_NOT_FOUND, MESSAGE_MONEY_INCORRECT, SDT_VANG_LAI, VND } from "../../constant";
+import { notifyError, notifySucess } from "../../utils/Notifi";
+
+
+
+const tagRender = (props) => {
+  const { label, value, closable, onClose } = props;
+  const onPreventMouseDown = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+  };
+  return (
+    <Tag
+      color={value}
+      onMouseDown={onPreventMouseDown}
+      closable={closable}
+      onClose={onClose}
+      style={{
+        marginRight: 3,
+      }}
+    >
+      {label}
+    </Tag>
+  );
+};
 
 const { TextArea } = Input;
 const PayComponent = ({next}) => {
@@ -36,53 +46,105 @@ const PayComponent = ({next}) => {
   const cinema = useSelector((state) => state.cinema);
   const user = useSelector((state) => state.user);
   const [totalPrice, setTotalPrice] = useState(0);
-  //0 : pick seat
-  //1: pick combo
-  const [tab, setTab] = useState(0)
+
   const [pickProducts, setPickProducts] = useState([])
   const [seatPicked, setSeatPicked] = useState([])
   const [pay, setPay] = useState([])
   const [customerSearched, setCustomerSearched] = useState(null)
-  console.log(pay?.customer);
-  //console.log(seatPicked);
+  const [discountMoney, setDiscountMoney] = useState(0)
+  const [moneyCustomer, setMoneyCustomer] = useState(0)
 
+  const [promotion, setPromotion] = useState([])
+  const [options, setOptions] = useState([])
 
+  console.log(pay)
   useEffect(() => {
     setSeatPicked(booking?.seats)
     setPickProducts(booking?.products)
   }, []);
+
   useEffect(()=>{
     const sumWithInitial = seatPicked.reduce((total, item)=>{
-     // console.log(value);
         return item?.price + total
     },0);
 
     const sumProducts = pickProducts.reduce((total, item)=>{
-      // console.log(value);
          return item?.price * item?.quatity + total
      },0);
-    //console.log(sumWithInitial);
     setTotalPrice(sumWithInitial+sumProducts)
   }, [seatPicked, pickProducts])
 
   const handleSearchCustomer = async (e) =>{
-   // if(e.target.value.length < 9) return;
     const data = await customerApi.getCustomerByPhone(e.target.value);
-    console.log(data);
     if(data.id){
       setCustomerSearched(data);
       return;
     }
     setCustomerSearched(null)
     setPay([])
+    setDiscountMoney(0)
+    setPromotion([])
+    setOptions([])
   }
   const handleClickCustomer = () =>{
     if(customerSearched) {
       setPay([...pay,{customer:customerSearched}])
-      setCustomerSearched(null)
+    
+       const dataPayload = {
+        date: booking.show.showDate,
+        phone: customerSearched?.phone,
+        totalMoney:totalPrice,
+        idProduct:1,
+        qtyBuy: booking.seats.length
+       }
+       getPromotion(dataPayload).then((result)=>{
+          //insert data into options
+          const dataOptions = result.map(val =>{
+            return {value: val?.promotionCode}
+          })
+          const discount = result.reduce((acc, val) =>{
+              if(val?.type === '1' || val?.type === '3'){
+                return acc + val?.discount
+              }
+              return acc + 0
+          }, 0)
+          setDiscountMoney(discount)
+          setOptions(dataOptions)
+          setPromotion(result)
+          setCustomerSearched(null)
+       }).catch(error => {
+
+       })
+
     }
   }
 
+  const handleChangeMoney = (value) =>{
+    const money =  value - totalPrice;
+    setMoneyCustomer(money)
+  }
+  const handleChange = async (value) => {
+    if(value === 'KH001'){
+      const data = await customerApi.getCustomerByPhone(SDT_VANG_LAI);
+      if(data.id){
+        setCustomerSearched(data);
+        return;
+      }
+    }else{
+      setCustomerSearched(null)
+      setPay([])
+      setDiscountMoney(0)
+      setPromotion([])
+    }
+  };
+
+  const handlePay = () =>{
+    console.log(pay[0]?.customer);
+    if(moneyCustomer <= 0) notifyError(MESSAGE_MONEY_INCORRECT)
+    else if (!pay[0]?.customer) notifyError(MESSAGE_CUSTOMER_NOT_FOUND)
+
+    notifySucess("Thành công.")
+  }
 
   return (
     <div className="pick_seat pay_style site-card-wrapper">
@@ -131,9 +193,6 @@ const PayComponent = ({next}) => {
             labelCol={{
             span: 6,
             }}
-            // wrapperCol={{
-            // span: 14,
-            // }}
             layout="horizontal"
         
             style={{
@@ -146,13 +205,26 @@ const PayComponent = ({next}) => {
           </Select>
         </Form.Item>
         <Form.Item label="Loại khách">
-          <Radio.Group>
-            <Radio checked={true} value="apple">Khách bình thường </Radio>
-            <Radio value="pear">Khách vãng lai </Radio>
-          </Radio.Group>
+        <Select
+            defaultValue="KH000"
+            style={{
+              width: 220,
+            }}
+            onChange={handleChange}
+            options={[
+              {
+                value: 'KH000',
+                label: 'Khách bình thường',
+              },
+              {
+                value: 'KH001',
+                label: 'Khách vãng lai',
+              },
+            ]}
+          />
         </Form.Item>
         <Form.Item style={{position:"relative"}} label="SĐT khách: ">
-          <Input placeholder="Nhập số điện thoại khách..." onChange={handleSearchCustomer}/>
+          <Input placeholder="Nhập số điện thoại khách..." value={pay[0]?.customer ? pay[0]?.customer?.phone : '' }  onChange={handleSearchCustomer}/>
           {
             customerSearched ?   <ul className="search_results">
             <li onClick={()=>handleClickCustomer()}  className="search_result">{customerSearched?.firstName + " " + customerSearched?.lastName + " - " +  customerSearched?.phone}</li>
@@ -163,6 +235,29 @@ const PayComponent = ({next}) => {
         <Form.Item label="Tên khách hàng: ">
           <Input disabled={pay[0]?.customer? true: false} value={pay[0]?.customer ? pay[0]?.customer?.firstName + " " + pay[0]?.customer.lastName : ""} placeholder="Nhập tên khách..."/>
         </Form.Item>
+        <Form.Item label="Khuyễn mãi: ">
+      
+            <Select
+              name="PromotionSelect"
+              mode="multiple"
+              showArrow
+              tagRender={tagRender}
+              style={{
+                width: '100%',
+              }}
+              
+              value={options}
+              disabled
+              options={options}
+            />
+          {
+            promotion[0]?.warning ? promotion.map(val =>{
+              return <span id={val?.message} style={{fontSize:"12px", color:"green", display:"block", marginTop:"6px"}}>{val?.message}</span>
+            }) : null
+          }
+        </Form.Item>
+
+        
         <Form.Item label="Ghi chú">
           <TextArea rows={2} />
         </Form.Item>
@@ -174,22 +269,43 @@ const PayComponent = ({next}) => {
             </p>
             <p>
               <span>Giảm giá:</span>
-              <span>0</span>
+              <div className="block_discount">
+                <span style={{textAlign:"end"}}>{VND.format(discountMoney)}</span>
+                 {
+                    promotion.map(val =>{
+                        if(val?.type === '2' && val?.promotionCode){
+                          return  <span className="color_text">{val?.message}</span>
+                        }
+                        return null
+                    })
+                 }
+                 
+              </div>
             </p>
             <p className="total_price_final">
               <span className="total_text_final">Thành tiền: </span>
-              <span  className="total_price_final">100.000</span>
+              <span  className="total_price_final">{VND.format(totalPrice - discountMoney)}</span>
             </p>
             <div>
               <span>Tiền khách đưa</span>
               <div className="block_money">
-                <Input placeholder="Tiền khách đưa"/>
-                <span>Trả lại 0đ</span>
+               
+                <InputNumber
+                defaultValue={totalPrice - discountMoney}
+                style={{ width: "100%" }}
+                formatter={(value) =>
+                  `VNĐ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+                parser={(value) => value.replace(/\VNĐ\s?|(,*)/g, "")}
+                onChange={handleChangeMoney}
+                placeholder="Tiền khách đưa"
+              />
+                <span>Trả lại {VND.format(moneyCustomer)}</span>
               </div>
             </div>
           
         <Form.Item label="">
-          <Button type="primary">Thanh toán</Button>
+          <Button type="primary" onClick={handlePay}>Thanh toán</Button>
         </Form.Item>
         </div>
       </Form>

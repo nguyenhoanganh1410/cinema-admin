@@ -46,6 +46,7 @@ import IndexRoutePrice from "../components/price/IndexRoutePrice";
 import IndexBooking from "../components/booking/IndexBooking";
 
 import { ToastContainer, toast } from 'react-toastify';
+import IndexTicket from "../components/tickets/IndexFilm";
 const { Header, Content, Footer, Sider } = Layout;
 
 const { Text } = Typography;
@@ -169,6 +170,9 @@ const HomePage = () => {
       return <IndexRoutePrice />;
     } else if (itemClicked === 13) {
       return <IndexRouteHall />;
+    } 
+    else if (itemClicked === 9) {
+      return <IndexTicket />;
     } 
     return <IndexDashboard />;
   };

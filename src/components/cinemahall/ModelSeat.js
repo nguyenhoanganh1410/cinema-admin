@@ -14,13 +14,7 @@ import {
 } from "antd";
 import "./IndexRoomMap.scss";
 import cinemaHallApi from "../../api/cinemaHallApi";
-import { MdChair, MdOutlineSignalCellularNull } from "react-icons/md";
-import { useSelector } from "react-redux";
 
-const initValue = {
-  status:"",
-  statusSeat:""
-}
 const ModelSeat = ({possition, seat, handleLogic }) => {
   const [form] = Form.useForm();
   const [isModalOpen, setIsModalOpen] = useState(true);
@@ -28,11 +22,7 @@ const ModelSeat = ({possition, seat, handleLogic }) => {
   const [statusSeatState, setStatusSeatState] = useState(null)
   const [statusState, setStatusState] = useState(null)
 
-  
-
   const handleOk = () => {
-   
-    
     const update = async (id, data) => {
       try {
         const response = await cinemaHallApi.updateSeat(
@@ -50,6 +40,7 @@ const ModelSeat = ({possition, seat, handleLogic }) => {
     };
     update(seat.id, {status: statusState, statusSeat: statusSeatState});
   };
+
   const handleCancel = () => {
     handleLogic()
   };

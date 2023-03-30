@@ -16,25 +16,12 @@ import cinemaHallApi from "../../api/cinemaHallApi";
 import { MdChair, MdOutlineSignalCellularNull } from "react-icons/md";
 import { useSelector } from "react-redux";
 import ModelSeat from "./ModelSeat";
-
-
-const { Title, Text } = Typography;
-const dateFormat = "YYYY/MM/DD";
-
-const openNotification = () => {
-  notification.open({
-    message: 'Thông báo',
-    description:
-      'Cập nhật ghế thành công!!',
-    onClick: () => {
-      console.log('Notification Clicked!');
-    },
-  });
-};
+import { notifySucess } from "../../utils/Notifi";
+import { MESSAGE_UPDATE_SEAT_SUCCESS } from "../../constant";
 
 const arrColumn = ["B", "C", "D", "E", "F", "G", "H", "I", "K"];
-
 const arrRow = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
 const IndexCinemaMap = ({ setTab }) => {
   const [seats, setSeats] = useState([]);
   const idCinemaHall = useSelector((state) => state.cinemaHallId);
@@ -42,8 +29,6 @@ const IndexCinemaMap = ({ setTab }) => {
   const [possition, setPossition] = useState("");
   const [open, setOpen] = useState(false);
   const [changeSeat, setChangeSeat] = useState(false);
-
-
 
   useEffect(() => {
     const getSeats = async () => {
@@ -77,14 +62,13 @@ const IndexCinemaMap = ({ setTab }) => {
       }
     };
     getSeatById(seat.id);
-   
   };
 
   const handleLogic = () =>{
     setSeat(null);
     setOpen(false)
     setChangeSeat(!changeSeat)
-    openNotification()
+    notifySucess(MESSAGE_UPDATE_SEAT_SUCCESS)
   }
   return (
     <div className="site-card-wrapper">

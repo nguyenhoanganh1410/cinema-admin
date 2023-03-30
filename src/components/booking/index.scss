@@ -284,7 +284,17 @@
   }
   .block_details {
     margin-left: 25%;
+    .block_discount{
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-content: flex-end;
+      .color_text{
+        color: green;
+      }
+    }
     .block_money {
+      margin-top: 0.5rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -331,4 +341,8 @@
       background-color: rgba(0, 0, 0, 0.1);
     }
   }
+}
+.ant-tag, .ant-tag-has-color{
+  background-color: greenyellow !important;
+ // color: white !important;
 }

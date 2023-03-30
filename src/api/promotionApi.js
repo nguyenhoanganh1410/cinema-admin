@@ -20,6 +20,13 @@ const promotionApi = {
   getPromotionLineByHeader: (_id) => {
     return axiosApi.get(`/promotionLine/promotionHeader/${_id}`);
   },
+
+  checkPromotion: (data) => {
+    const {date, phone, totalMoney, idProduct, qtyBuy} = data
+    return axiosApi.get(`/promotionHeader/check/promotion?date=${date}&phone=${phone}&totalMoney=${totalMoney}&idProductBuy=${idProduct}&qtyBuy=${qtyBuy}`);
+  },
+
+  
 };
 
 export default promotionApi;
