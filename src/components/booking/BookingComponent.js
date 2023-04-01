@@ -10,6 +10,8 @@ import PickSeatComponent from "./PickSeatComponent";
 import PickShowComponent from "./PickShowComponent";
 import PayComponent from "./PayComponent";
 import ResultPage from "../sucesspage/ResultPage";
+import { useDispatch, useSelector } from "react-redux";
+import { cancelReservationData } from "../../services/ReservationFetch";
 
 
 const BookingComponent = ({ setTab }) => {
@@ -18,11 +20,29 @@ const BookingComponent = ({ setTab }) => {
   const [film, setFilm] = useState(null)
   const [isSucess, setIsSecess] = useState(false)
   
+  const depatch = useDispatch();
+  const booking = useSelector((state) => state.booking);
+  const user = useSelector((state) => state.user);
+
   const next = (currentFilm) => {
     setCurrent(current + 1);
     setFilm(currentFilm)
   };
   const prev = () => {
+    if(current === 3){
+      const {show, film, seats} = booking
+      const listSeatId = seats.map(seat=>{
+        return seat?.id
+      })
+      const dataPayload = {
+        showTime_id: show?.id,
+        staff_id: user?.id,
+        seats: [...listSeatId]
+      }
+      console.log(dataPayload);
+      cancelReservationData(dataPayload)
+
+    }
     setCurrent(current - 1);
   };
   const steps = [

@@ -16,8 +16,8 @@ import {
 
 import { useDispatch, useSelector } from "react-redux";
 import { setReload } from "../../redux/actions";
-const { Option } = Select;
 import priceApi from "../../api/priceApi";
+const { Option } = Select;
 
 const ModelAddCustomer = ({
   showModalAddCustomer,

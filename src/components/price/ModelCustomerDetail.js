@@ -60,7 +60,7 @@ const ModelDetailCustomer = ({
   };
 
   const onChangeProduct = (value) => {
-    setProductSelected(value);
+   // setProductSelected(value);
   };
 
   useEffect(() => {

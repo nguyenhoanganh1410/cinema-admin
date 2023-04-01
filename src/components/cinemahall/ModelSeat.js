@@ -20,7 +20,7 @@ const ModelSeat = ({possition, seat, handleLogic }) => {
   const [isModalOpen, setIsModalOpen] = useState(true);
 
   const [statusSeatState, setStatusSeatState] = useState(null)
-  const [statusState, setStatusState] = useState(null)
+  const [statusState, setStatusState] = useState(1)
 
   const handleOk = () => {
     const update = async (id, data) => {
@@ -32,13 +32,13 @@ const ModelSeat = ({possition, seat, handleLogic }) => {
           console.log("update success");
           setStatusSeatState(null)
           setStatusState(null)
-           handleLogic();
+          handleLogic();
         }
       } catch (error) {
         console.log("Featch erro: ", error);
       }
     };
-    update(seat.id, {status: statusState, statusSeat: statusSeatState});
+    update(seat.id, {statusSeat: statusSeatState});
   };
 
   const handleCancel = () => {
@@ -46,17 +46,17 @@ const ModelSeat = ({possition, seat, handleLogic }) => {
   };
 
   const handleChange = (value) => {
-   
-    setStatusState(value)
+    setStatusSeatState(value)
   };
 
   const handleChangeStatusSeat = (value) => {
+
     setStatusSeatState(value)
   };
   
   useEffect(()=>{
     setStatusSeatState(seat?.statusSeat);
-    setStatusState(seat?.status)
+    
   },[])
  
   return (
@@ -84,47 +84,47 @@ const ModelSeat = ({possition, seat, handleLogic }) => {
           ]}
         >
          {
-          seat.status === 1 ? 
+          !seat.statusSeat ? 
           <Select
              placeholder="Trạng thái"
-             onChange={handleChange}
-             name="status"
+             onChange={handleChangeStatusSeat}
+             name="statusSeat"
              style={{
                width: "100%",
              }}
              defaultValue={{
-              value: "1",
+              value: "0",
               label: "Sẵn sàng",
             }}
              options={[
                {
-                 value: "1",
+                 value: "0",
                  label: "Sẵn sàng",
                },
                {
-                 value: "0",
+                 value: "1",
                  label: "Bảo trì",
                },
              ]}
            /> : 
            <Select
              placeholder="Trạng thái"
-             onChange={handleChange}
-             name="status"
+             onChange={handleChangeStatusSeat}
+             name="statusSeat"
              style={{
                width: "100%",
              }}
              defaultValue={{
-              value: "0",
+              value: "1",
               label: "Bảo trì",
             }}
              options={[
                {
-                 value: "1",
+                 value: "0",
                  label: "Sẵn sàng",
                },
                {
-                 value: "0",
+                 value: "1",
                  label: "Bảo trì",
                },
              ]}
@@ -137,7 +137,7 @@ const ModelSeat = ({possition, seat, handleLogic }) => {
           <Col span={4}>Loại ghế:</Col>
           <Col span={20}>
           <Form.Item
-          name="statusSeat"
+          name="statusSeatok"
           rules={[
             {
               required: true,
@@ -145,7 +145,7 @@ const ModelSeat = ({possition, seat, handleLogic }) => {
           ]}
         >
           {
-            seat?.statusSeat ? 
+            seat?.idProduct !== 1 ? 
             <Select
             placeholder="Loại ghế"
             onChange={handleChangeStatusSeat}
@@ -171,7 +171,7 @@ const ModelSeat = ({possition, seat, handleLogic }) => {
             <Select
             placeholder="Loại ghế"
             onChange={handleChangeStatusSeat}
-            name="statusSeat"
+            name="statusSeatOk"
             defaultValue={{
               value: "false",
                   label: "Ghế đơn",
