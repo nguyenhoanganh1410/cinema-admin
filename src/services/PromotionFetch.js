@@ -1,7 +1,4 @@
 import promotionApi from "../api/promotionApi";
-
-
-
 export const getPromotion = async (data) =>{
     try {
         const dataResult = await promotionApi.checkPromotion(data)

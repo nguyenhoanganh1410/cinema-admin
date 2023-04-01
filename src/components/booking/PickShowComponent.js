@@ -21,20 +21,27 @@ const PickShowComponent = ({next, film}) => {
  const [shows, setShows] = useState([])
  const depatch = useDispatch();
  const booking = useSelector((state) => state.booking);
-
+  console.log(shows);
  useEffect(()=>{
   setLoading(true)
     const getShowByDate = async (idMovie, datatDate) =>{
         try {
           const data = await showApi.getShowByMovieAndDate(idMovie, datatDate);
-          console.log(data);
+          var now = moment().format(dateFormatQuery);
+          const dataResult = data.map(val =>{
+              if(val?.showDate === now  ){
+                var cdt = moment(val?.ShowTime?.showTime, 'HH:mm');
+                const hour = moment().get('hour');
+                const minus = moment().get('minute');
+                const showHour = cdt.get('hour');
+                const showMinus = cdt.get('minute')
 
-          // const dataResult = data.map(val =>{
-          //   //val.ShowTime.showTime
-          //   const date1 = new Date('2020-01-01 ' + val.ShowTime.showTime);
-          //   const currentDate = new Date();
-          // })
-          setShows(data);
+                if(showHour < hour) return {...val, disable: true};
+                else if( showHour === hour && showMinus < minus) return {...val, disable:true};
+              }
+              return {...val, disable: false}
+          })
+          setShows(dataResult);
           setTimeout(()=>{
             setLoading(false)
         }, 1000)
@@ -131,14 +138,20 @@ const PickShowComponent = ({next, film}) => {
                       shows.length === 0 ? <p>Không có suất chiếu nào!!</p> :
                     <>
                         {
-                                                shows.map(val =>{
-                                                  return(
-                                                    <div onClick={()=>handlePickShow(val)} className="time" key={val?.id}>
-                                                    { val?.ShowTime.showTime}
-                                                  </div>
-                          
-                                                  )
-                                                })
+                          shows.map(val =>{
+                            if(val?.disable){
+                              return(
+                                <div style={{cursor:'not-allowed'}} className="time" key={val?.id}>
+                                  { val?.ShowTime.showTime}
+                                </div>
+                              )
+                            }
+                            return(
+                              <div onClick={()=>handlePickShow(val)} className="time" key={val?.id}>
+                                { val?.ShowTime.showTime}
+                              </div>
+                            )
+                          })
                         }
 
                       </>

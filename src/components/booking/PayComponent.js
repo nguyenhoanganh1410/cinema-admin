@@ -15,6 +15,7 @@ import customerApi from "../../api/customerApi";
 import { getPromotion } from "../../services/PromotionFetch";
 import { MESSAGE_CUSTOMER_NOT_FOUND, MESSAGE_MONEY_INCORRECT, SDT_VANG_LAI, VND } from "../../constant";
 import { notifyError, notifySucess } from "../../utils/Notifi";
+import orderApi from "../../api/orderApi";
 
 
 
@@ -40,7 +41,7 @@ const tagRender = (props) => {
 };
 
 const { TextArea } = Input;
-const PayComponent = ({next}) => {
+const PayComponent = ({next, setIsSecess}) => {
   const depatch = useDispatch();
   const booking = useSelector((state) => state.booking);
   const cinema = useSelector((state) => state.cinema);
@@ -56,8 +57,10 @@ const PayComponent = ({next}) => {
 
   const [promotion, setPromotion] = useState([])
   const [options, setOptions] = useState([])
+  const [loading,setLoading] = useState(false)
+  
+  console.log(promotion)
 
-  console.log(pay)
   useEffect(() => {
     setSeatPicked(booking?.seats)
     setPickProducts(booking?.products)
@@ -138,12 +141,65 @@ const PayComponent = ({next}) => {
     }
   };
 
-  const handlePay = () =>{
-    console.log(pay[0]?.customer);
-    if(moneyCustomer <= 0) notifyError(MESSAGE_MONEY_INCORRECT)
-    else if (!pay[0]?.customer) notifyError(MESSAGE_CUSTOMER_NOT_FOUND)
+  const handlePay = async () =>{
+    setLoading(true)
+    if(moneyCustomer <= 0) { setLoading(false); notifyError(MESSAGE_MONEY_INCORRECT);return}
+    else if (!pay[0]?.customer){ 
+      setLoading(false);
+      notifyError(MESSAGE_CUSTOMER_NOT_FOUND); return}
+    const {show, film, seats, products} = booking
+    const dataSeatPayLoad = seats?.map(seat =>{
+      return {
+        idSeat:seat?.id,
+        idProduct:seat?.Product?.id,
+        price:seat?.price,
+        qty: 1
+      }
+    })
+    const dataProductPayLoad = products?.map(product =>{
+      return {
+        id:product?.id,
+        qty: product?.quatity,
+        price: product?.price
+      }
+    })
 
-    notifySucess("Thành công.")
+    const promotionClear =  promotion?.filter(product =>{
+      if(product?.promotionCode){
+        return product
+      }
+     
+    })
+    const dataPromotionPayLoad = promotionClear?.map(product =>{
+      return  {
+        type: product?.type,
+        promotionLine_id:product?.promotionLine_id,
+        qtyReceived:product?.qtyReceived || 0,
+        productReceived_id: product?.productReceived?.id || null,
+        discount: product?.discount || 0
+    }
+    })
+    let price = totalPrice - discountMoney
+    const dataPayload = {
+      idShowMovie:show?.id,
+      idCustomer:pay[0]?.customer?.id,
+      idStaff:user?.id,
+      totalPrice: price,
+      seats:[...dataSeatPayLoad],
+      product_sp: [...dataProductPayLoad],
+      promotionApplicalbe:[...dataPromotionPayLoad]
+    }
+
+    try {
+      const result = await orderApi.createOrder(dataPayload)
+      notifySucess("Đặt Vé Thành công.")
+      setIsSecess(true)
+    } catch (error) {
+      notifyError("Thất bại.")
+    } finally{
+      setLoading(false);
+    }
+
   }
 
   return (
@@ -155,8 +211,6 @@ const PayComponent = ({next}) => {
         }}
         style={{  padding: "1rem", minHeight:"80vh" }}
       >
-        
-
         <Col span = {8}>
             <div className="booking_content">
               <div className="booking_content-top" style={{height:"350px"}}>
@@ -305,7 +359,7 @@ const PayComponent = ({next}) => {
             </div>
           
         <Form.Item label="">
-          <Button type="primary" onClick={handlePay}>Thanh toán</Button>
+          <Button type="primary" onClick={handlePay} loading={loading ? true : false}>Thanh toán</Button>
         </Form.Item>
         </div>
       </Form>
