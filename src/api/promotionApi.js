@@ -4,8 +4,12 @@ const promotionApi = {
   getPromotionHeader: () => {
     return axiosApi.get("/promotionHeader");
   },
-  updatePromotionHeader: (data) => {
-    return axiosApi.put(`/promotionHeader/${data.id}`, data);
+  updatePromotionHeader: (data,id) => {
+    return axiosApi.put(`/promotionHeader/${id}`, data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
   },
   createPromotionHeader: (data) => {
     return axiosApi.post("/promotionHeader", data, {
@@ -21,12 +25,17 @@ const promotionApi = {
     return axiosApi.get(`/promotionLine/promotionHeader/${_id}`);
   },
 
+  createPromotionLine: (data) => {
+    return axiosApi.post("/promotionLine", data);
+  },
+  createPromotionDetail: (data) => {
+    return axiosApi.post("/promotionDetail", data);
+  },
+
   checkPromotion: (data) => {
     const {date, phone, totalMoney, idProduct, qtyBuy} = data
     return axiosApi.get(`/promotionHeader/check/promotion?date=${date}&phone=${phone}&totalMoney=${totalMoney}&idProductBuy=${idProduct}&qtyBuy=${qtyBuy}`);
   },
-
-  
 };
 
 export default promotionApi;

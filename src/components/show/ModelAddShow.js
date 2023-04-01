@@ -289,7 +289,7 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
                       console.log('val',value)
                       console.log('start',new Date(startDatePicked))
                       if(value < new Date(startDatePicked)){
-                        console.log('ok')
+                        return Promise.reject("Ngày kết thúc phải lớn hơn hoặc ngày bắt đầu!");
                       }
                     }
                   })

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Input, Col, Row, Typography, Button, Modal } from "antd";
+import React, { useEffect, useState } from "react";
+import { Input, Col, Row, Typography, Button, Modal,Table } from "antd";
 
 import {
   SearchOutlined,
@@ -8,17 +8,63 @@ import {
   ToolOutlined,
   DeleteOutlined,
   DownloadOutlined,
+  EyeOutlined,
+  TableOutlined
 } from "@ant-design/icons";
 import TableCustomer from "./TableCustomer";
 import ModelAddCustomer from "./ModelAddCustomer";
+import productApi from "../../api/productApi";
+import { useDispatch, useSelector } from "react-redux";
+import { setReload } from "../../redux/actions";
 
 const { Title, Text } = Typography;
 const IndexCustomer = ({ setTab ,setSelectedIdHeader}) => {
   const [showModalAddCustomer, setShowModalAddCustomer] = useState(false);
+  const [isShowTable, setIsShowTable] = useState(true);
+  const [listProduct, setListProduct] = useState([]);
+  const depatch = useDispatch();
+  const reload = useSelector((state) => state.reload);
 
   const showModal = () => {
     setShowModalAddCustomer(true);
   };
+
+  const columns = [
+    {
+      title: "Mã sản phẩm",
+      dataIndex: "productCode",
+    },
+    {
+      title: "Tên sản phẩm",
+      dataIndex: "productName",
+    },
+    {
+      title: "Giá bán",
+      dataIndex: "price",
+      render:(val) => {
+        return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+      }
+    },
+  ];
+
+  useEffect(() => {
+    const fetchListProduct = async () => {
+      try {
+        const response = await productApi.getAllPriceProduct();
+        const data = response.map((item) => {
+          return {
+            productCode: item.productCode,
+            productName: item.productName,
+            price: item.price,
+          };
+        });
+        setListProduct(data);
+      } catch (error) {
+        console.log("Failed to fetch product list: ", error);
+      }
+    };
+    fetchListProduct();
+  }, [reload]);
 
   return (
     <div className="site-card-wrapper">
@@ -45,6 +91,17 @@ const IndexCustomer = ({ setTab ,setSelectedIdHeader}) => {
             Thêm
           </Button>
         </Col>
+        <Col style={{
+          marginLeft: "3rem"
+        }} span={1}>
+          {" "}
+          <Button type="primary" icon={<TableOutlined />} onClick={() => {
+            setIsShowTable(!isShowTable)
+          }} 
+            title="Danh sách giá sản phẩm hiện tại"
+          > 
+          </Button>
+        </Col>
         {/* <Col style={{ margin: "0 1rem" }}>
           {" "}
           <Button type="primary" size="large" icon={<ToolOutlined />}>
@@ -68,7 +125,13 @@ const IndexCustomer = ({ setTab ,setSelectedIdHeader}) => {
         }}
       >
         <Col span={24}>
-          <TableCustomer setTab={setTab} setSelectedIdHeader={setSelectedIdHeader} />
+          {isShowTable ? <TableCustomer setTab={setTab} setSelectedIdHeader={setSelectedIdHeader}  /> :
+           <Table
+           columns={columns}
+           dataSource={listProduct}
+            />
+           }
+          
         </Col>
       </Row>
       {showModalAddCustomer ? (

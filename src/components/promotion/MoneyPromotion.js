@@ -103,30 +103,6 @@ const MoneyPromotion = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
             </Form.Item>
           </Col>
         </Row>
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              name=""
-              label="Ngân sách"
-              rules={[
-                {
-                  required: true,
-                  message: "Nhập số  tiền ngân sách...",
-                },
-              ]}
-            >
-              <InputNumber
-                style={{ width: "100%" }}
-                formatter={(value) =>
-                  `VNĐ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                }
-                parser={(value) => value.replace(/\VNĐ\s?|(,*)/g, "")}
-                // onChange={onChange}
-                placeholder="Nhập số tiền ngân sách.."
-              />
-            </Form.Item>
-          </Col>
-        </Row>
       </Form>
     </>
   );

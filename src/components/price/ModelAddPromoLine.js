@@ -15,12 +15,19 @@ import {
   Space,
   TimePicker,
   Upload,
+  message,
 } from "antd";
 
 import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 // import ProductPromotion from "./ProductPromotion";
 // import MoneyPromotion from "./MoneyPromotion";
 // import PercentPromotion from "./PercentPromotion";
+import priceApi from "../../api/priceApi";
+import moment from "moment";
+import productApi from "../../api/productApi";
+
+import { useDispatch, useSelector } from "react-redux";
+import { setReload } from "../../redux/actions";
 
 const { Option } = Select;
 
@@ -35,38 +42,16 @@ const getBase64 = (file) =>
 const ModelAddPromoLine = ({
   showModalAddCustomer,
   setShowModalAddCustomer,
+  selectedIdHeader,
 }) => {
-  const [previewOpen, setPreviewOpen] = useState(false);
-  const [previewImage, setPreviewImage] = useState("");
-  const [previewTitle, setPreviewTitle] = useState("");
-  const [fileList, setFileList] = useState([]);
 
-  const [type, setType] = useState(1);
+  const [form] = Form.useForm();
+  const [priceHeader, setPriceHeader] = useState({});
+  const [listProduct, setListProduct] = useState([]);
+  const [productSelected, setProductSelected] = useState(0);
+  const depatch = useDispatch();
+  const reload = useSelector((state) => state.reload);
 
-  const handleCancel = () => setPreviewOpen(false);
-  const handlePreview = async (file) => {
-    if (!file.url && !file.preview) {
-      file.preview = await getBase64(file.originFileObj);
-    }
-    setPreviewImage(file.url || file.preview);
-    setPreviewOpen(true);
-    setPreviewTitle(
-      file.name || file.url.substring(file.url.lastIndexOf("/") + 1)
-    );
-  };
-  const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
-  const uploadButton = (
-    <div>
-      <PlusOutlined />
-      <div
-        style={{
-          marginTop: 8,
-        }}
-      >
-        Upload
-      </div>
-    </div>
-  );
 
   const onSearch = (value) => {
     console.log("search:", value);
@@ -77,36 +62,73 @@ const ModelAddPromoLine = ({
   };
 
   //handle submit form create new customer...
-  const handleSubmit = () => {
+  const handleSubmit = (val) => {
+    console.log("values:", val);
     //write code in here...
+    const data = {
+      price: val.price,
+      idProduct: val.product,
+      idPriceHeader: val.priceHeaderId,
+    };
+    const fetchAddPromoLine = async () => {
+      try {
+        const res = await priceApi.addPriceLine(data);
+        if (res.status === 200) {
+          message.success("Thêm thành công");
+          depatch(setReload(!reload));
+          onClose();
+        }
+      } catch (error) {
+        console.log('err',error);
+        const {data} = error.response;
+        let messageError ;
+        if(data.status === 409){
+          messageError 
+          = `Thêm thất bại: Sản phẩm đang được áp dụng cho bảng giá:
+           Mã: ${data.data[0].PriceHeader.id} - Tên: ${data.data[0].PriceHeader.name} - Ngày kết thúc: ${data.data[0].PriceHeader.endDate}`
+        }
+        if(data.status === 400){
+          messageError 
+          = `Thêm thất bại: Sản phẩm đã tồn tại trong bảng giá`
+        }
+        console.log('messageError',messageError);
+        message.error(messageError, 7);
+      }
+    };
+
+    fetchAddPromoLine();
   };
 
-  //change position
-  const handleChangeTypePro = (value) => {
-    setType(+value);
+  const onChangeProduct = (value) => {
+    setProductSelected(value);
   };
 
-  //choise date start worling
-  const onChangeDate = (date, dateString) => {
-    console.log(date, dateString);
-  };
 
-  // const RenderType = () => {
-  //   switch (type) {
-  //     case 1:
-  //       return <MoneyPromotion />;
-  //     case 2:
-  //       return <ProductPromotion />;
-  //     case 3:
-  //       return <PercentPromotion />;
-  //     default:
-  //       return <PercentPromotion />;
-  //   }
-  // };
+
+  useEffect(() => {
+    const fetchDetailPriceHeader = async () => {
+      const res = await priceApi.getPriceHeaderById(selectedIdHeader);
+      const data = {
+        priceHeaderId: res.id,
+        startDate: moment(res.startDate),
+        endDate: moment(res.endDate),
+      }
+      form.setFieldsValue(data);
+    };
+
+    const fetchListProduct = async () => {
+      const res = await productApi.getProducts();
+      setListProduct(res);
+    };
+
+    fetchListProduct();
+    fetchDetailPriceHeader();
+  }, []);
+
   return (
     <>
       <Drawer
-        title="Thêm chi tiết khuyễn mãi"
+        title="Thêm Sản phẩm vào bảng giá"
         width={720}
         onClose={onClose}
         open={showModalAddCustomer}
@@ -116,215 +138,94 @@ const ModelAddPromoLine = ({
         extra={
           <Space>
             <Button onClick={onClose}>Cancel</Button>
-            <Button onClick={handleSubmit} type="primary">
+            <Button  form="myFormLine" htmlType="submit" type="primary">
               Submit
             </Button>
           </Space>
         }
       >
-        <Form layout="vertical">
+        <Form
+          form={form}
+          onFinish={handleSubmit}
+          id="myFormLine"
+        layout="vertical">
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item
-                name=""
-                label="Mã Code"
-                rules={[
-                  {
-                    required: true,
-                    message: "Hãy nhập mã code...",
-                  },
-                ]}
-              >
-                <Input placeholder="Hãy nhập mã code.." />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="note" label="Ghi chú">
-                <Input.TextArea rows={4} placeholder="Nhập ghi chú..." />
+              <Form.Item name="priceHeaderId" label="Mã bảng giá">
+                <Input disabled={true} />
               </Form.Item>
             </Col>
           </Row>
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                name="category"
-                label="Chọn loại khuyến mãi "
-                rules={[
-                  {
-                    required: true,
-                    message: "Hãy chọn loại khuyến mãi...",
-                  },
-                ]}
-              >
-                <Select
-                  placeholder="Chọn loại KM"
-                  style={{
-                    width: "100%",
-                  }}
-                  onChange={handleChangeTypePro}
-                  options={[
-                    {
-                      value: "1",
-                      label: "Khuyến mãi tặng tiền",
-                    },
-                    {
-                      value: "2",
-                      label: "Khuyễn mãi tặng đồ",
-                    },
-                    {
-                      value: "3",
-                      label: "Khuyễn mãi phần trăm",
-                    },
-                  ]}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="status"
-                label="Chọn trạng thái"
-                rules={[
-                  {
-                    required: true,
-                    message: "Hãy chọn trạng thái...",
-                  },
-                ]}
-              >
-                <Select
-                  placeholder="Chọn trạng thái"
-                  style={{
-                    width: "100%",
-                  }}
-                  // onChange={handleChangePosition}
-                  options={[
-                    {
-                      value: "1",
-                      label: "Họat động",
-                    },
-                    {
-                      value: "2",
-                      label: "Hết hạn",
-                    },
-                  ]}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name=""
-                label="Số lượng trên ngày"
-                rules={[
-                  {
-                    required: true,
-                    message: "Nhập số lần được sử dụng trên ngày...",
-                  },
-                ]}
-              >
-                <InputNumber
-                  style={{ width: "100%" }}
-                  min={1}
-                  max={10}
-                  defaultValue={1}
-                  placeholder="Nhập số lần được sử dụng trên ngày.."
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name=""
-                label="Số lượng trên khách hàng"
-                rules={[
-                  {
-                    required: true,
-                    message: "Nhập số lần được sử dụng trên KH...",
-                  },
-                ]}
-              >
-                <InputNumber
-                  style={{ width: "100%" }}
-                  min={1}
-                  max={10}
-                  defaultValue={1}
-                  placeholder="Nhập số lần được sử dụng trên KH..."
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name="releaseDate"
+                name="startDate"
                 label="Ngày bắt đầu"
-                rules={[
-                  {
-                    required: true,
-                    message: "Hãy chọn ngày bắt đầu...",
-                  },
-                ]}
+               
               >
-                <DatePicker
-                  onChange={onChangeDate}
-                  style={{ width: "100%" }}
-                  placeholder="Chọn ngày bắt đầu"
-                />
+                <DatePicker disabled={true} style={{ width: "100%" }} />
               </Form.Item>
             </Col>
             <Col span={12} style={{}}>
               <Form.Item
-                name="releaseDate"
+                name="endDate"
                 label="Ngày kết thúc"
-                rules={[
-                  {
-                    required: true,
-                    message: "Hãy chọn ngày kết thúc...",
-                  },
-                ]}
               >
-                <DatePicker
-                  onChange={onChangeDate}
-                  style={{ width: "100%" }}
-                  placeholder="Chọn ngày kết thúc"
-                />
+                <DatePicker style={{ width: "100%" }} disabled={true} />
               </Form.Item>
             </Col>
           </Row>
-          <Row>
+          <Row style={{ marginBottom: "26px" }} gutter={16}>
+          
             <Col span={12}>
               <Form.Item
-                name="image"
-                label="Hình ảnh"
-                valuePropName="fileList"
-                extra="Chỉ chấp nhận file ảnh"
-                type="file"
+                name="product"
+                label="Chọn sản phẩm"
+                rules={[
+                  {
+                    required: true,
+                    message: "Hãy chọn sản phẩm...",
+                  },
+                ]}
               >
-                <Upload
-                  action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                  listType="picture-card"
-                  fileList={fileList}
-                  onPreview={handlePreview}
-                  onChange={handleChange}
-                >
-                  {fileList.length >= 1 ? null : uploadButton}
-                </Upload>
-                <Modal
-                  open={previewOpen}
-                  title={previewTitle}
-                  footer={null}
-                  onCancel={handleCancel}
-                >
-                  <img
-                    alt="example"
-                    style={{
-                      width: "100%",
-                    }}
-                    src={previewImage}
-                  />
-                </Modal>
+                <Select
+                  placeholder="Chọn sản phẩm..."
+                  style={{
+                    width: "100%",
+                  }}
+                  onChange={onChangeProduct}
+                  options={listProduct.map((item) => {
+                    return {
+                      value: item.id,
+                      label: item.productName,
+                    };
+                  })
+                  }
+                />
               </Form.Item>
             </Col>
+            <Col span={12}>
+            <Form.Item
+              name="price"
+              label="Giá bán"
+              rules={[
+                {
+                  required: true,
+                  message: "Nhập giá bán...",
+                },
+              ]}
+            >
+              <InputNumber
+                style={{ width: "100%" }}
+                formatter={(value) =>
+                  `VNĐ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+                parser={(value) => value.replace(/\VNĐ\s?|(,*)/g, "")}
+                // onChange={onChange}
+                placeholder="Nhập giá bán..."
+              />
+            </Form.Item>
+          </Col>
           </Row>
         </Form>
         {/* <RenderType /> */}

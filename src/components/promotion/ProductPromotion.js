@@ -21,17 +21,24 @@ import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 
-const ProductPromotion = ({
-  showModalAddCustomer,
-  setShowModalAddCustomer,
-}) => {
+const ProductPromotion = (
+  handleSubmit,
+) => {
+  const [form] = Form.useForm();
+  handleSubmit = (values) => {
+    console.log("values", values);
+  };
   return (
     <>
-      <Form layout="vertical">
+      <Form 
+        form={form}
+        id="myFormAddLinePro"
+        onFinish={handleSubmit}
+      layout="vertical">
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              name="category"
+              name="productBuy"
               label="Chọn sản phẩm mua "
               rules={[
                 {
@@ -61,7 +68,7 @@ const ProductPromotion = ({
           </Col>
           <Col span={12}>
             <Form.Item
-              name="status"
+              name="productReceive"
               label="Chọn sản phẩm nhận"
               rules={[
                 {
@@ -102,7 +109,7 @@ const ProductPromotion = ({
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              name="name"
+              name="qtyBuy"
               label="Số lượng mua"
               rules={[
                 {
@@ -122,7 +129,7 @@ const ProductPromotion = ({
           </Col>
           <Col span={12}>
             <Form.Item
-              name="name"
+              name="qtyReceive"
               label="Số lượng nhận"
               rules={[
                 {
@@ -137,28 +144,6 @@ const ProductPromotion = ({
                 max={10}
                 defaultValue={1}
                 placeholder="Nhập số lượng nhận.."
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              name=""
-              label="Ngân sách sản phẩm"
-              rules={[
-                {
-                  required: true,
-                  message: "Nhập Ngân sách sản phẩm...",
-                },
-              ]}
-            >
-              <InputNumber
-                min={1}
-                max={10}
-                style={{ width: "100%" }}
-                defaultValue={1}
-                placeholder="Nhập Ngân sách sản phẩm.."
               />
             </Form.Item>
           </Col>

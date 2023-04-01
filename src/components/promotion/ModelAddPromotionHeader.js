@@ -13,10 +13,60 @@ import {
   Select,
   Space,
   Upload,
+  Tag,
 } from "antd";
 
-import { PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import promotionApi from "../../api/promotionApi";
+import rankApi from "../../api/rankApi";
+import { CustomTagProps } from "rc-select/lib/BaseSelect";
+import moment from "moment";
+
+import { useDispatch, useSelector } from "react-redux";
+import { setReload } from "../../redux/actions";
+
+const normFile = (e) => {
+  console.log("Upload event:", e);
+  if (Array.isArray(e)) {
+    return e;
+  }
+  return e?.fileList;
+};
+
+const dummyRequest = ({ file, onSuccess }) => {
+  setTimeout(() => {
+    onSuccess("ok");
+  }, 0);
+};
+
+const tagRender = (props) => {
+  const { label, value, closable, onClose } = props;
+  const onPreventMouseDown = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+  };
+  let color;
+  if (label === "START") {
+    color = "green";
+  } else if (label === "GOLD") {
+    color = "gold";
+  } else if (label === "DIAMOND") {
+    color = "blue";
+  } else if (label === "ANONYMOUS") {
+    color = "geekblue";
+  }
+  return (
+    <Tag
+      color={color}
+      onMouseDown={onPreventMouseDown}
+      closable={closable}
+      onClose={onClose}
+      style={{ marginRight: 3 }}
+    >
+      {label}
+    </Tag>
+  );
+};
 
 const getBase64 = (file) =>
   new Promise((resolve, reject) => {
@@ -37,6 +87,13 @@ const ModelAddPromotionHeader = ({
   const [fileList, setFileList] = useState([]);
   const handleCancel = () => setPreviewOpen(false);
   const [form] = Form.useForm();
+  const [ranks, setRanks] = useState([]);
+  const [rankPicked, setRankPicked] = useState([]);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
+  const depatch = useDispatch();
+  const reload = useSelector((state) => state.reload);
 
   const handlePreview = async (file) => {
     if (!file.url && !file.preview) {
@@ -71,51 +128,60 @@ const ModelAddPromotionHeader = ({
     setShowModalAddCustomer(false);
   };
 
+  useEffect(() => {
+    const fetchRanks = async () => {
+      const rs = await rankApi.getRanks();
+      console.log(rs);
+      if (rs) {
+        const options = rs.map((rank) => {
+          return {
+            label: rank.nameRank,
+            value: Number(rank.id),
+          };
+        });
+        setRanks(options);
+      }
+    };
+    fetchRanks();
+  }, []);
+
   //handle submit form create new customer...
   const handleSubmit = async (val) => {
-    const { namePromotion, desc, startDate, endDate, statusPromotion, image } =
-      val;
-
-    const newStartDate = new Date(startDate?.$d).toISOString();
-    const newEndDate = new Date(endDate?.$d).toISOString();
-
+    console.log(val);
     const data = new FormData();
-    data.append("namePromotion", namePromotion);
-    data.append("desc", desc);
-    data.append("statusPromotion", statusPromotion);
-    data.append("startDate", newStartDate);
-    data.append("endDate", newEndDate);
-
-    console.log(data);
-
-    if (image) {
-      data.append("image", image[0].originFileObj);
+    data.append("namePromotion", val.namePromotion)
+    data.append("desc", val.desc)
+    data.append("startDate", startDate)
+    data.append("endDate", endDate)
+    rankPicked.forEach((rank) => {
+      data.append("rank", rank)
+    })
+    // data.append("rank", rankPicked)
+    if(val.image){
+      data.append("image", val.image[0].originFileObj)
     }
     const rs = await promotionApi.createPromotionHeader(data);
-    console.log(rs);
     if (rs) {
+      depatch(setReload(!reload));
+      message.success("Tạo mới thành công");
       setShowModalAddCustomer(false);
-
-      form.resetFields();
-      setTimeout(() => {
-        message.success("Thêm thành công!");
-      }, 500);
+      
     }
   };
 
   //change position
-  const handleChangePosition = (value) => {
-    console.log(`selected ${value}`);
+  const handleChangeRank = (value) => {
+    setRankPicked(value);
   };
 
   //choise date start worling
   const onChangeDate = (date, dateString) => {
-    console.log(dateString);
+    setStartDate(dateString);
   };
 
   //choise date start worling
   const onChangeEndDate = (date, dateString) => {
-    console.log(dateString);
+    setEndDate(dateString);
   };
 
   useEffect(() => {
@@ -124,6 +190,7 @@ const ModelAddPromotionHeader = ({
       desc: "",
     });
   }, []);
+
   return (
     <>
       <Drawer
@@ -146,7 +213,7 @@ const ModelAddPromotionHeader = ({
       >
         <Form layout="vertical" onFinish={handleSubmit} id="myForm" form={form}>
           <Row gutter={16}>
-            <Col span={12}>
+            <Col span={24}>
               <Form.Item
                 name="namePromotion"
                 label="Tên CT Khuyến mãi"
@@ -160,35 +227,33 @@ const ModelAddPromotionHeader = ({
                 <Input placeholder="Hãy nhập tên CT khuyến mãi..." />
               </Form.Item>
             </Col>
-            <Col span={12}>
-              <Form.Item
-                name="desc"
-                label="Chi tiết CTKM"
-                rules={[
-                  {
-                    required: true,
-                    message: "Hãy nhập chi tiết CTKH...",
-                  },
-                ]}
-              >
-                <Input placeholder="Hãy nhập chi tiết CTKM..." />
-              </Form.Item>
-            </Col>
           </Row>
-
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
                 name="startDate"
                 label="Ngày bắt đầu"
                 rules={[
-                  {
-                    required: true,
-                    message: "Hãy chọn ngày bắt đầu...",
-                  },
+                  ({ getFieldValue }) => ({
+                    validator(rule, value) {
+                      console.log(endDate);
+                      if (!value) {
+                        return Promise.reject("Hãy nhập ngày bắt đầu!");
+                      }
+                      if ( value < new Date()) {
+                        return Promise.reject(
+                          "Ngày bắt đầu nhỏ hơn ngày kết thúc!"
+                        );
+                      }
+                      return Promise.resolve();
+                    },
+                  }),
                 ]}
               >
                 <DatePicker
+                  disabledDate={(current) =>
+                    current && current < moment().endOf(startDate)
+                  }
                   onChange={onChangeDate}
                   style={{ width: "100%" }}
                   placeholder="Chọn ngày bắt đầu"
@@ -200,13 +265,25 @@ const ModelAddPromotionHeader = ({
                 name="endDate"
                 label="Ngày kết thúc"
                 rules={[
-                  {
-                    required: true,
-                    message: "Hãy chọn ngày kết thúc...",
-                  },
+                  ({ getFieldValue }) => ({
+                    validator(rule, value) {
+                      if (!value) {
+                        return Promise.reject("Hãy nhập ngày kết thúc!");
+                      }
+                      if (value < moment(startDate)) {
+                        return Promise.reject(
+                          "Ngày kết thúc phải lớn hơn hoặc ngày bắt đầu!"
+                        );
+                      }
+                      return Promise.resolve();
+                    },
+                  }),
                 ]}
               >
                 <DatePicker
+                  disabledDate={(current) =>
+                    current && current < moment().endOf(endDate)
+                  }
                   onChange={onChangeEndDate}
                   style={{ width: "100%" }}
                   placeholder="Chọn ngày kết thúc"
@@ -214,12 +291,11 @@ const ModelAddPromotionHeader = ({
               </Form.Item>
             </Col>
           </Row>
-
-          <Row style={{ marginBottom: "26px" }} gutter={16}>
+          <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                name="statusPromotion"
-                label="Trạng thái"
+                name="rankCustomer"
+                label="Nhóm khách hàng áp dụng"
                 rules={[
                   {
                     required: true,
@@ -232,46 +308,50 @@ const ModelAddPromotionHeader = ({
                   style={{
                     width: "100%",
                   }}
-                  onChange={handleChangePosition}
-                  options={[
-                    {
-                      value: "0",
-                      label: "Ngưng hoạt động",
-                    },
-                    {
-                      value: "1",
-                      label: "Hoạt động",
-                    },
-                  ]}
+                  mode="multiple"
+                  showArrow
+                  tagRender={tagRender}
+                  onChange={handleChangeRank}
+                  options={ranks}
                 />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="image"
+                label="Hình ảnh"
+                valuePropName="fileList"
+                getValueFromEvent={normFile}
+                extra="Chỉ chấp nhận file ảnh có dạng .jpg, .jpeg, .png"
+                type="file"
+              >
+                <Upload
+                  name="logo"
+                  customRequest={dummyRequest}
+                  listType="picture"
+                  maxCount={1}
+                  accept=".jpg,.jpeg,.png"
+                >
+                  <Button icon={<UploadOutlined />}>Click to upload</Button>
+                </Upload>
               </Form.Item>
             </Col>
           </Row>
           <Row>
-            <Upload
-              action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-              listType="picture-card"
-              fileList={fileList}
-              onPreview={handlePreview}
-              onChange={handleChange}
-              name="image"
-            >
-              {fileList.length >= 8 ? null : uploadButton}
-            </Upload>
-            <Modal
-              open={previewOpen}
-              title={previewTitle}
-              footer={null}
-              onCancel={handleCancel}
-            >
-              <img
-                alt="example"
-                style={{
-                  width: "100%",
-                }}
-                src={previewImage}
-              />
-            </Modal>
+            <Col span={24}>
+              <Form.Item
+                name="desc"
+                label="Mô tả"
+                rules={[
+                  {
+                    required: true,
+                    message: "Hãy mô tả...",
+                  },
+                ]}
+              >
+                <Input.TextArea rows={4} placeholder="Nhập mô tả..." />
+              </Form.Item>
+            </Col>
           </Row>
         </Form>
       </Drawer>

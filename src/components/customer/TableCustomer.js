@@ -112,9 +112,9 @@ const TableCustomer = () => {
               item.district_id
             );
             const city = await openAddressApi.getProvinceByCode(item.city_id);
-            item.ward_id = ward.name;
-            item.district_id = district.name;
-            item.city_id = city.name;
+            item.ward_id = ward?.name;
+            item.district_id = district?.name;
+            item.city_id = city?.name;
             return {
               key: index,
               id: item.id,
