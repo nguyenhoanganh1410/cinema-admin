@@ -1,7 +1,8 @@
 import { Button, Result } from 'antd';
-const ResultPage = ({setCurrent}) => {
+const ResultPage = ({setCurrent, setIsSucess}) => {
   const handleReset = () =>{
     setCurrent(0)
+
   }
   return (
     <Result

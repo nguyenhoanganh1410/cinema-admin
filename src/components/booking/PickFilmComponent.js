@@ -11,9 +11,7 @@ const PickFilmComponent = ({next}) => {
  const [searchText, setSearchText] = useState('')
  const depatch = useDispatch();
  const handleClick = (film) =>{
-    const resultData = {
-        film
-    }
+    const resultData = {film}
     depatch(setBooking(resultData));
     next(film)
  }
@@ -29,14 +27,11 @@ const PickFilmComponent = ({next}) => {
         
         setTrigger(!trigger)
     }
-    // e.target.value
     const searchFilm = async () =>{
         try{
             const data = await movieApi.searchMovies(e.target.value);
             if(data){
-                console.log("search")
                 setFilms(data);
-              
             }
         }
         catch{

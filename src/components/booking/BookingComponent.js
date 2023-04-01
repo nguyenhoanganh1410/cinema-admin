@@ -18,7 +18,7 @@ const BookingComponent = ({ setTab }) => {
   const { token } = theme.useToken();
   const [current, setCurrent] = useState(0);
   const [film, setFilm] = useState(null)
-  const [isSucess, setIsSecess] = useState(false)
+  const [isSucess, setIsSucess] = useState(false)
   
   const depatch = useDispatch();
   const booking = useSelector((state) => state.booking);
@@ -39,7 +39,6 @@ const BookingComponent = ({ setTab }) => {
         staff_id: user?.id,
         seats: [...listSeatId]
       }
-      console.log(dataPayload);
       cancelReservationData(dataPayload)
 
     }
@@ -52,7 +51,7 @@ const BookingComponent = ({ setTab }) => {
     },
     {
       title: 'Chọn suất chiếu',
-      content: <PickShowComponent next={next} film={film}/>
+      content: <PickShowComponent next={next}/>
     },
     {
       title: 'Chọn ghế',
@@ -60,7 +59,7 @@ const BookingComponent = ({ setTab }) => {
     },
     {
       title: 'Thanh toán',
-      content: isSucess ? <ResultPage setCurrent={setCurrent} next={next} /> : <PayComponent setIsSecess={setIsSecess} next={next} />
+      content: isSucess ? <ResultPage setIsSucess={setIsSucess} setCurrent={setCurrent} next={next} /> : <PayComponent setIsSucess={setIsSucess} next={next} />
     },
   ];
   const items = steps.map((item) => ({

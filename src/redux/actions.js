@@ -39,3 +39,10 @@ export const setBooking = (data) => {
     payload: data,
   };
 };
+
+export const setIsBooking = (data) => {
+  return {
+    type: "booking/setIsBooking",
+    payload: data,
+  };
+};

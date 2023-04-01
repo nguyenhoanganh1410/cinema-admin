@@ -16,7 +16,7 @@ import { GHE_DOI, GHE_THUONG, MESSAGE_PICK_SEAT, VND } from "../../constant";
 import ItemProduct from "./ItemProduct";
 import ModelCustomer from './ModelCustomer'
 import { notifyError, notifyWarn } from "../../utils/Notifi";
-import { setBooking } from "../../redux/actions";
+import { setBooking, setIsBooking } from "../../redux/actions";
 import { createReservationData, getReservationData } from "../../services/ReservationFetch";
 
 const arrColumn = ["B", "C", "D", "E", "F", "G", "H", "I", "K"];
@@ -38,6 +38,7 @@ const PickSeatComponent = ({next}) => {
   const [seatPicked, setSeatPicked] = useState([])
   const [showModel, setShowMode] = useState(false)
   const user = useSelector((state) => state.user);
+  const isBooking = useSelector((state) => state.isBooking);
   console.log("---", booking?.show?.Show?.idCinemaHall);
   useEffect(() => {
     const getSeats = async (_id) => {
@@ -164,6 +165,7 @@ const PickSeatComponent = ({next}) => {
       setTab(1) }
     else {
       depatch(setBooking({...booking, products: pickProducts}));
+   
 
       const {show, film, seats} = booking
       const listSeatId = seats.map(seat=>{
@@ -175,6 +177,7 @@ const PickSeatComponent = ({next}) => {
         seats: [...listSeatId]
       }
       createReservationData(dataPayload).then( ()=>{
+        //depatch(setIsBooking(true))
         next();
       }).catch(()=>{
         notifyError("Hệ thống đang có lỗi.");

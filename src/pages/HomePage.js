@@ -47,6 +47,8 @@ import IndexBooking from "../components/booking/IndexBooking";
 
 import { ToastContainer, toast } from 'react-toastify';
 import IndexTicket from "../components/tickets/IndexFilm";
+import { notifyWarn } from "../utils/Notifi";
+import { MESSAGE_NOT_ACCEPT } from "../constant";
 const { Header, Content, Footer, Sider } = Layout;
 
 const { Text } = Typography;
@@ -93,7 +95,7 @@ const HomePage = () => {
   const navigator = useNavigate();
   const user = useSelector((state) => state.user);
   const cinema = useSelector((state) => state.cinema);
-  
+  const isBooking = useSelector((state) => state.isBooking);
   //model
   const [isModalOpen, setIsModalOpen] = useState(false);
   const showModal = () => {
@@ -128,9 +130,14 @@ const HomePage = () => {
 
   //onclich item in menu
   function onClick(info) {
-    // console.log(info.key);
+    if(itemClicked !== 2 && isBooking){
+      notifyWarn(MESSAGE_NOT_ACCEPT)
+      console.log('reun 1');
+    }else{
+      setItemClicked(+info.key);
+      console.log('reun 2');
+    }
 
-    setItemClicked(+info.key);
   }
 
   const onClickMenuUser = (info) => {
@@ -145,7 +152,7 @@ const HomePage = () => {
 
   // console.log("home page");
   const RenderHome = () => {
-    console.log(itemClicked);
+
     if (itemClicked === 1) {
       return <IndexDashboard />;
     }else if(itemClicked === 2){
