@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Table, Modal, Tag, Image, Alert, Space, message } from "antd";
+import { Button, Table, Modal, Tag, Image, Alert, Space, message, Select } from "antd";
 import {
   SearchOutlined,
   PlusSquareFilled,
@@ -47,6 +47,10 @@ const TableProduct = () => {
       },
     },
     {
+      title: "Mã sản phẩm",
+      dataIndex: "productCode",
+    },
+    {
       title: "Thể loại",
       dataIndex: "type",
       render: (type) => {
@@ -62,21 +66,13 @@ const TableProduct = () => {
       },
     },
     {
+      
       title: "Tên sản phẩm",
       dataIndex: "productName",
-    },
-    {
-      title: "Mã sản phẩm",
-      dataIndex: "productCode",
-    },
-    {
-      title: "Phòng chiếu",
-      dataIndex: "typeHall",
-      render: (typeHall) => {
-        return (
-          <Tag color={typeHall === "2D" ? "blue" : "cyan"}>{typeHall}</Tag>
-        );
+      render: (productName) => {
+        return <Select.Option value={productName}>{productName}</Select.Option>;
       },
+
     },
     {
       title: "Mô tả",

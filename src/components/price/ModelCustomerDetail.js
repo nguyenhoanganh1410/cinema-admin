@@ -7,15 +7,19 @@ import {
   Drawer,
   Form,
   Input,
+  InputNumber,
   message,
   Row,
   Select,
   Space,
   Upload,
 } from "antd";
-import openAddressApi from "../../api/openApi";
-import customerApi from "../../api/customerApi";
 import moment from "moment";
+
+import { useDispatch, useSelector } from "react-redux";
+import { setReload } from "../../redux/actions";
+import priceApi from "../../api/priceApi";
+import productApi from "../../api/productApi";
 
 const { Option } = Select;
 
@@ -23,39 +27,13 @@ const ModelDetailCustomer = ({
   showModalDetailCustomer,
   setShowModalDetailCustomer,
   selectedId,
+  selectedIdHeader
 }) => {
-  const [province, setProvince] = useState([]);
-  const [districts, setDistricts] = useState([]);
-  const [wards, setWards] = useState([]);
-  const [provincePicked, setProvincePicked] = useState(0);
-  const [districtPicked, setDistrictPicked] = useState(0);
-  const [wardPicked, setWardPicked] = useState(0);
-  const [customerInfo, setCustomerInfo] = useState({});
-  const [fileList, setFileList] = useState([]);
+  const depatch = useDispatch();
+  const reload = useSelector((state) => state.reload);
   const [form] = Form.useForm();
-  const [image, setImage] = useState("");
+  const [listProduct, setListProduct] = useState([]);
 
-  const normFile = (e) => {
-    console.log("Upload event:", e);
-    if (Array.isArray(e)) {
-      return e;
-    }
-    return e?.fileList;
-  };
-
-  const onChangeProvince = (value) => {
-    console.log(`selected ${value}`);
-    setProvincePicked(value);
-  };
-  const onChangeDistrict = (value) => {
-    console.log(`selected ${value}`);
-    setDistrictPicked(value);
-  };
-
-  const onChangeWard = (value) => {
-    console.log(`selected ${value}`);
-    setWardPicked(value);
-  };
 
   const onSearch = (value) => {
     console.log("search:", value);
@@ -67,183 +45,63 @@ const ModelDetailCustomer = ({
 
   const handleSubmit = async (val) => {
     console.log("submit", val);
-    const { id, firstName, lastname, phone, email, address, dob, note, image } =
-      val;
-    const data = new FormData();
-    data.append("firstName", firstName);
-    data.append("lastName", lastname);
-    data.append("phone", phone);
-    data.append("email", email);
-    data.append("address", address);
-    data.append("dob", dob);
-    data.append("note", note);
-    data.append("city_id", provincePicked);
-    data.append("district_id", districtPicked);
-    data.append("ward_id", wardPicked);
-    data.append("street", address);
-    console.log("data", image);
-    if (image) {
-      data.append("image", image[0].originFileObj);
-    }
-
-    // const data = {
-    //   firstName: firstName,
-    //   lastName: lastname,
-    //   phone: phone,
-    //   email: email,
-    //   address: address,
-    //   dob: dob,
-    //   note: note,
-    //   city_id: provincePicked,
-    //   district_id: districtPicked,
-    //   ward_id: wardPicked,
-    //   street: address,
-    // };
+    const {price} = val;
     try {
-      const response = await customerApi.updateCustomer(id, data);
-      console.log(response);
-      if (response) {
+      const res = await priceApi.updatePriceLineById(selectedId, {price});
+      if(res[0]===1){
+        message.success("Cập nhật thành công");
+        depatch(setReload(!reload));
         onClose();
-        setTimeout(() => {
-          message.success("Cập nhật thành công");
-        }, 1000);
       }
     } catch (error) {
-      console.log(error);
+      message.error("Cập nhật thất bại");
     }
+   
+  };
+
+  const onChangeProduct = (value) => {
+    setProductSelected(value);
   };
 
   useEffect(() => {
-    const fetchCustomerInfo = async (id) => {
-      try {
-        const response = await customerApi.getCustomer(id);
-
-        if (response) {
-          console.log("res", response);
-          setCustomerInfo(response);
-          setProvincePicked(Number(response.city_id));
-          setDistrictPicked(Number(response.district_id));
-          setWardPicked(Number(response.ward_id));
-          setImage(response.image);
-          console.log("file", response.image);
-
-          form.setFieldsValue({
-            id: response.id,
-            firstName: response.firstName,
-            lastname: response.lastName,
-            phone: response.phone,
-            email: response.email,
-            dob: response.dob,
-            address: response.address,
-            province: response.province,
-            district: response.district,
-            ward: response.ward,
-            image: [
-              {
-                uid: "-1",
-                name: response.image,
-                status: "done",
-                url: response?.image,
-              },
-            ],
-          });
-        }
-      } catch (error) {
-        console.log("Failed to fetch conversation list: ", error);
+    const fetchDetailPriceHeader = async () => {
+      const res = await priceApi.getPriceHeaderById(selectedIdHeader);
+      const data = {
+        priceHeaderId: res.id,
+        startDate: moment(res.startDate),
+        endDate: moment(res.endDate),
       }
+      form.setFieldsValue(data);
     };
-    fetchCustomerInfo(selectedId);
-  }, []);
-  console.log("customerInfo", customerInfo);
-  console.log("fileList", fileList);
 
-  useEffect(() => {
-    const fetchConversations = async () => {
-      try {
-        const response = await openAddressApi.getList("/p");
+    const fetchListProduct = async () => {
+      const res = await productApi.getProducts();
+      setListProduct(res);
+    };
 
-        //console.log(response);
-        if (response) {
-          const newResponse = response.map((val) => {
-            return {
-              value: val.code,
-              label: val.name,
-            };
-          });
-          setProvince(newResponse);
-        }
-      } catch (error) {
-        console.log("Failed to fetch conversation list: ", error);
+    const fetchDetailPriceLine = async () => {
+      console.log("selectedId", selectedId);
+      const res = await priceApi.getLineById(selectedId);
+      console.log("res", res);
+      if(res){
+        form.setFieldsValue({
+          product: res.idProduct,
+          price: res.price,
+        });
       }
     };
 
-    fetchConversations();
+    fetchDetailPriceLine();
+    fetchListProduct();
+    fetchDetailPriceHeader();
   }, []);
 
-  useEffect(() => {
-    if (provincePicked !== 0) {
-      console.log("run");
-      const fetchConversations = async (id) => {
-        try {
-          const response = await openAddressApi.getList(`/p/${id}?depth=2`);
-
-          console.log(response);
-          if (response) {
-            const { districts } = response;
-            const newDistricts = districts.map((val) => {
-              return {
-                value: val.code,
-                label: val.name,
-              };
-            });
-            setDistricts(newDistricts);
-          }
-        } catch (error) {
-          console.log("Failed to fetch conversation list: ", error);
-        }
-      };
-
-      fetchConversations(provincePicked);
-    }
-  }, [provincePicked]);
-
-  useEffect(() => {
-    if (districtPicked !== 0) {
-      const fetchConversations = async (id) => {
-        try {
-          const response = await openAddressApi.getList(`/d/${id}?depth=2`);
-
-          console.log(response);
-          if (response) {
-            const { wards } = response;
-            const newWards = wards.map((val) => {
-              return {
-                value: val.code,
-                label: val.name,
-              };
-            });
-            setWards(newWards);
-          }
-        } catch (error) {
-          console.log("Failed to fetch conversation list: ", error);
-        }
-      };
-
-      fetchConversations(districtPicked);
-    }
-  }, [districtPicked]);
-
-  const dummyRequest = ({ file, onSuccess }) => {
-    setImage(file);
-    setTimeout(() => {
-      onSuccess("ok");
-    }, 0);
-  };
+ 
 
   return (
     <>
       <Drawer
-        title="Thông tin khách hàng"
+        title="Thông tin gía sản phẩm"
         width={720}
         onClose={onClose}
         open={showModalDetailCustomer}
@@ -253,152 +111,91 @@ const ModelDetailCustomer = ({
         extra={
           <Space>
             <Button onClick={onClose}>Cancel</Button>
-            <Button form="myForm" htmlType="submit" type="primary">
+            <Button form="myFormDetailLine" htmlType="submit" type="primary">
               Submit
             </Button>
           </Space>
         }
       >
-        <Form form={form} onFinish={handleSubmit} id="myForm" layout="vertical">
-          <Row gutter={16}>
+        <Form form={form} onFinish={handleSubmit} id="myFormDetailLine" layout="vertical">
+        <Row gutter={16}>
             <Col span={12}>
-              <Form.Item name="id" label="ID">
+              <Form.Item name="priceHeaderId" label="Mã bảng giá">
                 <Input disabled={true} />
               </Form.Item>
             </Col>
-
-            <Col span={12}></Col>
           </Row>
           <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item name="firstName" label="Họ">
-                <Input />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="lastname" label="Tên">
-                <Input />
-              </Form.Item>
-            </Col>
-            <Col span={12}></Col>
-          </Row>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item name="phone" label="Số điện thoại">
-                <Input />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="email" label="Email">
-                <Input />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={16}>
-            <Col span={12}>
-              <Select
-                showSearch
-                placeholder="Chọn tỉnh thành"
-                optionFilterProp="children"
-                value={provincePicked}
-                onChange={onChangeProvince}
-                onSearch={onSearch}
-                style={{ width: "100%" }}
-                filterOption={(input, option) =>
-                  (option?.label ?? "")
-                    .toLowerCase()
-                    .includes(input.toLowerCase())
-                }
-                options={province}
-              />
-            </Col>
-            <Col span={12}>
-              <Select
-                showSearch
-                placeholder="Chọn quận huyện"
-                optionFilterProp="children"
-                value={districtPicked}
-                onChange={onChangeDistrict}
-                onSearch={onSearch}
-                style={{ width: "100%" }}
-                filterOption={(input, option) =>
-                  (option?.label ?? "")
-                    .toLowerCase()
-                    .includes(input.toLowerCase())
-                }
-                options={districts}
-              />
-            </Col>
-          </Row>
-          <Row gutter={16} style={{ marginTop: "24px" }}>
-            <Col span={12}>
-              <Select
-                showSearch
-                placeholder="Chọn phường/xã"
-                optionFilterProp="children"
-                onChange={onChangeWard}
-                value={wardPicked}
-                onSearch={onSearch}
-                style={{ width: "100%" }}
-                filterOption={(input, option) =>
-                  (option?.label ?? "")
-                    .toLowerCase()
-                    .includes(input.toLowerCase())
-                }
-                options={wards}
-              />
-            </Col>
-            <Col span={12}>
-              <Form.Item name="address">
-                <Input
-                  style={{
-                    width: "100%",
-                  }}
-                  placeholder="Nhập địa chỉ khách hàng..."
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="dob" label="Ngày sinh" valuePropName="date">
-                <DatePicker
-                  value={moment(customerInfo?.dob)}
-                  style={{
-                    width: "100%",
-                  }}
-                  format="YYYY-MM-DD"
-                />
-              </Form.Item>
-            </Col>
             <Col span={12}>
               <Form.Item
-                name="image"
-                label="Hình ảnh"
-                valuePropName="fileList"
-                getValueFromEvent={normFile}
-                extra="Chỉ chấp nhận file ảnh"
-                type="file"
+                name="startDate"
+                label="Ngày bắt đầu"
+               
               >
-                <Upload
-                  name="image"
-                  customRequest={dummyRequest}
-                  listType="picture"
-                  maxCount={1}
-                  accept=".jpg,.jpeg,.png"
-                >
-                  <Button icon={<UploadOutlined />}>Click to upload</Button>
-                </Upload>
+                <DatePicker disabled={true} style={{ width: "100%" }} />
               </Form.Item>
             </Col>
-            <Col span={12}></Col>
+            <Col span={12} style={{}}>
+              <Form.Item
+                name="endDate"
+                label="Ngày kết thúc"
+              >
+                <DatePicker style={{ width: "100%" }} disabled={true} />
+              </Form.Item>
+            </Col>
           </Row>
-
-          <Row style={{ marginTop: "16px" }} gutter={16}>
-            <Col span={24}>
-              <Form.Item name="description" label="Ghi chú">
-                <Input.TextArea rows={4} placeholder="Nhập ghi chú..." />
+          <Row style={{ marginBottom: "26px" }} gutter={16}>
+          
+            <Col span={12}>
+              <Form.Item
+                name="product"
+                label="Chọn sản phẩm"
+                rules={[
+                  {
+                    required: true,
+                    message: "Hãy chọn sản phẩm...",
+                  },
+                ]}
+              >
+                <Select
+                  disabled={true}
+                  placeholder="Chọn sản phẩm..."
+                  style={{
+                    width: "100%",
+                  }}
+                  onChange={onChangeProduct}
+                  options={listProduct.map((item) => {
+                    return {
+                      value: item.id,
+                      label: item.productName,
+                    };
+                  })
+                  }
+                />
               </Form.Item>
             </Col>
+            <Col span={12}>
+            <Form.Item
+              name="price"
+              label="Giá bán"
+              rules={[
+                {
+                  required: true,
+                  message: "Nhập giá bán...",
+                },
+              ]}
+            >
+              <InputNumber
+                style={{ width: "100%" }}
+                formatter={(value) =>
+                  `VNĐ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+                parser={(value) => value.replace(/\VNĐ\s?|(,*)/g, "")}
+                // onChange={onChange}
+                placeholder="Nhập giá bán..."
+              />
+            </Form.Item>
+          </Col>
           </Row>
         </Form>
       </Drawer>

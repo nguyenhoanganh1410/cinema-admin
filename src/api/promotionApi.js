@@ -4,8 +4,12 @@ const promotionApi = {
   getPromotionHeader: () => {
     return axiosApi.get("/promotionHeader");
   },
-  updatePromotionHeader: (data) => {
-    return axiosApi.put(`/promotionHeader/${data.id}`, data);
+  updatePromotionHeader: (data,id) => {
+    return axiosApi.put(`/promotionHeader/${id}`, data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
   },
   createPromotionHeader: (data) => {
     return axiosApi.post("/promotionHeader", data, {
@@ -19,6 +23,12 @@ const promotionApi = {
   },
   getPromotionLineByHeader: (_id) => {
     return axiosApi.get(`/promotionLine/promotionHeader/${_id}`);
+  },
+  createPromotionLine: (data) => {
+    return axiosApi.post("/promotionLine", data);
+  },
+  createPromotionDetail: (data) => {
+    return axiosApi.post("/promotionDetail", data);
   },
 };
 

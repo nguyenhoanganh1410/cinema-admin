@@ -12,6 +12,7 @@ import {
   Select,
   Space,
   Upload,
+  Table
 } from "antd";
 
 import productApi from "../../api/productApi";
@@ -34,6 +35,21 @@ const ModelAddProduct = ({
   const [image, setImage] = useState("");
   const [type, setType] = useState("");
   const [typeHall, setTypeHall] = useState("");
+
+  const columns = [
+    {
+      title: "Mã sản phẩm",
+      dataIndex: "productCode",
+    },
+    {
+      title: "Tên sản phẩm",
+      dataIndex: "productName",
+    },
+    {
+      title: "Số lượng",
+      dataIndex: "qty",
+    }
+  ];
 
   const normFile = (e) => {
     console.log("Upload event:", e);
@@ -146,10 +162,10 @@ const ModelAddProduct = ({
                       value: "SP",
                       label: "Sản phẩm",
                     },
-                    // {
-                    //   value: "CB",
-                    //   label: "Combo",
-                    // },
+                    {
+                      value: "CB",
+                      label: "Combo",
+                    },
                   ]}
                 />
               </Form.Item>
@@ -168,7 +184,25 @@ const ModelAddProduct = ({
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="typeHall" label="Phòng chiếu">
+            <Form.Item
+                name="image"
+                label="Hình ảnh"
+                valuePropName="fileList"
+                getValueFromEvent={normFile}
+                extra="Chỉ chấp nhận file ảnh"
+                type="file"
+              >
+                <Upload
+                  name="image"
+                  customRequest={dummyRequest}
+                  listType="picture"
+                  maxCount={1}
+                  accept=".jpg,.jpeg,.png"
+                >
+                  <Button icon={<UploadOutlined />}>Click to upload</Button>
+                </Upload>
+              </Form.Item>
+              {/* <Form.Item name="typeHall" label="Phòng chiếu">
                 <Select
                  disabled={ !type || type === "SP" ? true : false }
                   placeholder="Chọn loại Phòng chiếu"
@@ -187,9 +221,26 @@ const ModelAddProduct = ({
                     },
                   ]}
                 />
-              </Form.Item>
+              </Form.Item> */}
             </Col>
           </Row>
+          <Row gutter={16}>
+          <Button style={{
+            marginBottom: "16px",
+            marginLeft: "530px"
+
+          }} 
+          type="primary">Thêm sản phẩm</Button>
+          <Col span={24}>
+              <Form.Item name="comboLine">
+                <Table
+                  columns={columns}
+                  pagination={false}
+                  size="small"
+                />
+              </Form.Item>
+            </Col>
+          </Row> 
           <Row style={{ marginTop: "16px" }} gutter={16}>
             <Col span={24}>
               <Form.Item name="desc" label="Mô tả">
@@ -197,30 +248,6 @@ const ModelAddProduct = ({
               </Form.Item>
             </Col>
           </Row>
-          <Row gutter={16} style={{ marginTop: "24px" }}>
-            <Col span={12}>
-              <Form.Item
-                name="image"
-                label="Hình ảnh"
-                valuePropName="fileList"
-                getValueFromEvent={normFile}
-                extra="Chỉ chấp nhận file ảnh"
-                type="file"
-              >
-                <Upload
-                  name="image"
-                  customRequest={dummyRequest}
-                  listType="picture"
-                  maxCount={1}
-                  accept=".jpg,.jpeg,.png"
-                >
-                  <Button icon={<UploadOutlined />}>Click to upload</Button>
-                </Upload>
-              </Form.Item>
-            </Col>
-            <Col span={12}></Col>
-          </Row>
-
           
         </Form>
       </Drawer>

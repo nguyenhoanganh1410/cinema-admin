@@ -24,6 +24,12 @@ const productApi = {
     deleteProduct: (id) => {
         return axiosApi.delete(`/product/${id}`);
     },
+    getAllPriceProduct: () => {
+        return axiosApi.get("/product/list/price");
+    },
+    getListProductByType: (type) => {
+        return axiosApi.get(`/product/list/type/${type}`);
+    }
 };
 
 export default productApi;

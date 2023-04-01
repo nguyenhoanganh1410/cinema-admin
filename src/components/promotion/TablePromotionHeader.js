@@ -6,27 +6,25 @@ import {
   UserAddOutlined,
   ToolOutlined,
   DeleteOutlined,
+  MinusCircleOutlined,
 } from "@ant-design/icons";
-import { useDispatch } from "react-redux";
 import movieApi from "../../api/movieApi";
 import promotionApi from "../../api/promotionApi";
 import { setPromotionHeader } from "../../redux/actions";
+
+import { useDispatch, useSelector } from "react-redux";
+import { setReload } from "../../redux/actions";
 
 const TablePromotionHeader = ({ setTab }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [promotionHeaderList, setPromotionHeaderList] = useState([]);
   const dispatch = useDispatch();
+  const reload = useSelector((state) => state.reload);
   const onSelectChange = (newSelectedRowKeys) => {
     console.log("selectedRowKeys changed: ", newSelectedRowKeys);
     setSelectedRowKeys(newSelectedRowKeys);
   };
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: onSelectChange,
-  };
-  const hasSelected = selectedRowKeys.length > 0;
-  const selectedOne = selectedRowKeys.length === 1;
 
   //handle delete customer in here...
   const handleDelete = () => {
@@ -68,7 +66,7 @@ const TablePromotionHeader = ({ setTab }) => {
             // } else {
             //   item.statusPromotion = "Disabled";
             // }
-            item.statusPromotion = item.statusPromotion
+            item.statusPromotion = item.statusPromotion;
 
             return item;
           });
@@ -79,7 +77,7 @@ const TablePromotionHeader = ({ setTab }) => {
       }
     };
     getListPromotionHeader();
-  }, []);
+  }, [reload]);
 
   const handleOnclik = (id) => {
     //set id in headerId;
@@ -98,7 +96,14 @@ const TablePromotionHeader = ({ setTab }) => {
     },
     {
       title: "Mô tả",
-      dataIndex: "title",
+      dataIndex: "desc",
+      render: (text) => {
+        if (text.length > 50) {
+          return text.substring(0, 50) + "...";
+        } else {
+          return text;
+        }
+      },
     },
     {
       title: "Ngày bắt đầu",
@@ -112,56 +117,18 @@ const TablePromotionHeader = ({ setTab }) => {
       title: "Trạng thái",
       dataIndex: "statusPromotion",
       render: (text) => {
-        if( text === true){
+        if (text === true) {
           return <Badge status="success" text="Hoạt động" />;
-        }else{
+        } else {
           return <Badge status="error" text="Ngưng hoạt đông" />;
         }
-      }
-    },
-
-    {
-      title: "Action",
-      key: "action",
-      render: (_, record) => (
-        <Space size="middle">
-          <a>Delete</a>
-        </Space>
-      ),
-    },
+      },
+    }
   ];
 
   return (
     <div>
-      <div
-        style={{
-          marginBottom: 16,
-        }}
-      >
-        <Button
-          type="primary"
-          danger
-          onClick={handleDelete}
-          disabled={!hasSelected}
-          loading={loading}
-          icon={<DeleteOutlined />}
-          style={{ marginRight: "1rem" }}
-        >
-          Xóa
-        </Button>
-        <span
-          style={{
-            marginLeft: 8,
-          }}
-        >
-          {hasSelected ? `Selected ${selectedRowKeys.length} items` : ""}
-        </span>
-      </div>
-      <Table
-        rowSelection={rowSelection}
-        columns={columns}
-        dataSource={promotionHeaderList}
-      />
+      <Table columns={columns} dataSource={promotionHeaderList} />
       <Modal
         title="Xóa bộ phim"
         open={isModalOpen}

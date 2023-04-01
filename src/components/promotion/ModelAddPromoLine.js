@@ -15,14 +15,25 @@ import {
   Space,
   TimePicker,
   Upload,
+  message,
 } from "antd";
 
 import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import ProductPromotion from "./ProductPromotion";
 import MoneyPromotion from "./MoneyPromotion";
 import PercentPromotion from "./PercentPromotion";
+import promotionApi from "../../api/promotionApi";
+import moment from "moment";
+
+import { useDispatch, useSelector } from "react-redux";
+import { setReload } from "../../redux/actions";
+
+import dayjs from "dayjs";
+import productApi from "../../api/productApi";
 
 const { Option } = Select;
+
+const newDateFormat = 'YYYY-MM-DD'
 
 const getBase64 = (file) =>
   new Promise((resolve, reject) => {
@@ -35,38 +46,24 @@ const getBase64 = (file) =>
 const ModelAddPromoLine = ({
   showModalAddCustomer,
   setShowModalAddCustomer,
+  startDateDb,
+  endDateDb,
+  idHeaderPromotion
 }) => {
-  const [previewOpen, setPreviewOpen] = useState(false);
-  const [previewImage, setPreviewImage] = useState("");
-  const [previewTitle, setPreviewTitle] = useState("");
-  const [fileList, setFileList] = useState([]);
+  const [form] = Form.useForm();
 
-  const [type, setType] = useState(1);
+  const depatch = useDispatch();
+  const reload = useSelector((state) => state.reload);
 
-  const handleCancel = () => setPreviewOpen(false);
-  const handlePreview = async (file) => {
-    if (!file.url && !file.preview) {
-      file.preview = await getBase64(file.originFileObj);
-    }
-    setPreviewImage(file.url || file.preview);
-    setPreviewOpen(true);
-    setPreviewTitle(
-      file.name || file.url.substring(file.url.lastIndexOf("/") + 1)
-    );
-  };
-  const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
-  const uploadButton = (
-    <div>
-      <PlusOutlined />
-      <div
-        style={{
-          marginTop: 8,
-        }}
-      >
-        Upload
-      </div>
-    </div>
-  );
+  const [type, setType] = useState(0);
+
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+
+  const [listProductSeat, setListProductSeat] = useState([]);
+  const [listProduct, setListProduct] = useState([]);
+
+  const [idPromotionLine, setIdPromotionLine] = useState(0);
 
   const onSearch = (value) => {
     console.log("search:", value);
@@ -77,36 +74,112 @@ const ModelAddPromoLine = ({
   };
 
   //handle submit form create new customer...
-  const handleSubmit = () => {
-    //write code in here...
+  const handleSubmit = (val) => {
+    console.log("val", val);
+
+    const payloadLine = {
+      promotionCode: val.promotionCode,
+      desc: val.desc,
+      type: val.type,
+      startDate: startDate,
+      endDate: endDate,
+      max_qty: val.maxUse,
+      max_qty_per_customer_per_day: val.maxUsePerCustomer,
+      budget: val.budget,
+      promotionHeaderId: idHeaderPromotion,
+    }
+
+    const payloadDetail = {
+      IdProduct_buy: val.productBuy,
+      qty_buy: val.qtyBuy,
+      money_received: val.moneyReceived,
+      IdProduct_receive: val.productReceive,
+      qty_receive: val.qtyReceive,
+      total_purchase_amount: val.moneyBought,
+      percent_reduction: val.percent,
+    };
+
+    try {
+      const createLine = async () => {
+        const response = await promotionApi.createPromotionLine(payloadLine);
+        setIdPromotionLine(response.id);
+        console.log("response", response);
+        if (response) {
+          const createDetail = async () => {
+            console.log("idPromotionLine", idPromotionLine);
+            payloadDetail.idPromotionLine = response.id ;
+            console.log("payloadDetail", payloadDetail);
+            const res = await promotionApi.createPromotionDetail(payloadDetail);
+            console.log("res", res);
+            if (res) {
+              message.success("Thêm thành công");
+              depatch(setReload(!reload));
+              onClose();
+            }
+          };
+          createDetail();
+        }
+      };
+
+      createLine();
+    }
+    catch (error) {
+      console.log("error", error);
+    }
   };
 
   //change position
   const handleChangeTypePro = (value) => {
-    setType(+value);
+    setType(value);
   };
 
   //choise date start worling
-  const onChangeDate = (date, dateString) => {
-    console.log(date, dateString);
+  const onChangeStartDate = (date, dateString) => {
+    setStartDate(dateString);
   };
 
-  const RenderType = () => {
-    switch (type) {
-      case 1:
-        return <MoneyPromotion />;
-      case 2:
-        return <ProductPromotion />;
-      case 3:
-        return <PercentPromotion />;
-      default:
-        return <PercentPromotion />;
-    }
+  //choise date end worling
+  const onChangeEndDate = (date, dateString) => {
+    setEndDate(dateString);
   };
+
+  useEffect(() => {
+    const fetchProductSeats = async () => {
+      try {
+        const response = await productApi.getListProductByType("Ghe");
+        console.log("response", response);
+        const options = response.map((item) => ({
+          value: item.id,
+          label: item.productName,
+        }));
+        setListProductSeat(options);
+      } catch (error) {
+        console.log("error", error);
+      }
+    };
+    const fetchAllProduct = async () => {
+      try {
+        const response = await productApi.getProducts();
+        console.log("response", response);
+        const options = response.map((item) => ({
+          value: item.id,
+          label: item.productName,
+        }));
+        setListProduct(options);
+      } catch (error) {
+        console.log("error", error);
+      }
+    };
+
+    fetchAllProduct();
+    fetchProductSeats();
+  }, []);
+
+  console.log("startDate", startDate);
   return (
     <>
       <Drawer
-        title="Thêm chi tiết khuyễn mãi"
+        title="Thêm dòng khuyễn mãi"
         width={720}
         onClose={onClose}
         open={showModalAddCustomer}
@@ -116,13 +189,18 @@ const ModelAddPromoLine = ({
         extra={
           <Space>
             <Button onClick={onClose}>Cancel</Button>
-            <Button onClick={handleSubmit} type="primary">
+            <Button form="myFormAddLinePro" htmlType="submit" type="primary">
               Submit
             </Button>
           </Space>
         }
       >
-        <Form layout="vertical">
+        <Form
+          onFinish={handleSubmit}
+          id="myFormAddLinePro"
+          form={form}
+          layout="vertical"
+        >
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
@@ -135,19 +213,31 @@ const ModelAddPromoLine = ({
                   },
                 ]}
               >
-                <Input placeholder="Hãy nhập mã áp dụng..." />
+                <Input
+                  style={{ textTransform: "uppercase" }}
+                  placeholder="Hãy nhập mã áp dụng..."
+                />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="note" label="Ghi chú">
-                <Input.TextArea rows={4} placeholder="Nhập ghi chú..." />
+              <Form.Item
+                name="desc"
+                label="Mô tả"
+                rules={[
+                  {
+                    required: true,
+                    message: "Hãy nhập mô tả...",
+                  },
+                ]}
+              >
+                <Input placeholder="Hãy nhập mô tả..." />
               </Form.Item>
             </Col>
           </Row>
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                name="category"
+                name="type"
                 label="Chọn loại khuyến mãi "
                 rules={[
                   {
@@ -164,16 +254,16 @@ const ModelAddPromoLine = ({
                   onChange={handleChangeTypePro}
                   options={[
                     {
-                      value: "1",
-                      label: "Khuyến mãi tặng tiền",
+                      value: 1,
+                      label: "Khuyến mãi giảm tiền",
                     },
                     {
-                      value: "2",
-                      label: "Khuyễn mãi tặng đồ",
+                      value: 2,
+                      label: "Khuyễn mãi tặng sản phẩm",
                     },
                     {
-                      value: "3",
-                      label: "Khuyễn mãi phần trăm",
+                      value: 3,
+                      label: "Khuyễn mãi chiết khấu %",
                     },
                   ]}
                 />
@@ -181,31 +271,23 @@ const ModelAddPromoLine = ({
             </Col>
             <Col span={12}>
               <Form.Item
-                name="status"
-                label="Chọn trạng thái"
+                name="budget"
+                label="Ngân sách"
                 rules={[
                   {
                     required: true,
-                    message: "Hãy chọn trạng thái...",
+                    message: "Nhập số tiền ngân sách...",
                   },
                 ]}
               >
-                <Select
-                  placeholder="Chọn trạng thái"
-                  style={{
-                    width: "100%",
-                  }}
-                  // onChange={handleChangePosition}
-                  options={[
-                    {
-                      value: "1",
-                      label: "Họat động",
-                    },
-                    {
-                      value: "2",
-                      label: "Hết hạn",
-                    },
-                  ]}
+                <InputNumber
+                  style={{ width: "100%" }}
+                  formatter={(value) =>
+                    `VNĐ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  }
+                  parser={(value) => value.replace(/\VNĐ\s?|(,*)/g, "")}
+                  // onChange={onChange}
+                  placeholder="Nhập số tiền ngân sách.."
                 />
               </Form.Item>
             </Col>
@@ -213,42 +295,27 @@ const ModelAddPromoLine = ({
 
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item
-                name=""
-                label="Số lượng trên ngày"
-                rules={[
-                  {
-                    required: true,
-                    message: "Nhập số lần được sử dụng trên ngày...",
-                  },
-                ]}
-              >
+              <Form.Item name="maxUse" label="Số lượng KH áp dụng tối đa">
                 <InputNumber
                   style={{ width: "100%" }}
                   min={1}
-                  max={10}
-                  defaultValue={1}
-                  placeholder="Nhập số lần được sử dụng trên ngày.."
+                  max={100}
+                  // defaultValue={1}
+                  placeholder="Nhập số lương KH áp dụng tối đa..."
                 />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
-                name=""
-                label="Số lượng trên khách hàng"
-                rules={[
-                  {
-                    required: true,
-                    message: "Nhập số lần được sử dụng trên KH...",
-                  },
-                ]}
+                name="maxUsePerCustomer"
+                label="Số lượng tối đa cho 1 KH trên 1 ngày"
               >
                 <InputNumber
                   style={{ width: "100%" }}
                   min={1}
                   max={10}
-                  defaultValue={1}
-                  placeholder="Nhập số lần được sử dụng trên KH..."
+                  // defaultValue={1}
+                  placeholder="Nhập số lần KH được sử dụng KM/ngày..."
                 />
               </Form.Item>
             </Col>
@@ -256,7 +323,7 @@ const ModelAddPromoLine = ({
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                name="releaseDate"
+                name="startDate"
                 label="Ngày bắt đầu"
                 rules={[
                   {
@@ -266,15 +333,20 @@ const ModelAddPromoLine = ({
                 ]}
               >
                 <DatePicker
-                  onChange={onChangeDate}
+                  disabledDate={(current) =>
+                    current && current < moment(startDateDb).subtract(1, "days") || current > moment(endDateDb)
+                  }
+                  onChange={onChangeStartDate}
                   style={{ width: "100%" }}
                   placeholder="Chọn ngày bắt đầu"
+                  defaultValue={dayjs(startDateDb, newDateFormat)}
+                  format={newDateFormat}
                 />
               </Form.Item>
             </Col>
             <Col span={12} style={{}}>
               <Form.Item
-                name="releaseDate"
+                name="endDate"
                 label="Ngày kết thúc"
                 rules={[
                   {
@@ -284,50 +356,246 @@ const ModelAddPromoLine = ({
                 ]}
               >
                 <DatePicker
-                  onChange={onChangeDate}
+                disabledDate={(current) =>
+                  current && current < moment(startDate) || current > moment(endDateDb)
+                }
+                  onChange={onChangeEndDate}
                   style={{ width: "100%" }}
                   placeholder="Chọn ngày kết thúc"
+                  defaultValue={dayjs(endDateDb, newDateFormat)}
+                  format={newDateFormat}
                 />
               </Form.Item>
             </Col>
           </Row>
-          <Row>
-            <Col span={12}>
-              <Form.Item
-                name="image"
-                label="Hình ảnh"
-                valuePropName="fileList"
-                extra="Chỉ chấp nhận file ảnh"
-                type="file"
-              >
-                <Upload
-                  action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                  listType="picture-card"
-                  fileList={fileList}
-                  onPreview={handlePreview}
-                  onChange={handleChange}
-                >
-                  {fileList.length >= 1 ? null : uploadButton}
-                </Upload>
-                <Modal
-                  open={previewOpen}
-                  title={previewTitle}
-                  footer={null}
-                  onCancel={handleCancel}
-                >
-                  <img
-                    alt="example"
-                    style={{
-                      width: "100%",
-                    }}
-                    src={previewImage}
-                  />
-                </Modal>
-              </Form.Item>
-            </Col>
-          </Row>
+          <Space
+            direction="vertical"
+            style={{
+              width: "100%",
+              marginBottom: 20,
+            }}
+          >
+            <span
+              style={{
+                fontSize: "1rem",
+                fontWeight: "bold",
+              }}
+            >
+              Chi tiết loại khuyến mãi
+            </span>
+          </Space>
+          {type === 1 ? (
+            <>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    name="productBuy"
+                    label="Chọn sản phẩm mua "
+                    rules={[
+                      {
+                        required: true,
+                        message: "Hãy chọn sản phẩm mua...",
+                      },
+                    ]}
+                  >
+                    <Select
+                      placeholder="Chọn sản phẩm mua"
+                      style={{
+                        width: "100%",
+                      }}
+                      // onChange={handleChangePosition}
+                      options={listProductSeat}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    name="qtyBuy"
+                    label="Số lượng mua"
+                    style={{ width: "100%" }}
+                    rules={[
+                      {
+                        required: true,
+                        message: "Nhập số lượng mua...",
+                      },
+                    ]}
+                  >
+                    <InputNumber
+                      style={{ width: "100%" }}
+                      min={1}
+                      max={10}
+                      defaultValue={1}
+                      placeholder="Nhập số lượng mua.."
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    name="moneyReceived"
+                    label="Số tiền KM"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Nhập số  tiền KM...",
+                      },
+                    ]}
+                  >
+                    <InputNumber
+                      style={{ width: "100%" }}
+                      formatter={(value) =>
+                        `VNĐ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                      }
+                      parser={(value) => value.replace(/\VNĐ\s?|(,*)/g, "")}
+                      // onChange={onChange}
+                      placeholder="Nhập số tiền KM.."
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </>
+          ) : type === 2 ? (
+            <>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    name="productBuy"
+                    label="Chọn sản phẩm mua "
+                    rules={[
+                      {
+                        required: true,
+                        message: "Hãy chọn sản phẩm mua...",
+                      },
+                    ]}
+                  >
+                    <Select
+                      placeholder="Chọn sản phẩm mua"
+                      style={{
+                        width: "100%",
+                      }}
+                      // onChange={handleChangePosition}
+                      options={listProductSeat}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    name="productReceive"
+                    label="Chọn sản phẩm nhận"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Hãy chọn sản phẩm nhận...",
+                      },
+                    ]}
+                  >
+                    <Select
+                      placeholder="Chọn sản phẩm nhận"
+                      style={{
+                        width: "100%",
+                      }}
+                      // onChange={handleChangePosition}
+                      options={listProduct}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    name="qtyBuy"
+                    label="Số lượng mua"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Nhập số lượng mua...",
+                      },
+                    ]}
+                  >
+                    <InputNumber
+                      min={1}
+                      max={10}
+                      style={{ width: "100%" }}
+                      defaultValue={1}
+                      placeholder="Nhập số lượng mua.."
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    name="qtyReceive"
+                    label="Số lượng nhận"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Nhập số  lượng nhận...",
+                      },
+                    ]}
+                  >
+                    <InputNumber
+                      min={1}
+                      style={{ width: "100%" }}
+                      max={10}
+                      defaultValue={1}
+                      placeholder="Nhập số lượng nhận.."
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </>
+          ) : type === 3 ? (
+            <>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    name="moneyBought"
+                    label="Số tiền Mua"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Nhập số  tiền Mua...",
+                      },
+                    ]}
+                  >
+                    <InputNumber
+                      style={{ width: "100%" }}
+                      formatter={(value) =>
+                        `VNĐ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                      }
+                      parser={(value) => value.replace(/\VNĐ\s?|(,*)/g, "")}
+                      // onChange={onChange}
+                      placeholder="Nhập số tiền Mua.."
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    name="percent"
+                    label="Phần trăm giảm"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Nhập số phần trăm giảm...",
+                      },
+                    ]}
+                  >
+                    <InputNumber
+                      min={1}
+                      style={{ width: "100%" }}
+                      max={100}
+                      placeholder="Nhập số phần trăm giảm.."
+                      formatter={(value) => `% ${value}`}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </>
+          ) : null}
         </Form>
-        <RenderType />
+
+        {/* <RenderType /> */}
       </Drawer>
     </>
   );

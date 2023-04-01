@@ -54,24 +54,26 @@ const TableCustomer = ({ setTab, setSelectedIdHeader }) => {
       title: "Id",
       dataIndex: "id",
       render: (val) => {
+        setSelectedId(val);
+        return val;
+      }
+      
+    },
+    {
+      title: "Tên bảng giá",
+      dataIndex: "name",
+      render: (val,recod) => {
+        console.log(recod)
         return (
           <a
             onClick={() => {
-              showModalDetail(val);
+              showModalDetail(recod.id);
             }}
           >
             {val}
           </a>
         );
       },
-    },
-    {
-      title: "Tên bảng giá",
-      dataIndex: "name",
-    },
-    {
-      title: "Mô tả ",
-      dataIndex: "desc",
     },
     {
       title: "Ngày bắt đầu",
@@ -88,15 +90,14 @@ const TableCustomer = ({ setTab, setSelectedIdHeader }) => {
         console.log(status);
         let color;
         let name;
-
         if (status === true) {
-          color = "green";
+          color = "success";
           name = "Hoạt động";
         } else if (status === false) {
-          color = "red";
+          color = "error";
           name = "Ngưng hoạt động";
         } else if (status === 2) {
-          color = "blue";
+          color = "processing";
           name = "Sắp Chiếu";
         }
         return <Badge status={color} text={name} />;

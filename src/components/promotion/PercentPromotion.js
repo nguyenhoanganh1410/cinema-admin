@@ -21,10 +21,21 @@ import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 
-const PercentPromotion = () => {
+const PercentPromotion = (props) => {
+  const [form] = Form.useForm();
+
+  const onFinish = (values) => {
+    console.log("values", values);
+    props.handleSubmit("values");
+  };
+
   return (
     <>
-      <Form layout="vertical">
+      <Form
+       form={form}
+       onFinish={onFinish}
+       id="myFormAddLinePro"
+       layout="vertical">
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
@@ -49,68 +60,22 @@ const PercentPromotion = () => {
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item
+          <Form.Item
               name="percent"
-              label="Chọn loại khuyến mãi "
+              label="Phần trăm giảm"
               rules={[
                 {
                   required: true,
-                  message: "Hãy chọn loại khuyến mãi...",
-                },
-              ]}
-            >
-              <Select
-                placeholder="Chọn loại KM"
-                style={{
-                  width: "100%",
-                }}
-                // onChange={handleChangePosition}
-                options={[
-                  {
-                    value: "10",
-                    label: "10%",
-                  },
-                  {
-                    value: "20",
-                    label: "20%",
-                  },
-                  {
-                    value: "30",
-                    label: "30%",
-                  },
-                  {
-                    value: "40",
-                    label: "40%",
-                  },
-                  {
-                    value: "50",
-                    label: "50%",
-                  },
-                ]}
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              name=""
-              label="Ngân sách"
-              rules={[
-                {
-                  required: true,
-                  message: "Nhập số  tiền ngân sách...",
+                  message: "Nhập số phần trăm giảm...",
                 },
               ]}
             >
               <InputNumber
+                min={1}
                 style={{ width: "100%" }}
-                formatter={(value) =>
-                  `VNĐ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                }
-                parser={(value) => value.replace(/\VNĐ\s?|(,*)/g, "")}
-                // onChange={onChange}
-                placeholder="Nhập số tiền ngân sách.."
+                max={100}
+                placeholder="Nhập số phần trăm giảm.."
+                formatter={(value) => `% ${value}`}
               />
             </Form.Item>
           </Col>

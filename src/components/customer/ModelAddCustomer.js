@@ -84,37 +84,38 @@ const ModelAddCustomer = ({
 
   //handle submit form create new customer...
   const handleSubmit = async (val) => {
-    const { firstname, lastname, phone, email, address, dob, note, image } =
-      val;
-    const date = new Date(dob?.$d).toISOString();
-    const data = new FormData();
-    data.append("firstName", firstname);
-    data.append("lastName", lastname);
-    data.append("phone", phone);
-    data.append("email", email);
-    data.append("address", address);
-    data.append("dob", date);
-    data.append("city_id", provincePicked);
-    data.append("district_id", districtPicked);
-    data.append("ward_id", wardPicked);
-    data.append("street", address);
-    data.append("note", note);
+    console.log("values:", val);
+    // const { firstname, lastname, phone, email, address, dob, note, image } =
+    //   val;
+    // const date = new Date(dob?.$d).toISOString();
+    // const data = new FormData();
+    // data.append("firstName", firstname);
+    // data.append("lastName", lastname);
+    // data.append("phone", phone);
+    // data.append("email", email);
+    // data.append("address", address);
+    // data.append("dob", date);
+    // data.append("city_id", provincePicked);
+    // data.append("district_id", districtPicked);
+    // data.append("ward_id", wardPicked);
+    // data.append("street", address);
+    // data.append("note", note);
 
-    if (image) {
-      data.append("image", image[0].originFileObj);
-    }
+    // if (image) {
+    //   data.append("image", image[0].originFileObj);
+    // }
 
-    console.log(data);
-    const rs = await customerApi.createCustomer(data);
+    // console.log(data);
+    // const rs = await customerApi.createCustomer(data);
 
-    if (rs) {
-      setShowModalAddCustomer(false);
-      depatch(setReload(!reload));
-      form.resetFields();
-      setTimeout(() => {
-        message.success("Thêm nhân viên thành công!");
-      }, 500);
-    }
+    // if (rs) {
+    //   setShowModalAddCustomer(false);
+    //   depatch(setReload(!reload));
+    //   form.resetFields();
+    //   setTimeout(() => {
+    //     message.success("Thêm nhân viên thành công!");
+    //   }, 500);
+    // }
   };
 
   useEffect(() => {

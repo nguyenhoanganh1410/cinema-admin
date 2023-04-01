@@ -16,11 +16,13 @@ import {
   Select,
   Space,
   Upload,
+  Table
 } from "antd";
 import openAddressApi from "../../api/openApi";
 import customerApi from "../../api/customerApi";
 import moment from "moment";
 import TableCustomer from "./TableCustomer";
+import priceApi from "../../api/priceApi";
 
 const { Option } = Select;
 
@@ -29,38 +31,30 @@ const ModelPriceView = ({
   setShowModalPriceView,
   selectedId,
 }) => {
-  const [province, setProvince] = useState([]);
-  const [districts, setDistricts] = useState([]);
-  const [wards, setWards] = useState([]);
-  const [provincePicked, setProvincePicked] = useState(0);
-  const [districtPicked, setDistrictPicked] = useState(0);
-  const [wardPicked, setWardPicked] = useState(0);
-  const [customerInfo, setCustomerInfo] = useState({});
-  const [fileList, setFileList] = useState([]);
+
   const [form] = Form.useForm();
-  const [image, setImage] = useState("");
+  const [priceDetail, setPriceDetail] = useState({});
+  const [priceLine, setPriceLine] = useState([]);
 
-  const normFile = (e) => {
-    console.log("Upload event:", e);
-    if (Array.isArray(e)) {
-      return e;
-    }
-    return e?.fileList;
-  };
 
-  const onChangeProvince = (value) => {
-    console.log(`selected ${value}`);
-    setProvincePicked(value);
-  };
-  const onChangeDistrict = (value) => {
-    console.log(`selected ${value}`);
-    setDistrictPicked(value);
-  };
-
-  const onChangeWard = (value) => {
-    console.log(`selected ${value}`);
-    setWardPicked(value);
-  };
+  const columns = [
+    {
+      title: "Mã Sản phẩm",
+      dataIndex: "productCode",
+      render: (text) => <a>{text}</a>,
+    },
+    {
+      title: "Tên Sản phẩm",
+      dataIndex: "productName",
+    },
+    {
+      title: "Giá bán",
+      dataIndex: "price",
+      render:(val) => {
+        return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+      }
+    },
+  ];
 
   const onSearch = (value) => {
     console.log("search:", value);
@@ -74,148 +68,29 @@ const ModelPriceView = ({
     console.log("export excel");
   };
 
-  const handleSubmit = async (val) => {
-    console.log("submit", val);
-    const { id, firstName, lastname, phone, email, address, dob, note, image } =
-      val;
-    const data = new FormData();
-    data.append("firstName", firstName);
-    data.append("lastName", lastname);
-    data.append("phone", phone);
-    data.append("email", email);
-    data.append("address", address);
-    data.append("dob", dob);
-    data.append("note", note);
-    data.append("city_id", provincePicked);
-    data.append("district_id", districtPicked);
-    data.append("ward_id", wardPicked);
-    data.append("street", address);
-    console.log("data", image);
-    if (image) {
-      data.append("image", image[0].originFileObj);
-    }
-
-    // const data = {
-    //   firstName: firstName,
-    //   lastName: lastname,
-    //   phone: phone,
-    //   email: email,
-    //   address: address,
-    //   dob: dob,
-    //   note: note,
-    //   city_id: provincePicked,
-    //   district_id: districtPicked,
-    //   ward_id: wardPicked,
-    //   street: address,
-    // };
-    try {
-      const response = await customerApi.updateCustomer(id, data);
-      console.log(response);
-      if (response) {
-        onClose();
-        setTimeout(() => {
-          message.success("Cập nhật thành công");
-        }, 1000);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  
 
   useEffect(() => {
-    const fetchPriceDetail = async (selectedId) => {
+    const fetchPriceDetail = async () => {
       console.log("selectedId", selectedId);
-      // try {
-      //   const rep = await 
-
-    };
-    
-    
-    // fetchCustomerInfo(selectedId);
-  }, []);
-
-  useEffect(() => {
-    const fetchConversations = async () => {
-      try {
-        const response = await openAddressApi.getList("/p");
-
-        //console.log(response);
-        if (response) {
-          const newResponse = response.map((val) => {
+        const res = await priceApi.getPriceLineByHeader(selectedId);
+        console.log("res", res.priceHeader);
+        if (res) {
+          setPriceDetail(res.priceHeader);
+          const data = res.lines.map((item) => {
             return {
-              value: val.code,
-              label: val.name,
+              productCode: item.Product.productCode,
+              productName: item.Product.productName,
+              price: item.price,
             };
           });
-          setProvince(newResponse);
+          setPriceLine(data);
         }
-      } catch (error) {
-        console.log("Failed to fetch conversation list: ", error);
-      }
     };
-
-    fetchConversations();
+    
+    fetchPriceDetail();
   }, []);
 
-  useEffect(() => {
-    if (provincePicked !== 0) {
-      console.log("run");
-      const fetchConversations = async (id) => {
-        try {
-          const response = await openAddressApi.getList(`/p/${id}?depth=2`);
-
-          console.log(response);
-          if (response) {
-            const { districts } = response;
-            const newDistricts = districts.map((val) => {
-              return {
-                value: val.code,
-                label: val.name,
-              };
-            });
-            setDistricts(newDistricts);
-          }
-        } catch (error) {
-          console.log("Failed to fetch conversation list: ", error);
-        }
-      };
-
-      fetchConversations(provincePicked);
-    }
-  }, [provincePicked]);
-
-  useEffect(() => {
-    if (districtPicked !== 0) {
-      const fetchConversations = async (id) => {
-        try {
-          const response = await openAddressApi.getList(`/d/${id}?depth=2`);
-
-          console.log(response);
-          if (response) {
-            const { wards } = response;
-            const newWards = wards.map((val) => {
-              return {
-                value: val.code,
-                label: val.name,
-              };
-            });
-            setWards(newWards);
-          }
-        } catch (error) {
-          console.log("Failed to fetch conversation list: ", error);
-        }
-      };
-
-      fetchConversations(districtPicked);
-    }
-  }, [districtPicked]);
-
-  const dummyRequest = ({ file, onSuccess }) => {
-    setImage(file);
-    setTimeout(() => {
-      onSuccess("ok");
-    }, 0);
-  };
 
   return (
     <>
@@ -257,20 +132,21 @@ const ModelPriceView = ({
             alignItems:'center',
           }}
         >
-          <p style={{ fontSize: "20px" }}>Bảng giá phim tại rạp A (Hà Nội) - 01/2023</p>
+          <p style={{ fontSize: "20px" }}>{priceDetail?.name}</p>
         </Space>
-        <Form form={form} onFinish={handleSubmit} id="myForm" layout="vertical">
+        <Form form={form} id="myForm" layout="vertical">
           <Row gutter={16} style={{ marginBottom:'10px' }} >
             <Col span={12}>
-              <span>
+              <span
+              >
                 Mã bảng giá:
-                <span> 20 </span>
+                <span> {priceDetail?.id} </span>
               </span>
             </Col>
             <Col span={12}>
               <span>
                 Trạng thái:
-                <span> Hoạt động </span>
+                <span>{priceDetail?.status === true ? " Đang hoạt động" : " Ngừng hoạt động"}</span>
               </span>
             </Col>
           </Row>
@@ -278,13 +154,13 @@ const ModelPriceView = ({
             <Col span={12}>
               <span>
                 Ngày bắt đầu:
-                <span> 2000-11-11 </span>
+                <span> {priceDetail?.startDate} </span>
               </span>
             </Col>
             <Col span={12}>
             <span>
                 Ngày kết thúc:
-                <span> 2000-11-11 </span>
+                <span> {priceDetail?.endDate} </span>
               </span>
             </Col>
           </Row>
@@ -297,31 +173,48 @@ const ModelPriceView = ({
               }}
              > Danh sách giá sản phẩm</span>
             </Col>
-            <Col span={12}>
-            </Col>
           </Row>
-          <Row gutter={16}>
-            <TableCustomer />
-          </Row>
-          <Row gutter={16} style={{ marginTop: "24px" }}>
-            <Col span={12}>
-              
-            </Col>
-            <Col span={12}>
-              
-            </Col>
-            <Col span={12}>
-              
-            </Col>
-            <Col span={12}>
-              
-            </Col>
-            <Col span={12}></Col>
-          </Row>
-
-          <Row style={{ marginTop: "16px" }} gutter={16}>
+          <Row style={{ marginTop: "20px" }}>
             <Col span={24}>
-              
+              <Table columns={columns} dataSource ={priceLine} pagination={false}/>
+            </Col>
+          </Row>
+          <Row gutter={16} style={{ marginTop: "30px" }} >
+            <Col span={12}>
+            <span 
+              style={{
+                fontSize: "20px",
+                fontWeight: "bold",
+              }}
+             > Thông tin lịch sử</span>
+            </Col>
+          </Row>
+          <Row style={{ marginTop: "20px" }} gutter={16}>
+            <Col span={12}>
+              <span>
+                Ngày tạo:
+                <span> {moment(priceDetail?.createdAt).format('YYYY-MM-DD : HH:mm')} </span>
+              </span>
+            </Col>
+            <Col span={12}>
+            <span>
+                Người tạo:
+                <span> {priceDetail?.user_create?.firstName + priceDetail?.user_create?.lastName } </span>
+              </span>
+            </Col>
+          </Row>
+          <Row style={{ marginTop: "20px" }} gutter={16}>
+            <Col span={12}>
+              <span>
+                Ngày cập nhật:
+                <span> {moment(priceDetail?.updatedAt).format('YYYY-MM-DD : HH:mm')} </span>
+              </span>
+            </Col>
+            <Col span={12}>
+            <span>
+                Người cập nhật:
+                <span> {priceDetail?.user_update?.firstName + priceDetail?.user_update?.lastName } </span>
+              </span>
             </Col>
           </Row>
         </Form>

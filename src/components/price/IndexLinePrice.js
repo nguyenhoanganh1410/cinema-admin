@@ -16,14 +16,21 @@ import {
   Tag,
   Table,
   Breadcrumb,
+  message,
 } from "antd";
 
-import { PlusOutlined,MinusCircleOutlined } from "@ant-design/icons";
+import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import ModelAddPromoLine from "./ModelAddPromoLine";
-import { useSelector } from "react-redux";
 import priceApi from "../../api/priceApi";
 import moment from "moment";
 import cinemaApi from "../../api/cinemaApi";
+import { useDispatch, useSelector } from "react-redux";
+import { setReload } from "../../redux/actions";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+import ModelDetailCustomer from "./ModelCustomerDetail";
+
+dayjs.extend(customParseFormat);
 
 const { TextArea } = Input;
 const getBase64 = (file) =>
@@ -36,60 +43,104 @@ const getBase64 = (file) =>
 const { Option } = Select;
 
 const { Title, Text } = Typography;
-const dateFormat = "YYYY/MM/DD";
 const newDateFormat = "YYYY-MM-DD";
-const columns = [
-  {
-    title: "Mã Sản phẩm",
-    dataIndex: "productCode",
-    render: (text) => <a>{text}</a>,
-  },
-  {
-    title: "Tên Sản phẩm",
-    dataIndex: "name",
-  },
-  {
-    title: "Giá bán",
-    dataIndex: "price",
-  },
-  {
-    render: (text, record) => (
-      <Button 
 
-      icon={<MinusCircleOutlined color="#ff4d4f" />}
-      >
-      </Button>
-    ),
-  },
-];
 
-const IndexLinePrice = ({ setTab,selectedIdHeader }) => {
+const IndexLinePrice = ({ setTab, selectedIdHeader }) => {
   const [showModalAddCustomer, setShowModalAddCustomer] = useState(false);
 
   const [form] = Form.useForm();
   const [status, setStatus] = useState(0);
   const [applyTo, setApplyTo] = useState(0);
-  const [listCinema,setListCinema] = useState([]);
-  const [startDate,setStartDate] = useState("");
-  const [endDate,setEndDate] = useState("");
-  const [applyToHall,setApplyToHall] = useState([]);
-  const [listPriceLine,setListPriceLine] = useState([]);
+  const [listCinema, setListCinema] = useState([]);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [applyToHall, setApplyToHall] = useState([]);
+  const [listPriceLine, setListPriceLine] = useState([]);
+  const depatch = useDispatch();
+  const reload = useSelector((state) => state.reload);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpenDelete, setIsModalOpenDelete] = useState(false);
 
-  const handleCancel = () => setPreviewOpen(false);
-  const handlePreview = async (file) => {
-    if (!file.url && !file.preview) {
-      file.preview = await getBase64(file.originFileObj);
+  const [dataUpdate, setDataUpdate] = useState({});
+  const currentDate = moment().format(newDateFormat);
+  const [startDateDb, setStartDateDb] = useState("");
+  const [endDateDb, setEndDateDb] = useState("");
+  const [statusDb, setStatusDb] = useState(0);
+  const [idPriceLine, setIdPriceLine] = useState(0);
+  const [selectedId, setSelectedId] = useState([]);
+  const [showModalDetailCustomer, setShowModalDetailCustomer] = useState(false);
+
+  const columns = [
+    {
+      title: "Mã Sản phẩm",
+      dataIndex: "productCode",
+      render: (val,recod) => {
+        return (
+          <a
+            onClick={() => {
+              showModalDetail(recod);
+            }}
+          >
+            {val}
+          </a>
+        );
+      },
+    },
+    {
+      title: "Tên Sản phẩm",
+      dataIndex: "name",
+    },
+    {
+      title: "Giá bán",
+      dataIndex: "price",
+      render: (val) => {
+        return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      },
+    },
+    {
+      dataIndex:"id",
+      render: (text, record) => (
+        currentDate < startDate && statusDb === false ? 
+        (
+          <Button style={{
+            border: "none",
+            width: "100%",
+          }}
+          onClick={() => {
+            setIsModalOpenDelete(true);
+            setIdPriceLine(record.id);
+          }}
+           danger icon={<MinusCircleOutlined color="red" />}>
+          
+           </Button>
+        )
+        : null
+      ),
+    },
+  ];
+
+  const showModalDetail = (e) => {
+    setShowModalDetailCustomer(true);
+    setIdPriceLine(e.id);
+    
+  };
+
+  const handleOkDelete = async() => {
+    console.log("idPriceLine",idPriceLine);
+    setIsModalOpenDelete(false);
+    try {
+      const response = await priceApi.deletePriceLineById(idPriceLine);
+      console.log(response);
+      if (response) {
+        depatch(setReload(!reload));
+        message.success("Xóa thành công");
+      }
+    } catch (error) {
+      message.error("Xóa thất bại");
     }
-    setPreviewImage(file.url || file.preview);
-    setPreviewOpen(true);
-    setPreviewTitle(
-      file.name || file.url.substring(file.url.lastIndexOf("/") + 1)
-    );
   };
-  const handleChange = ({ fileList: newFileList }) => {
-    setFileList(newFileList);
-    setChangeImage(true);
-  };
+
 
   const onChangeStatus = (value) => {
     setStatus(value);
@@ -143,30 +194,72 @@ const IndexLinePrice = ({ setTab,selectedIdHeader }) => {
   };
 
   const handleSubmit = async (val) => {
-    console.log(val);
+    console.log("value::", val);
+    const data = {
+      name: val.namePrice,
+      startDate: startDate,
+      endDate: endDate,
+      status: val.status,
+    };
+    if (
+      currentDate > startDateDb &&
+      currentDate < endDateDb &&
+      statusDb === true
+    ) {
+      showModal(data);
+    } else {
+      try {
+        const response = await priceApi.updatePriceHeaderById(
+          selectedIdHeader,
+          data
+        );
+        if (response[0] === 1) {
+          console.log(response);
+          depatch(setReload(!reload));
+          message.success("Cập nhật thành công");
+          handleRouter();
+        }
+      } catch (error) {
+        const { data } = error.response;
+        let messageError;
+        if (data.status === 409) {
+          messageError = `Thêm thất bại: Sản phẩm đã được áp dụng cho bảng giá:
+           Mã: ${data.data[0].PriceHeader.id} - Tên: ${data.data[0].PriceHeader.name} - (${data.data[0].PriceHeader.startDate} - ${data.data[0].PriceHeader.endDate} )`;
+        }
+        message.error(messageError, 7);
+      }
+    }
+
+    // try {
+    //   const response = await priceApi.updatePriceHeaderById(selectedIdHeader,data)
+    //   if (response) {
+    //     console.log(response);
+    //     depatch(setReload(!reload));
+    //     message.success("Cập nhật thành công");
+    //     handleRouter();
+    //   }
+    // } catch (error) {
+    //   console.log("Failed to login ", error);
+    // }
   };
-
-
-  
-
-  
 
   // price detail
   useEffect(() => {
     const getPriceLine = async () => {
       console.log(selectedIdHeader);
       try {
-        const line = await priceApi.getPriceLineByHeader(selectedIdHeader)
+        const line = await priceApi.getPriceLineByHeader(selectedIdHeader);
         if (line) {
-          console.log(line);
-          const data = line.map((item) => {
-            return{
+          console.log('line',line);
+          const data = line.lines.map((item) => {
+            return {
+              id: item.id,
               productCode: item.Product.productCode,
               name: item.Product.productName,
               price: item.price,
-            }
+            };
           });
-          setListPriceLine(data)
+          setListPriceLine(data);
         }
       } catch (error) {
         console.log("Failed to login ", error);
@@ -175,7 +268,7 @@ const IndexLinePrice = ({ setTab,selectedIdHeader }) => {
 
     const getPriceHeaderDetail = async () => {
       try {
-        const response = await priceApi.getPriceHeaderById(selectedIdHeader)
+        const response = await priceApi.getPriceHeaderById(selectedIdHeader);
         if (response) {
           console.log(response);
           setApplyTo(response.applyTo);
@@ -183,11 +276,14 @@ const IndexLinePrice = ({ setTab,selectedIdHeader }) => {
           setStartDate(response.startDate);
           setEndDate(response.endDate);
           setApplyToHall(response.applyToHall);
+          setStartDateDb(response.startDate);
+          setEndDateDb(response.endDate);
+          setStatusDb(response.status);
           form.setFieldsValue({
             codePrice: response.id,
             namePrice: response.name,
-            startDate: moment(response.startDate),
-            endDate: moment(response.endDate),
+            startDate: dayjs(response.startDate, newDateFormat),
+            endDate: dayjs(response.endDate, newDateFormat),
             status: response.status,
             applyTo: response.applyTo,
             applyToHall: response.applyToHall,
@@ -215,8 +311,40 @@ const IndexLinePrice = ({ setTab,selectedIdHeader }) => {
     getCinema();
     getPriceHeaderDetail();
     getPriceLine();
+  }, [selectedIdHeader, reload]);
 
-  },[selectedIdHeader]);
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+  const handleCancelDelete = () => {
+    setIsModalOpenDelete(false);
+  };
+  const showModal = (data) => {
+    setIsModalOpen(true);
+    setDataUpdate(data);
+  };
+
+
+  const handleOk = async () => {
+    setIsModalOpen(false);
+    try {
+      const response = await priceApi.updatePriceHeaderById(
+        selectedIdHeader,
+        dataUpdate
+      );
+      if (response[0] === 1) {
+        console.log(response);
+        depatch(setReload(!reload));
+        message.success("Cập nhật thành công");
+        handleRouter();
+      }
+    } catch (error) {
+      console.log("Failed to login ", error);
+    }
+  };
+
+
+  console.log("listPriceLine", isModalOpenDelete);
 
   return (
     <div className="site-card-wrapper" style={{ minWidth: "100vh" }}>
@@ -236,6 +364,7 @@ const IndexLinePrice = ({ setTab,selectedIdHeader }) => {
 
           <Button
             type="primary"
+            form="myForm"
             htmlType="submit"
             style={{
               marginBottom: "1rem",
@@ -255,15 +384,13 @@ const IndexLinePrice = ({ setTab,selectedIdHeader }) => {
           borderRadius: "8px",
           marginBottom: "1rem",
         }}
+        id="myForm"
         onFinish={handleSubmit}
         form={form}
         layout="vertical"
       >
         <Row gutter={16}>
           <Col span={12}>
-            <Form.Item name="id" hidden={true}>
-              <Input />
-            </Form.Item>
             <Form.Item name="codePrice" label="Mã bảng giá">
               <Input
                 disabled={true}
@@ -284,25 +411,44 @@ const IndexLinePrice = ({ setTab,selectedIdHeader }) => {
                 },
               ]}
             >
-              <Input placeholder="Hãy nhập tên bảng giá..." />
+              <Input
+                disabled={statusDb === true ? true : false}
+                placeholder="Hãy nhập tên bảng giá..."
+              />
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item
               label="Ngày bắt đầu"
               name="startDate"
-              rules={[
-                {
-                  required: true,
-                  message: "Hãy chọn ngày bắt đầu...",
-                },
-              ]}
+              rules={
+                [
+                  // ( {getFieldValue})=>({
+                  //   validator(rule,value){
+                  //     if(!value){
+                  //       return Promise.reject("Hãy nhập ngày bắt đầu!");
+                  //     }
+                  //     if(value < new Date()){
+                  //       return Promise.reject("Ngày bắt đầu phải lớn hơn ngày hiện tại!");
+                  //     }
+                  //     return Promise.resolve();
+                  //   }
+                  // })
+                ]
+              }
             >
               <DatePicker
-                disabled={true}
+                disabledDate={(current) =>
+                  current && current < moment().endOf(startDate)
+                }
+                disabled={
+                  currentDate > startDate || statusDb === true ? true : false
+                }
                 onChange={onChangeStartDate}
                 style={{ width: "100%" }}
                 placeholder="Chọn ngày bắt đầu"
+                defaultValue={dayjs(startDate, newDateFormat)}
+                format={newDateFormat}
               />
             </Form.Item>
           </Col>
@@ -338,69 +484,35 @@ const IndexLinePrice = ({ setTab,selectedIdHeader }) => {
               />
             </Form.Item>
           </Col>
-          <Col span={4}>
-            <Form.Item
-              name="applyTo"
-              label="Chi nhánh áp dụng"
-              rules={[
-                {
-                  required: true,
-                  message: "Áp dụng cho...",
-                },
-              ]}
-            >
-              <Select
-                placeholder="Chi nhánh áp dụng"
-                style={{
-                  width: "100%",
-                }}
-                onChange={onChangeApplyTo}
-                options={listCinema}
+          <Col span={8}></Col>
 
-              />
-            </Form.Item>
-          </Col>
-          <Col span={4}>
-          <Form.Item
-              name="applyToHall"
-              label="Loại phòng áp dụng"
-              
-            >
-              <Select
-                placeholder="Loại phòng áp dụng"
-                style={{
-                  width: "100%",
-                }}
-                onChange={onChangeApplyToHall}
-                options={[
-                  {
-                    value: "2D",
-                    label: "2D",
-                  },
-                  {
-                    value: "3D",
-                    label: "3D",
-                  },
-                ]}
-
-              />
-            </Form.Item>
-          </Col>
           <Col span={12}>
             <Form.Item
               name="endDate"
               label="Ngày kết thúc"
               rules={[
-                {
-                  required: true,
-                  message: "Hãy chọn ngày kết thúc...",
-                },
+                ({ getFieldValue }) => ({
+                  validator(rule, value) {
+                    if (!value) {
+                      return Promise.reject("Hãy nhập ngày kết thúc!");
+                    }
+                    if (value < moment(startDate)) {
+                      return Promise.reject(
+                        "Ngày kết thúc phải lớn hơn hoặc ngày bắt đầu!"
+                      );
+                    }
+                    return Promise.resolve();
+                  },
+                }),
               ]}
             >
               <DatePicker
                 onChange={onChangeEndDate}
                 style={{ width: "100%" }}
                 placeholder="Chọn ngày kết thúc"
+                defaultValue={dayjs(endDate, newDateFormat)}
+                format={newDateFormat}
+                disabled={statusDb === true ? true : false}
               />
             </Form.Item>
           </Col>
@@ -411,27 +523,74 @@ const IndexLinePrice = ({ setTab,selectedIdHeader }) => {
         <div
           style={{
             display: "flex",
-            justifyContent: "flex-end",
+            justifyContent: "space-between",
+            marginBottom: "20px",
           }}
         >
-          <Button
-            type="primary"
-            onClick={() => handleOpenModel()}
-            style={{
-              marginRight: "1rem",
-              marginBottom: "1rem",
-              width: "100px",
-            }}
-          >
-            Thêm
-          </Button>
+          <Space>
+            <span
+              style={{
+                fontSize: "1rem",
+                fontWeight: "bold",
+              }}
+            >
+              Danh sách giá
+            </span>
+          </Space>
+          {currentDate < startDate && statusDb === false ? (
+            <Button
+              type="primary"
+              onClick={() => handleOpenModel()}
+              style={{
+                marginRight: "1rem",
+                marginBottom: "1rem",
+                width: "100px",
+              }}
+            >
+              Thêm
+            </Button>
+          ) : null}
         </div>
-        <Table columns={columns} dataSource={listPriceLine} />;
+        <Table
+          pagination={false}
+          columns={columns}
+          dataSource={listPriceLine}
+        />
       </div>
+      <Modal
+        title="Cập nhật trạng thái bảng giá"
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+      >
+        <p>
+          Bảng giá đang trong thời gian hoạt động. Bạn có chắc muốn ngưng không?
+        </p>
+      </Modal>
+      <Modal
+        title="Xóa sản phẩm khỏi bảng giá"
+        open={isModalOpenDelete}
+        onOk={handleOkDelete}
+        onCancel={handleCancelDelete}
+      >
+        <p>
+          Bản có chắc muốn xóa sản phẩm khỏi bảng giá không?
+        </p>
+      </Modal>
       {showModalAddCustomer ? (
         <ModelAddPromoLine
           showModalAddCustomer={showModalAddCustomer}
           setShowModalAddCustomer={setShowModalAddCustomer}
+          selectedIdHeader={selectedIdHeader}
+        />
+      ) : null}
+      {showModalDetailCustomer ? (
+        <ModelDetailCustomer
+          showModalDetailCustomer={showModalDetailCustomer}
+          setShowModalDetailCustomer={setShowModalDetailCustomer}
+          selectedId={idPriceLine}
+          selectedIdHeader={selectedIdHeader}
+
         />
       ) : null}
     </div>
