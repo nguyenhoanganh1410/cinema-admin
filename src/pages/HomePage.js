@@ -130,13 +130,13 @@ const HomePage = () => {
 
   //onclich item in menu
   function onClick(info) {
-    if(itemClicked !== 2 && isBooking){
-      notifyWarn(MESSAGE_NOT_ACCEPT)
-      console.log('reun 1');
-    }else{
-      setItemClicked(+info.key);
+    // if(itemClicked !== 2 && isBooking){
+    //   notifyWarn(MESSAGE_NOT_ACCEPT)
+    //   console.log('reun 1');
+    // }else{
+     setItemClicked(+info.key);
       console.log('reun 2');
-    }
+    //}
 
   }
 
