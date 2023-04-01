@@ -24,11 +24,17 @@ const promotionApi = {
   getPromotionLineByHeader: (_id) => {
     return axiosApi.get(`/promotionLine/promotionHeader/${_id}`);
   },
+
   createPromotionLine: (data) => {
     return axiosApi.post("/promotionLine", data);
   },
   createPromotionDetail: (data) => {
     return axiosApi.post("/promotionDetail", data);
+  },
+
+  checkPromotion: (data) => {
+    const {date, phone, totalMoney, idProduct, qtyBuy} = data
+    return axiosApi.get(`/promotionHeader/check/promotion?date=${date}&phone=${phone}&totalMoney=${totalMoney}&idProductBuy=${idProduct}&qtyBuy=${qtyBuy}`);
   },
 };
 

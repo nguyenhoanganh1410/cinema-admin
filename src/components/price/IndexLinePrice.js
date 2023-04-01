@@ -62,6 +62,7 @@ const IndexLinePrice = ({ setTab, selectedIdHeader }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalOpenDelete, setIsModalOpenDelete] = useState(false);
 
+
   const [dataUpdate, setDataUpdate] = useState({});
   const currentDate = moment().format(newDateFormat);
   const [startDateDb, setStartDateDb] = useState("");
@@ -140,6 +141,7 @@ const IndexLinePrice = ({ setTab, selectedIdHeader }) => {
       message.error("Xóa thất bại");
     }
   };
+
 
 
   const onChangeStatus = (value) => {

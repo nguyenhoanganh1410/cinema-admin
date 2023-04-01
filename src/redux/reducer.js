@@ -4,6 +4,7 @@ const initValue = {
   cinemaHallId: null,
   reload: false,
   booking: null,
+  cinema: null
 };
 
 const rootReducer = (state = initValue, action) => {
@@ -33,6 +34,11 @@ const rootReducer = (state = initValue, action) => {
             ...state,
             booking: action.payload,
           };
+          case "cinema/setCinema":
+            return {
+              ...state,
+              cinema: action.payload,
+            };
     default:
       return state;
   }

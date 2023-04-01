@@ -13,6 +13,7 @@ const priceApi = {
     getPriceLineByHeader: (_id) => {
         return axiosApi.get(`/priceLine/priceHeader/${_id}`);
     },
+
     addPriceLine: (data) => {
         return axiosApi.post("/priceLine", data);
     },
@@ -27,6 +28,10 @@ const priceApi = {
     },
     updatePriceLineById: (id,data) => {
         return axiosApi.put(`/priceLine/${id}`, data);
+    },
+
+    getPriceProduct: () => {
+        return axiosApi.get("/product/list/price");
     },
 
 };

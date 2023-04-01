@@ -3,44 +3,41 @@ import {
   Input,
   Col,
   Row,
-  Typography,
   Button,
-  Modal,
-  Breadcrumb,
-  DatePicker,
-  Select,
-  notification
+  notification,
 } from "antd";
 import "../cinemahall/IndexRoomMap.scss";
 import './index.scss'
 import { useDispatch, useSelector } from "react-redux";
 import cinemaHallApi from "../../api/cinemaHallApi";
-import { MdChair, MdOutlineSignalCellularNull } from "react-icons/md";
-
-
-
-const openNotification = () => {
-  notification.open({
-    message: 'Thông báo',
-    description:
-      'Cập nhật ghế thành công!!',
-    onClick: () => {
-      console.log('Notification Clicked!');
-    },
-  });
-};
+import { MdAlternateEmail, MdChair, MdOutlineSignalCellularNull } from "react-icons/md";
+import priceApi from "../../api/priceApi";
+import { GHE_DOI, GHE_THUONG, MESSAGE_PICK_SEAT, VND } from "../../constant";
+import ItemProduct from "./ItemProduct";
+import ModelCustomer from './ModelCustomer'
+import { notifyWarn } from "../../utils/Notifi";
+import { setBooking } from "../../redux/actions";
 
 const arrColumn = ["B", "C", "D", "E", "F", "G", "H", "I", "K"];
 
 const arrRow = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-const PickSeatComponent = ({ setTab }) => {
+
+
+const PickSeatComponent = ({next}) => {
   const [seats, setSeats] = useState([]);
-  const idCinemaHall = useSelector((state) => state.cinemaHallId);
-  const [seat, setSeat] = useState(null);
-  const [possition, setPossition] = useState("");
-  const [open, setOpen] = useState(false);
+  const [listPrice, setListPrice] = useState([]);
+  const depatch = useDispatch();
   const booking = useSelector((state) => state.booking);
+  const cinema = useSelector((state) => state.cinema);
+  const [totalPrice, setTotalPrice] = useState(0);
+  //0 : pick seat
+  //1: pick combo
+  const [tab, setTab] = useState(0)
+  const [pickProducts, setPickProducts] = useState([])
+  const [seatPicked, setSeatPicked] = useState([])
+  const [showModel, setShowMode] = useState(false)
   console.log(booking);
+  //console.log(seatPicked);
 
 
   useEffect(() => {
@@ -56,24 +53,120 @@ const PickSeatComponent = ({ setTab }) => {
         console.log("Featch erro: ", error);
       }
     };
-    getSeats(booking?.show?.Show?.idCinemaHall);
-  }, []);
-
-  const handleShowModel = (val, idx, seat) => {
-    //call api get seat
-    const getSeatById = async (id) => {
+    const getPrice = async () =>{
       try {
-        const response = await cinemaHallApi.getSeatById(id);
+        const response = await priceApi.getPriceProduct();
         if (response) {
-          setSeat(response);
+          setListPrice(response)
         }
       } catch (error) {
         console.log("Featch erro: ", error);
       }
-    };
-    getSeatById(seat.id);
+    }
+    
+    getPrice();
+    getSeats(booking?.show?.Show?.idCinemaHall);
+  }, []);
+
+  const handleShowModel = (val, idx, seat) => {
+    if(!seat.status){
+      return;
+    }
+   
+    const isFound = seatPicked.some(element => {
+      if (element.id === seat.id) {
+        return true;
+      }
+      return false;
+    });
+    if(isFound){
+      const newArr = seatPicked.filter(val =>{
+          if(val?.id != seat?.id){
+            return val
+          }
+      })
+      setSeatPicked(newArr)
+    }else{
+      if(seat.Product.typeSeat === 3){ //double seat
+        //featch price
+        const array = listPrice.filter(val =>{
+          return val.productName == GHE_DOI
+        })
+        setSeatPicked([...seatPicked, {...seat, price: array[0].price}])
+      }
+      else if(seat.Product.typeSeat === 1){
+        const array = listPrice.filter(val =>{
+          return val.productName == GHE_THUONG
+        })
+        setSeatPicked([...seatPicked, {...seat, price: array[0].price}])
+      } 
+      
+    }
+
    
   };
+  const onChange = (e,value) => {
+    if(e === 0 || e === null){
+      let newArr = pickProducts.filter(val =>{
+        return val?.id != value?.id
+      })
+      setPickProducts(newArr)
+      return;
+    }
+    const item = {...value, quatity: e}
+    const isFound = pickProducts.some(element => {
+      if (element.id === value.id) {
+        return true;
+      }
+      return false;
+    });
+    if(isFound){
+      const newArr = pickProducts.map(val =>{
+        if(val?.id === value?.id){
+          return {...val, quatity: e}
+        }
+        return val
+      })
+      setPickProducts(newArr)
+    }else{
+      setPickProducts([...pickProducts, {...item}])
+    }
+     
+  };
+
+  const totalPriceProduct = pickProducts.reduce( (value, item) =>{
+    return value + item?.price * item?.quatity
+  }, 0)
+
+  const handleChangeTab = () =>{
+    if(seatPicked.length === 0) {
+      notifyWarn(MESSAGE_PICK_SEAT)
+      return
+    }
+    if(tab === 0){ 
+      depatch(setBooking({...booking, seats: seatPicked}));
+      setTab(1) }
+    else {
+      depatch(setBooking({...booking, products: pickProducts}));
+      next()
+    }
+  
+  }
+  useEffect(()=>{
+    const sumWithInitial = seatPicked.reduce((total, item)=>{
+     // console.log(value);
+        return item?.price + total
+    },0);
+
+    const sumProducts = pickProducts.reduce((total, item)=>{
+      // console.log(value);
+         return item?.price * item?.quatity + total
+     },0);
+    //console.log(sumWithInitial);
+    setTotalPrice(sumWithInitial+sumProducts)
+  }, [seatPicked, pickProducts])
+
+ 
   return (
     <div className="pick_seat site-card-wrapper">
       
@@ -82,9 +175,11 @@ const PickSeatComponent = ({ setTab }) => {
           xs: 8,
           lg: 32,
         }}
-        style={{  padding: "1rem", height:"80vh" }}
+        style={{  padding: "1rem", minHeight:"80vh" }}
       >
-        <div style={{display:"flex", alignItems:"center", marginLeft:"1rem"}}>
+        {
+          tab === 0 ? <>
+        <div style={{display:"flex", alignItems:"center", marginLeft:"1rem", marginBottom:"1rem"}}>
          <div className="blocks-remine">
             <div className="blocks-remine">
             <span className="block-remine_block" style={{backgroundColor:"red"}}></span>
@@ -112,7 +207,7 @@ const PickSeatComponent = ({ setTab }) => {
           </div>
         </div>
         <Col
-          span={24}
+          span={16}
           style={{
             background: "",
             display: "flex",
@@ -120,7 +215,6 @@ const PickSeatComponent = ({ setTab }) => {
             alignItems: "center",
           }}
         >
-         
           <div
             style={{
               width: "80%",
@@ -135,7 +229,6 @@ const PickSeatComponent = ({ setTab }) => {
           >
             <text style={{ color: "white", fontWeight: "700" }}>Màn Hình</text>
           </div>
-
           <div className="block-cinema">
             <div className="cinemaHall_left">
               <span>STT</span>
@@ -156,7 +249,7 @@ const PickSeatComponent = ({ setTab }) => {
                 })}
               </tr>
               <>
-                {arrColumn.map((val, idx) => {
+                {seats && arrColumn.map((val, idx) => {
                   let number = 1;
                   let agg = 1;
                   const newArr = seats.filter((seat) => {
@@ -170,16 +263,60 @@ const PickSeatComponent = ({ setTab }) => {
                       <tr>
                         {newArr.map((seat, idx) => {
                           let tmp = idx + 1
-                          if (seat.seatColumn === val) {
+                          const index = seatPicked.findIndex(element => {
+                            if (element.id === seat?.id) {
+                              return true;
+                            }
+                            return false;
+                          });
+
+                          if (index !== -1) {
+                            // 👉️ object is contained in the array
                             return (
                               <>
                               {
-                                seat?.Product.typeSeat === 3 ? 
+                                seat?.Product?.typeSeat === 3 ? 
                               <td
                                 onClick={() => handleShowModel(val, idx + 1, seat)}
                                 title={seat?.status ? val + tmp : val + tmp + " ghế bảo trì"}
-                                key={seat.createdAt}
-                                style={!seat?.status ? {background:"red"} : {}}
+                                key={seat?.createdAt}
+                               
+                                style={{backgroundColor:"gray"}}
+                              >
+                                <span>
+                                  <MdChair />
+                                  <MdChair />
+                                </span>
+                              </td> : 
+                               <td
+                                onClick={() => handleShowModel(val, idx + 1, seat)}
+                               title={seat?.status ? val + tmp : val + tmp + " ghế bảo trì"}
+                               key={seat?.createdAt}
+                               style={{backgroundColor:"gray"}}
+                             >
+                               <span>
+                                 <MdChair />
+                               
+                               </span>
+                             </td>
+                              }
+                              
+                              </>
+                          
+                            );
+                          }
+
+                          if (seat?.seatColumn === val) {
+                            return (
+                              <>
+                              {
+                                seat?.Product?.typeSeat === 3 ? 
+                              <td
+                                onClick={() => handleShowModel(val, idx + 1, seat)}
+                                title={seat?.status ? val + tmp : val + tmp + " ghế bảo trì"}
+                                key={seat?.createdAt}
+                               
+                                style={!seat?.status ? {background:"#CD0404"} : {}}
                               >
                                 <span>
                                   <MdChair />
@@ -190,7 +327,7 @@ const PickSeatComponent = ({ setTab }) => {
                                 onClick={() => handleShowModel(val, idx + 1, seat)}
                                title={seat?.status ? val + tmp : val + tmp + " ghế bảo trì"}
                                key={seat.createdAt}
-                               style={!seat?.status ? {background:"red"} : {}}
+                               style={!seat?.status ? {background:"#CD0404"} : {}}
                              >
                                <span>
                                  <MdChair />
@@ -219,10 +356,87 @@ const PickSeatComponent = ({ setTab }) => {
             </table>
           </div>
         </Col>
-      
+          </> : 
+        <Col span={16}>
+            <h3>Chọn bắp/ nước</h3>
+            <div className="products">
+              <div className="header_text">
+                <span style={{width:"45%", textAlign:"left"}}>Combo</span>
+                <span style={{ width:"20%", textAlign:"end"}}>Số lượng</span>
+                <span style={{width:"20%", textAlign:"end"}}>Đơn giá (VNĐ)</span>
+                <span style={{width:"15%", textAlign:"end"}}>Tổng (VNĐ)</span>    
+              </div>
+              <div className="products_list">
+              {
+                listPrice?.map(val =>{
+                  if(val?.productName === GHE_DOI || val?.productName === GHE_THUONG){
+                    return null;
+                  }
+                  const index = pickProducts.findIndex(product => {
+                    return product?.id === val?.id;
+                  });
+                  if(index != -1){
+                    const totalPrice = pickProducts[index].price * pickProducts[index].quatity
+                      return  <ItemProduct val={val} handleOnChange={onChange} totalPrice = {totalPrice} />
+                  }
+
+                  return <ItemProduct val={val} handleOnChange={onChange} totalPrice={0}/>
+                })
+              }
+              </div>
+              <p className="total_price">Tiền sản phẩm: <span>{VND.format(totalPriceProduct)}</span></p>
+            </div>
+        </Col>
+        }
+        <Col span = {8}>
+            <div className="booking_content">
+              <div className="booking_content-top">
+                <img src={booking?.film?.image}/>
+                <h3>{booking?.film?.nameMovie}</h3>
+
+              </div>
+
+              <div className="booking_content-bottom">
+                <p className="p-custom">Rạp: <span>{cinema?.name}</span></p>
+                <p>Suất chiếu: <span>{booking?.show?.ShowTime?.showTime + " - " + booking?.show?.showDate}</span></p>
+                <p>Combo:  {
+                  pickProducts.length > 0 ? 
+                      pickProducts.map(val =>{
+                        return   <span>{val?.quatity + " - " + val?.productName}, </span>
+                      })
+                      : <span>Không có sản phẩm.</span>
+                    }     </p>
+                <p>Ghế: <span>
+                  {seatPicked.length > 0 ? 
+                    seatPicked.map(val =>{
+                      return val?.seatColumn + "-" + val?.seatRow + ", "
+                    }) : 'Chưa chọn ghế.'
+                  }
+                </span></p>
+        
+                <p>Tổng: <span className="total_price">{VND.format(totalPrice)}</span></p>
+
+              </div>
+              <div style={{display:"flex"}}>
+
+               {
+                tab === 1 ?  <Button type="primary" onClick={()=>{
+                  setTab(0)
+                  // setPickProducts([])
+                  // depatch(setBooking({...booking, seats: []}));
+                }} style={{marginTop:"12px", marginRight:"12px"}}>
+                Quay lại
+              </Button> : null
+               }
+                <Button type="primary" onClick={()=>handleChangeTab()} style={{marginTop:"12px"}}>
+                  Tiếp tục
+                </Button>
+              </div>
+            </div>
+        </Col>
       </Row>
       
-  
+    
     </div>
   );
 };

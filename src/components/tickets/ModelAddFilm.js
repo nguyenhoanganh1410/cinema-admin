@@ -11,7 +11,6 @@ import {
   Row,
   Select,
   Space,
-  
   Upload,
   message
 } from "antd";
@@ -19,10 +18,8 @@ import {
 import { useFormik } from "formik";
 import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import categoryMovie from "../../api/categoryMovie";
-import { fimlValidator } from "./FilmSchema";
 import cinameApi from "../../api/cinemaApi";
 import movieApi from "../../api/movieApi";
-import { notifyError } from "../../utils/Notifi";
 const { Option } = Select;
 
 const getBase64 = (file) =>
@@ -34,8 +31,6 @@ const getBase64 = (file) =>
   });
 
 const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
-  const [form] = Form.useForm();
-
   const [listCategory, setListCategory] = useState([]);
   const [listCinema, setListCinema] = useState([]);
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -62,40 +57,40 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
   const [status, setStatus] = useState("");
   const [image, setImage] = useState("");
 
-  // const handleCancel = () => setPreviewOpen(false);
-  // const handlePreview = async (file) => {
-  //   console.log(file);
-  //   if (!file.url && !file.preview) {
-  //     file.preview = await getBase64(file.originFileObj);
-  //   }
-  //   setPreviewImage(file.url || file.preview);
-  //   setPreviewOpen(true);
-  //   setPreviewTitle(
-  //     file.name || file.url.substring(file.url.lastIndexOf("/") + 1)
-  //   );
-  // };
-  // const handleChange = ({ fileList: newFileList }) => {
-  //   console.log(newFileList);
-  //   if (fileList.length < 1) {
-  //     setFileList(newFileList);
-  //   }
-  // };
-  // const uploadButton = (
-  //   <div>
-  //     <PlusOutlined />
-  //     <div
-  //       style={{
-  //         marginTop: 8,
-  //       }}
-  //     >
-  //       Upload
-  //     </div>
-  //   </div>
-  // );
+  const handleCancel = () => setPreviewOpen(false);
+  const handlePreview = async (file) => {
+    console.log(file);
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj);
+    }
+    setPreviewImage(file.url || file.preview);
+    setPreviewOpen(true);
+    setPreviewTitle(
+      file.name || file.url.substring(file.url.lastIndexOf("/") + 1)
+    );
+  };
+  const handleChange = ({ fileList: newFileList }) => {
+    console.log(newFileList);
+    if (fileList.length < 1) {
+      setFileList(newFileList);
+    }
+  };
+  const uploadButton = (
+    <div>
+      <PlusOutlined />
+      <div
+        style={{
+          marginTop: 8,
+        }}
+      >
+        Upload
+      </div>
+    </div>
+  );
 
-  // const onSearch = (value) => {
-  //   console.log("search:", value);
-  // };
+  const onSearch = (value) => {
+    console.log("search:", value);
+  };
 
   const onClose = () => {
     setShowModalAddCustomer(false);
@@ -147,23 +142,18 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
     data.append("classify", classify);
     data.append("endDate", endDate);
     data.append("status", status);
+    console.log(image);
     if(image){
       data.append("image", image);
     }
-    try {
-      const rs = await movieApi.createMovie(data);
-      console.log(rs);
-      if(rs){
-        setShowModalAddCustomer(false);
-        setTimeout(() => {
-          message.success("Thêm phim thành công");
-        }, 500);
-      }
-    } catch (error) {
-     
-      notifyError("Chọn sai định dạng ảnh.")
+    const rs = await movieApi.createMovie(data);
+    console.log(rs);
+    if(rs){
+      setShowModalAddCustomer(false);
+      setTimeout(() => {
+        message.success("Thêm phim thành công");
+      }, 500);
     }
-   
   };
   useEffect(() => {
     //load categories
@@ -237,13 +227,13 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
         extra={
           <Space>
             <Button onClick={onClose}>Cancel</Button>
-            <Button form="myForm" htmlType="submit" type="primary">
+            <Button onClick={handleSubmit} type="primary">
               Submit
             </Button>
           </Space>
         }
       >
-        <Form layout="vertical"  onFinish={handleSubmit} id="myForm" form={form}>
+        <Form layout="vertical" hideRequiredMark>
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
@@ -328,6 +318,12 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
               <Form.Item
                 name="classify"
                 label="Độ tuổi thích hợp"
+                rules={[
+                  {
+                    required: true,
+                    message: "Hãy chọn độ tuổi thích hợp...",
+                  },
+                ]}
               >
                 <Select
                   placeholder="Chọn độ tuổi thích hợp"
@@ -400,7 +396,12 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
               <Form.Item
                 name="daoDien"
                 label="Đạo diễn"
-               
+                rules={[
+                  {
+                    required: true,
+                    message: "Hãy tên đạo diễn...",
+                  },
+                ]}
               >
                 <Input
                   onChange={(e) => setDirector(e.target.value)}
@@ -412,6 +413,12 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
               <Form.Item
                 name="dienVien"
                 label="Diễn viên"
+                rules={[
+                  {
+                    required: true,
+                    message: "Hãy nhập tên diễn viên...",
+                  },
+                ]}
               >
                 <Input
                   onChange={(e) => setCast(e.target.value)}
@@ -425,7 +432,12 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
               <Form.Item
                 name="link"
                 label="Link trailer"
-               
+                rules={[
+                  {
+                    required: true,
+                    message: "Link trailer...",
+                  },
+                ]}
               >
                 <Input
                   onChange={(e) => setLinkTrailer(e.target.value)}
@@ -517,7 +529,9 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
                 />
               </Form.Item>
             </Col>
-          </Row>  
+          </Row>
+
+          
         </Form>
       </Drawer>
     </>

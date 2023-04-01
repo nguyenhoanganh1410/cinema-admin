@@ -1,25 +1,22 @@
 import React, { useEffect, useState } from "react";
 import {
-  Input,
-  Col,
-  Row,
-  Typography,
   Button,
   Modal,
   Breadcrumb,
-  DatePicker,
-  Select,
-  message, Steps, theme
+ Steps, theme
 } from "antd";
 import PickFilmComponent from "./PickFilmComponent";
 import PickSeatComponent from "./PickSeatComponent";
 import PickShowComponent from "./PickShowComponent";
+import PayComponent from "./PayComponent";
+import ResultPage from "../sucesspage/ResultPage";
 
 
 const BookingComponent = ({ setTab }) => {
   const { token } = theme.useToken();
   const [current, setCurrent] = useState(0);
   const [film, setFilm] = useState(null)
+  const [isSucess, setIsSecess] = useState(false)
   
   const next = (currentFilm) => {
     setCurrent(current + 1);
@@ -39,23 +36,11 @@ const BookingComponent = ({ setTab }) => {
     },
     {
       title: 'Chọn ghế',
-      content: <PickSeatComponent />
-    },
-    {
-      title: 'Chọn khuyến mãi',
-      content: 'Last-content',
-    },
-    {
-      title: 'Chọn bắp nước',
-      content: 'Last-content',
-    },
-    {
-      title: 'Khách hàng',
-      content: 'Last-content',
+      content: <PickSeatComponent next={next}/>
     },
     {
       title: 'Thanh toán',
-      content: 'Last-content',
+      content: isSucess ? <ResultPage setCurrent={setCurrent} next={next} /> : <PayComponent setIsSecess={setIsSecess} next={next} />
     },
   ];
   const items = steps.map((item) => ({
@@ -64,7 +49,6 @@ const BookingComponent = ({ setTab }) => {
   }));
   const contentStyle = {
     minHeight: '260px',
-    
     color: token.colorTextTertiary,
     backgroundColor: token.colorFillAlter,
     borderRadius: token.borderRadiusLG,
@@ -89,16 +73,7 @@ const BookingComponent = ({ setTab }) => {
           marginTop: 24,
         }}
       >
-        {current < steps.length - 1 && (
-          <Button type="primary" onClick={() => next()}>
-            Next
-          </Button>
-        )}
-        {current === steps.length - 1 && (
-          <Button type="primary" onClick={() => message.success('Processing complete!')}>
-            Done
-          </Button>
-        )}
+ 
         {current > 0 && (
           <Button
             style={{

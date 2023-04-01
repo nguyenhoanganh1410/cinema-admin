@@ -74,24 +74,24 @@ const ShowChart = ({ setTab }) => {
             placeholder="Chọn chi nhánh"
             style={{ width:150}}
           >
-            <Option value="jack">Jack</Option>
+            {/* <Option value="jack">Jack</Option>
             <Option value="lucy">Lucy</Option>
             <Option value="disabled" disabled>
               Disabled
             </Option>
-            <Option value="Yiminghe">yiminghe</Option>
+            <Option value="Yiminghe">yiminghe</Option> */}
           </Select>
 
           <Select
             style={{ margin: "0 0.5rem", width: 300 }}
             placeholder="Chọn phim"
           >
-            <Option value="jack">Jack</Option>
+            {/* <Option value="jack">Jack</Option>
             <Option value="lucy">Lucy</Option>
             <Option value="disabled" disabled>
               Disabled
             </Option>
-            <Option value="Yiminghe">yiminghe</Option>
+            <Option value="Yiminghe">yiminghe</Option> */}
           </Select>
         </div>
         <div

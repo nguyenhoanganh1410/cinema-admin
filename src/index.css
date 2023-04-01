@@ -86,3 +86,14 @@ code {
     --N300: #001a33;
     --HL_photo-bg: #545454;
 }
+
+
+ul,ol{
+  list-style: none;
+  
+}
+
+a{
+  text-decoration: none;
+}
+

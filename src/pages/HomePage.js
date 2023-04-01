@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   DesktopOutlined,
   FileOutlined,
@@ -39,16 +39,14 @@ import { useSelector } from "react-redux";
 import UserInfo from "../components/user/UserIndex";
 import tokenService from "../service/token.service";
 import { useNavigate } from "react-router-dom";
-import IndexPromotion from "../components/promotion/IndexPromotion";
 import IndexRoutePro from "../components/promotion/IndexRoutePro";
 import IndexProduct from "../components/product";
-import IndexPrice from "../components/price";
 import IndexRouteHall from "../components/cinemahall/IndexRoute";
-import IndexRouteBooking from "../components/booking/IndexRouteBooking";
 import IndexRoutePrice from "../components/price/IndexRoutePrice";
 import IndexBooking from "../components/booking/IndexBooking";
 
-
+import { ToastContainer, toast } from 'react-toastify';
+import IndexTicket from "../components/tickets/IndexFilm";
 const { Header, Content, Footer, Sider } = Layout;
 
 const { Text } = Typography;
@@ -61,44 +59,7 @@ function getItem(label, key, icon, children) {
     label,
   };
 }
-const dropList = [
-  {
-    key: "1",
-    label: (
-      <a
-        target="_blank"
-        rel="noopener noreferrer"
-        href="https://www.antgroup.com"
-      >
-        1st menu item
-      </a>
-    ),
-  },
-  {
-    key: "2",
-    label: (
-      <a
-        target="_blank"
-        rel="noopener noreferrer"
-        href="https://www.aliyun.com"
-      >
-        2nd menu item
-      </a>
-    ),
-  },
-  {
-    key: "3",
-    label: (
-      <a
-        target="_blank"
-        rel="noopener noreferrer"
-        href="https://www.luohanacademy.com"
-      >
-        3rd menu item
-      </a>
-    ),
-  },
-];
+
 const items = [
   getItem("Dashboard", "1", <DashboardTwoTone />),
   getItem("Đặt vé", "sub00", <DesktopOutlined />, [
@@ -125,15 +86,14 @@ const items = [
   ]),
   getItem("Hệ thống", "sub100", <ProjectOutlined />, [
     getItem("Nhân viên", "15"),
-    getItem("Tài khoản", "16"),
-    getItem("Thu chi", "17"),
   ]),
   getItem("Thống kê", "18", <PieChartOutlined />),
 ];
 const HomePage = () => {
   const navigator = useNavigate();
   const user = useSelector((state) => state.user);
-
+  const cinema = useSelector((state) => state.cinema);
+  
   //model
   const [isModalOpen, setIsModalOpen] = useState(false);
   const showModal = () => {
@@ -211,6 +171,9 @@ const HomePage = () => {
     } else if (itemClicked === 13) {
       return <IndexRouteHall />;
     } 
+    else if (itemClicked === 9) {
+      return <IndexTicket />;
+    } 
     return <IndexDashboard />;
   };
 
@@ -227,6 +190,8 @@ const HomePage = () => {
     //delete user in local storage
     tokenService.removeUser();
   };
+
+ 
   return (
     <Layout
       style={{
@@ -269,8 +234,12 @@ const HomePage = () => {
               padding: "0 1rem",
             }}
           >
-            <div></div>
+            <div>
+            <p style={{fontWeight:"700",fontSize:"16px"}}>{cinema?.name}</p>
+            </div>
             <div style={{ display: "flex", alignItems: "center" }}>
+             
+              <p style={{marginRight:"1rem", fontWeight:"500"}}>Hi, Anh Nguyen</p>
               <Dropdown
                 overlay={
                   <>
@@ -434,14 +403,6 @@ const HomePage = () => {
             overflow: "auto",
           }}
         >
-          {/* <Breadcrumb
-            style={{
-              margin: "16px 0",
-            }}
-          >
-            <Breadcrumb.Item>User</Breadcrumb.Item>
-            <Breadcrumb.Item>Bill</Breadcrumb.Item>
-          </Breadcrumb> */}
           <div
             style={{
               //padding: 24,
@@ -452,13 +413,6 @@ const HomePage = () => {
             <RenderHome />
           </div>
         </Content>
-        {/* <Footer
-          style={{
-            textAlign: "center",
-          }}
-        >
-          Ant Design ©2018 Created by Ant UED
-        </Footer> */}
       </Layout>
       <Modal
         title="Đăng xuất"
@@ -468,6 +422,18 @@ const HomePage = () => {
       >
         <p>Bạn muốn đăng xuất không?</p>
       </Modal>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+        />
     </Layout>
   );
 };
