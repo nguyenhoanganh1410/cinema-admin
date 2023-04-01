@@ -12,6 +12,6 @@ export const MESSAGE_PICK_SEAT = 'Hãy chọn ghế.';
 export const MESSAGE_UPDATE_SEAT_SUCCESS = 'Cập nhật ghế thành công!';
 export const MESSAGE_MONEY_INCORRECT = 'Tiền khách đưa không hợp lệ.'
 export const MESSAGE_CUSTOMER_NOT_FOUND = 'Chưa nhập khách hàng.'
-
+export const MESSAGE_NOT_ACCEPT = 'Hãy hoàn tất giao dịch hoặc hủy để thực hiện chức năng mới.'
 
 

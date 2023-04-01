@@ -211,9 +211,9 @@ const IndexLinePromotion = ({ setTab }) => {
     data.append("startDate", startDate)
     data.append("endDate", endDate)
     data.append("statusPromotion", val.statusPromotion)
-    rankCustomer.forEach((rank) => {
-      data.append("rank", rank.value)
-    })
+    // rankCustomer.forEach((rank) => {
+    //   data.append("rank", rank.value)
+    // })
     // data.append("rank", rankPicked)
     if(val.image){
       data.append("image", val.image[0].originFileObj)
@@ -297,7 +297,7 @@ const IndexLinePromotion = ({ setTab }) => {
                 url: response?.image,
               },
             ],
-            rankCustomer: ranksRes,
+           // rankCustomer: ranksRes,
           });
           setPromotionHeader(response);
         }

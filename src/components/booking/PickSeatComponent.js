@@ -15,8 +15,9 @@ import priceApi from "../../api/priceApi";
 import { GHE_DOI, GHE_THUONG, MESSAGE_PICK_SEAT, VND } from "../../constant";
 import ItemProduct from "./ItemProduct";
 import ModelCustomer from './ModelCustomer'
-import { notifyWarn } from "../../utils/Notifi";
-import { setBooking } from "../../redux/actions";
+import { notifyError, notifyWarn } from "../../utils/Notifi";
+import { setBooking, setIsBooking } from "../../redux/actions";
+import { createReservationData, getReservationData } from "../../services/ReservationFetch";
 
 const arrColumn = ["B", "C", "D", "E", "F", "G", "H", "I", "K"];
 
@@ -36,10 +37,9 @@ const PickSeatComponent = ({next}) => {
   const [pickProducts, setPickProducts] = useState([])
   const [seatPicked, setSeatPicked] = useState([])
   const [showModel, setShowMode] = useState(false)
-  console.log(booking);
-  //console.log(seatPicked);
-
-
+  const user = useSelector((state) => state.user);
+  const isBooking = useSelector((state) => state.isBooking);
+  console.log("---", booking?.show?.Show?.idCinemaHall);
   useEffect(() => {
     const getSeats = async (_id) => {
       try {
@@ -47,7 +47,25 @@ const PickSeatComponent = ({next}) => {
           _id
         );
         if (response) {
-          setSeats(response);
+          const {show} = booking
+          getReservationData(show?.id)
+          .then(result =>{
+            const dataClear = result.filter(seat =>{
+              return seat?.status === 0
+            })
+         
+            const finalSeat = response.map(val =>{
+              const searchIndex = dataClear.findIndex((item) => item.id === val.id);
+              if(searchIndex != -1){
+                return {...val, status: 0}
+              }
+              return val;
+            })
+            console.log(finalSeat);
+            setSeats(finalSeat)
+          }).catch(()=>{
+            notifyError("Lỗi hệ thống không lấy được danh sách ghế đã đặt.")
+          })
         }
       } catch (error) {
         console.log("Featch erro: ", error);
@@ -63,7 +81,6 @@ const PickSeatComponent = ({next}) => {
         console.log("Featch erro: ", error);
       }
     }
-    
     getPrice();
     getSeats(booking?.show?.Show?.idCinemaHall);
   }, []);
@@ -148,7 +165,24 @@ const PickSeatComponent = ({next}) => {
       setTab(1) }
     else {
       depatch(setBooking({...booking, products: pickProducts}));
-      next()
+   
+
+      const {show, film, seats} = booking
+      const listSeatId = seats.map(seat=>{
+        return seat?.id
+      })
+      const dataPayload = {
+        showTime_id: show?.id,
+        staff_id: user?.id,
+        seats: [...listSeatId]
+      }
+      createReservationData(dataPayload).then( ()=>{
+        //depatch(setIsBooking(true))
+        next();
+      }).catch(()=>{
+        notifyError("Hệ thống đang có lỗi.");
+      })
+     
     }
   
   }
@@ -188,7 +222,7 @@ const PickSeatComponent = ({next}) => {
           </div>
           <div className="blocks-remine">
             <div className="blocks-remine">
-            <span className="block-remine_block" style={{backgroundColor:"gray"}}></span>
+            <span className="block-remine_block" style={{backgroundColor:"#BDBDD7"}}></span>
             <span className="blocks-remine_text">Ghế đã đặt</span>
             </div>
           </div>
@@ -278,7 +312,7 @@ const PickSeatComponent = ({next}) => {
                                 seat?.Product?.typeSeat === 3 ? 
                               <td
                                 onClick={() => handleShowModel(val, idx + 1, seat)}
-                                title={seat?.status ? val + tmp : val + tmp + " ghế bảo trì"}
+                                title={seat?.status ? val + tmp : val + tmp + " ghế đã đặt"}
                                 key={seat?.createdAt}
                                
                                 style={{backgroundColor:"gray"}}
@@ -290,7 +324,7 @@ const PickSeatComponent = ({next}) => {
                               </td> : 
                                <td
                                 onClick={() => handleShowModel(val, idx + 1, seat)}
-                               title={seat?.status ? val + tmp : val + tmp + " ghế bảo trì"}
+                               title={seat?.status ? val + tmp : val + tmp + " ghế đã đặt"}
                                key={seat?.createdAt}
                                style={{backgroundColor:"gray"}}
                              >
@@ -305,35 +339,91 @@ const PickSeatComponent = ({next}) => {
                           
                             );
                           }
-
                           if (seat?.seatColumn === val) {
                             return (
                               <>
                               {
                                 seat?.Product?.typeSeat === 3 ? 
-                              <td
-                                onClick={() => handleShowModel(val, idx + 1, seat)}
-                                title={seat?.status ? val + tmp : val + tmp + " ghế bảo trì"}
-                                key={seat?.createdAt}
-                               
-                                style={!seat?.status ? {background:"#CD0404"} : {}}
-                              >
-                                <span>
-                                  <MdChair />
-                                  <MdChair />
-                                </span>
-                              </td> : 
-                               <td
-                                onClick={() => handleShowModel(val, idx + 1, seat)}
-                               title={seat?.status ? val + tmp : val + tmp + " ghế bảo trì"}
-                               key={seat.createdAt}
-                               style={!seat?.status ? {background:"#CD0404"} : {}}
-                             >
-                               <span>
-                                 <MdChair />
-                               
-                               </span>
-                             </td>
+                                  <>
+                                    {
+                                      seat?.statusSeat ? 
+                                      <td
+                                      onClick={() => handleShowModel(val, idx + 1, seat)}
+                                      title={seat?.statusSeat ? val + tmp : val + tmp + " ghế  bảo trì"}
+                                      key={seat?.createdAt}
+                                    
+                                      style={seat?.statusSeat ? {background:"red", cursor:"not-allowed"} : {}}
+                                    >
+                                      <span>
+                                        <MdChair />
+                                        <MdChair />
+                                      </span>
+                                    </td> : 
+                                      <td
+                                      onClick={() => handleShowModel(val, idx + 1, seat)}
+                                      title={seat?.status ? val + tmp : val + tmp + " ghế đã đặt"}
+                                      key={seat?.createdAt}
+                                    
+                                      style={!seat?.status ? {background:"#BDBDD7", color:"white", cursor:"not-allowed"} : {}}
+                                    >
+                                      <span>
+                                        <MdChair />
+                                        <MdChair />
+                                      </span>
+                                    </td>
+                                    }
+                                  </> :
+                                  <>
+                                  {
+                                    seat?.statusSeat ? 
+                                    <td
+                                    onClick={() => handleShowModel(val, idx + 1, seat)}
+                                    title={seat?.statusSeat ? val + tmp : val + tmp + " ghế  bảo trì"}
+                                    key={seat?.createdAt}
+                                  
+                                    style={seat?.statusSeat ? {background:"red", cursor:"not-allowed"} : {}}
+                                  >
+                                    <span>
+                                      <MdChair />
+                                      <MdChair />
+                                    </span>
+                                  </td> : 
+                                    <td
+                                    onClick={() => handleShowModel(val, idx + 1, seat)}
+                                    title={seat?.status ? val + tmp : val + tmp + " ghế đã đặt"}
+                                    key={seat?.createdAt}
+                                  
+                                    style={!seat?.status ? {background:"#BDBDD7", color:"white", cursor:"not-allowed"} : {}}
+                                  >
+                                    <span>
+                                      <MdChair />
+                                    </span>
+                                  </td>
+                                  }
+                                </>
+
+                                //   <td
+                                //     onClick={() => handleShowModel(val, idx + 1, seat)}
+                                //     title={seat?.status ? val + tmp : val + tmp + " ghế đã đặt"}
+                                //     key={seat?.createdAt}
+                                  
+                                //     style={!seat?.status ? {background:"#BDBDD7", color:"white", cursor:"not-allowed"} : {}}
+                                //   >
+                                //     <span>
+                                //       <MdChair />
+                                //       <MdChair />
+                                //     </span>
+                                //   </td> : 
+                                //   <td
+                                //     onClick={() => handleShowModel(val, idx + 1, seat)}
+                                //   title={seat?.status ? val + tmp : val + tmp + " ghế đã đặt"}
+                                //   key={seat.createdAt}
+                                //   style={!seat?.status ? {background:"#BDBDD7", color:"white", cursor:"not-allowed"} : {}}
+                                // >
+                                //   <span>
+                                //     <MdChair />
+                                //   </span>
+                                // </td>
                               }
                               
                               </>
@@ -422,8 +512,6 @@ const PickSeatComponent = ({next}) => {
                {
                 tab === 1 ?  <Button type="primary" onClick={()=>{
                   setTab(0)
-                  // setPickProducts([])
-                  // depatch(setBooking({...booking, seats: []}));
                 }} style={{marginTop:"12px", marginRight:"12px"}}>
                 Quay lại
               </Button> : null

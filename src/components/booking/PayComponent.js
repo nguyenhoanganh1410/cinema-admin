@@ -16,6 +16,7 @@ import { getPromotion } from "../../services/PromotionFetch";
 import { MESSAGE_CUSTOMER_NOT_FOUND, MESSAGE_MONEY_INCORRECT, SDT_VANG_LAI, VND } from "../../constant";
 import { notifyError, notifySucess } from "../../utils/Notifi";
 import orderApi from "../../api/orderApi";
+import { setBooking, setIsBooking } from "../../redux/actions";
 
 
 
@@ -41,7 +42,7 @@ const tagRender = (props) => {
 };
 
 const { TextArea } = Input;
-const PayComponent = ({next, setIsSecess}) => {
+const PayComponent = ({next, setIsSucess}) => {
   const depatch = useDispatch();
   const booking = useSelector((state) => state.booking);
   const cinema = useSelector((state) => state.cinema);
@@ -58,12 +59,13 @@ const PayComponent = ({next, setIsSecess}) => {
   const [promotion, setPromotion] = useState([])
   const [options, setOptions] = useState([])
   const [loading,setLoading] = useState(false)
-  
-  console.log(promotion)
 
+  const isBooking = useSelector((state) => state.isBooking);
+  console.log(isBooking);
   useEffect(() => {
     setSeatPicked(booking?.seats)
     setPickProducts(booking?.products)
+    // depatch(setIsBooking(true))
   }, []);
 
   useEffect(()=>{
@@ -193,7 +195,9 @@ const PayComponent = ({next, setIsSecess}) => {
     try {
       const result = await orderApi.createOrder(dataPayload)
       notifySucess("Đặt Vé Thành công.")
-      setIsSecess(true)
+      depatch(setBooking(null))
+      setIsSucess(true)
+    //  depatch(setIsBooking(false))
     } catch (error) {
       notifyError("Thất bại.")
     } finally{

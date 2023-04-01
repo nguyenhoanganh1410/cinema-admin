@@ -10,19 +10,38 @@ import PickSeatComponent from "./PickSeatComponent";
 import PickShowComponent from "./PickShowComponent";
 import PayComponent from "./PayComponent";
 import ResultPage from "../sucesspage/ResultPage";
+import { useDispatch, useSelector } from "react-redux";
+import { cancelReservationData } from "../../services/ReservationFetch";
 
 
 const BookingComponent = ({ setTab }) => {
   const { token } = theme.useToken();
   const [current, setCurrent] = useState(0);
   const [film, setFilm] = useState(null)
-  const [isSucess, setIsSecess] = useState(false)
+  const [isSucess, setIsSucess] = useState(false)
   
+  const depatch = useDispatch();
+  const booking = useSelector((state) => state.booking);
+  const user = useSelector((state) => state.user);
+
   const next = (currentFilm) => {
     setCurrent(current + 1);
     setFilm(currentFilm)
   };
   const prev = () => {
+    if(current === 3){
+      const {show, film, seats} = booking
+      const listSeatId = seats.map(seat=>{
+        return seat?.id
+      })
+      const dataPayload = {
+        showTime_id: show?.id,
+        staff_id: user?.id,
+        seats: [...listSeatId]
+      }
+      cancelReservationData(dataPayload)
+
+    }
     setCurrent(current - 1);
   };
   const steps = [
@@ -32,7 +51,7 @@ const BookingComponent = ({ setTab }) => {
     },
     {
       title: 'Chọn suất chiếu',
-      content: <PickShowComponent next={next} film={film}/>
+      content: <PickShowComponent next={next}/>
     },
     {
       title: 'Chọn ghế',
@@ -40,7 +59,7 @@ const BookingComponent = ({ setTab }) => {
     },
     {
       title: 'Thanh toán',
-      content: isSucess ? <ResultPage setCurrent={setCurrent} next={next} /> : <PayComponent setIsSecess={setIsSecess} next={next} />
+      content: isSucess ? <ResultPage setIsSucess={setIsSucess} setCurrent={setCurrent} next={next} /> : <PayComponent setIsSucess={setIsSucess} next={next} />
     },
   ];
   const items = steps.map((item) => ({

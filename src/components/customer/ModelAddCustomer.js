@@ -16,7 +16,6 @@ import {
 import openAddressApi from "../../api/openApi";
 import customerApi from "../../api/customerApi";
 import { useDispatch, useSelector } from "react-redux";
-import { setReload } from "../../redux/actions";
 const { Option } = Select;
 
 const ModelAddCustomer = ({

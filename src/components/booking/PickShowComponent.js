@@ -13,7 +13,7 @@ const dateFormatQuery = "YYYY-MM-DD";
 const date = [0,1,2,3,4,5,6]
 
 
-const PickShowComponent = ({next, film}) => {
+const PickShowComponent = ({next}) => {
 
  const [dateQuery, setDateQUery] = useState(moment().format(dateFormatQuery));
  const [current, setCurrent] = useState(0);
@@ -141,7 +141,7 @@ const PickShowComponent = ({next, film}) => {
                           shows.map(val =>{
                             if(val?.disable){
                               return(
-                                <div style={{cursor:'not-allowed'}} className="time" key={val?.id}>
+                                <div style={{cursor:'not-allowed', background:"#333", color:"white"}} className="time" key={val?.id}>
                                   { val?.ShowTime.showTime}
                                 </div>
                               )

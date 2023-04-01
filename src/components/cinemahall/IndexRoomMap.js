@@ -154,9 +154,9 @@ const IndexCinemaMap = ({ setTab }) => {
                                 seat?.Product.typeSeat === 3 ? 
                               <td
                                 onClick={() => handleShowModel(val, idx + 1, seat)}
-                                title={seat?.status ? val + tmp : val + tmp + " ghế bảo trì"}
+                                title={seat?.statusSeat ? val + tmp : val + tmp + " ghế bảo trì"}
                                 key={seat.createdAt}
-                                style={!seat?.status ? {background:"red"} : {}}
+                                style={seat?.statusSeat ? {background:"red"} : {}}
                               >
                                 <span>
                                   <MdChair />
@@ -165,9 +165,9 @@ const IndexCinemaMap = ({ setTab }) => {
                               </td> : 
                                <td
                                onClick={() => handleShowModel(val, idx + 1, seat)}
-                               title={seat?.status ? val + tmp : val + tmp + " ghế bảo trì"}
+                               title={seat?.statusSeat ? val + tmp : val + tmp + " ghế bảo trì"}
                                key={seat.createdAt}
-                               style={!seat?.status ? {background:"red"} : {}}
+                               style={seat?.statusSeat ? {background:"red"} : {}}
                              >
                                <span>
                                  <MdChair />
