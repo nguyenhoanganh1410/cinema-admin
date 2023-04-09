@@ -35,19 +35,14 @@ const TableFilms = () => {
   const depatch = useDispatch();
   const reload = useSelector((state) => state.reload);
 
-  const currentDay = moment().format("YYYY-MM-DD");
-  const currentTimes = moment().format("HH:mm");
-
   const columns = [
     {
       title: "Mã hóa đơn",
       dataIndex: "id",
-      width: '5%',
     },
     {
       title: "Khách hàng",
       dataIndex: "customer",
-      width: '15%',
       render: (val) => {
         if(val === "N N"){
           return "Khách vãng lai"
@@ -59,14 +54,13 @@ const TableFilms = () => {
     {
       title: "Nhân viên",
       dataIndex: "staff",
-      width: '15%',
     },
     {
-      title: "Ngày đặt",
-      dataIndex: "createdAt",
+      title: "Ngày trả",
+      dataIndex: "refundDate",
     },
     {
-      title: "Tổng tiền",
+      title: "Tổng tiền hoàn trả",
       dataIndex: "totalPrice",
       render: (val) => {
         return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -78,15 +72,12 @@ const TableFilms = () => {
       dataIndex: "status",
       render: (active) => {
         let color = '';
-        if (active === 1) {
-          color = "green";
-        }
         if (active === 3) {
-          color = "volcano";
+          color = "green";
         }
         return (
           <Tag color={color} key={active}>
-            {active === 1 ? "HOÀN THÀNH" : "TRẢ HÀNG"}
+            {active === 3 ? "HOÀN THÀNH" : "TRẢ HÀNG"}
           </Tag>
         );
       },
@@ -94,21 +85,7 @@ const TableFilms = () => {
     {
       dataIndex: "action",
       render: (text, record) => (
-        console.log('rs',record),
         <div>
-          <Space>
-          <Button
-            title="Đổi trả hóa đơn"
-            icon={<RetweetOutlined />}
-            disabled={ 
-              record.status === 3 ? true : false || 
-              currentDay > moment(record.showDate).format("YYYY-MM-DD") ? true : false ||
-              currentDay === moment(record.showDate).format("YYYY-MM-DD") && currentTimes > moment(record.showTime).format("HH:mm") ? true : false
-            }
-            onClick={() => showModal(record.id)}
-          >
-          </Button>
-          </Space> 
           <Space style={{marginLeft:"10px"}} >
           <Button
             title="Xem chi tiết"
@@ -246,7 +223,7 @@ const TableFilms = () => {
     //load movies
     const gettListOrder = async () => {
       try {
-        const response = await orderApi.getAll();
+        const response = await orderApi.getByType(3);
         console.log(response);
         //set user info
         if (response) {
@@ -256,8 +233,7 @@ const TableFilms = () => {
               customer: item.Customer.firstName + " " + item.Customer.lastName,
               staff: item.Staff.firstName + " " + item.Staff.lastName,
               showTime: item.ShowMovie.ShowTime.showTime,
-              showDate: item.ShowMovie.showDate,
-              createdAt: moment(item.createdAt).format("DD/MM/YYYY HH:mm"),
+              refundDate: moment(item.refundDate).format("DD/MM/YYYY HH:mm"),
               totalPrice: item.totalPrice,
               status: item.status,
             };

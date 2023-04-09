@@ -44,6 +44,7 @@ import IndexProduct from "../components/product";
 import IndexRouteHall from "../components/cinemahall/IndexRoute";
 import IndexRoutePrice from "../components/price/IndexRoutePrice";
 import IndexBooking from "../components/booking/IndexBooking";
+import IndexTicketRefund from "../components/ticketsRefund/IndexFilm";
 
 import { ToastContainer, toast } from 'react-toastify';
 import IndexTicket from "../components/tickets/IndexFilm";
@@ -67,7 +68,7 @@ const items = [
   getItem("Đặt vé", "sub00", <DesktopOutlined />, [
     getItem("Đặt vé", "2"),
     getItem("Vé đã đặt", "9"),
-    getItem("Vé đặt online", "10"),
+    getItem("Hoá đơn trả", "10"),
   ]),
 
   getItem("Quản lý phim", "sub1", <UserOutlined />, [
@@ -180,6 +181,9 @@ const HomePage = () => {
     } 
     else if (itemClicked === 9) {
       return <IndexTicket />;
+    }
+    else if (itemClicked === 10) {
+      return <IndexTicketRefund />;
     } 
     return <IndexDashboard />;
   };

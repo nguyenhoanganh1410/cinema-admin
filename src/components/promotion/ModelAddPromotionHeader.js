@@ -14,6 +14,7 @@ import {
   Space,
   Upload,
   Tag,
+  InputNumber,
 } from "antd";
 
 import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
@@ -153,6 +154,7 @@ const ModelAddPromotionHeader = ({
     data.append("desc", val.desc)
     data.append("startDate", startDate)
     data.append("endDate", endDate)
+    data.append("promotionCode", val.promotionCode)
     rankPicked.forEach((rank) => {
       data.append("rank", rank)
     })
@@ -213,7 +215,7 @@ const ModelAddPromotionHeader = ({
       >
         <Form layout="vertical" onFinish={handleSubmit} id="myForm" form={form}>
           <Row gutter={16}>
-            <Col span={24}>
+            <Col span={12}>
               <Form.Item
                 name="namePromotion"
                 label="Tên CT Khuyến mãi"
@@ -227,6 +229,24 @@ const ModelAddPromotionHeader = ({
                 <Input placeholder="Hãy nhập tên CT khuyến mãi..." />
               </Form.Item>
             </Col>
+            <Col span={12}>
+              <Form.Item
+                name="promotionCode"
+                label="Mã CT Khuyến mãi"
+                rules={[
+                  {
+                    required: true,
+                    message: "Hãy nhập mã CT khuyến mãi...",
+                  },
+                ]}
+              >
+                <InputNumber placeholder="Hãy nhập mã CT khuyến mãi..." 
+                  addonBefore="PRO"  
+                  min={1}
+                  style={{ width: "100%" }}
+                />
+              </Form.Item>
+            </Col>
           </Row>
           <Row gutter={16}>
             <Col span={12}>
@@ -234,6 +254,9 @@ const ModelAddPromotionHeader = ({
                 name="startDate"
                 label="Ngày bắt đầu"
                 rules={[
+                  {
+                    required: true,
+                  },
                   ({ getFieldValue }) => ({
                     validator(rule, value) {
                       console.log(endDate);
@@ -265,6 +288,9 @@ const ModelAddPromotionHeader = ({
                 name="endDate"
                 label="Ngày kết thúc"
                 rules={[
+                  {
+                    required: true,
+                  },
                   ({ getFieldValue }) => ({
                     validator(rule, value) {
                       if (!value) {
@@ -296,12 +322,6 @@ const ModelAddPromotionHeader = ({
               <Form.Item
                 name="rankCustomer"
                 label="Nhóm khách hàng áp dụng"
-                rules={[
-                  {
-                    required: true,
-                    message: "Hãy chọn trạng thái...",
-                  },
-                ]}
               >
                 <Select
                   placeholder="Chọn trạng thái"
@@ -342,12 +362,6 @@ const ModelAddPromotionHeader = ({
               <Form.Item
                 name="desc"
                 label="Mô tả"
-                rules={[
-                  {
-                    required: true,
-                    message: "Hãy mô tả...",
-                  },
-                ]}
               >
                 <Input.TextArea rows={4} placeholder="Nhập mô tả..." />
               </Form.Item>

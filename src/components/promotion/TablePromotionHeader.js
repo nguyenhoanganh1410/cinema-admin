@@ -87,6 +87,10 @@ const TablePromotionHeader = ({ setTab }) => {
 
   const columns = [
     {
+      title: "Mã CT khuyễn mãi",
+      dataIndex: "promotionCode",
+    },
+    {
       title: "Tên CT khuyễn mãi",
       dataIndex: "namePromotion",
       key: "name",
@@ -98,8 +102,8 @@ const TablePromotionHeader = ({ setTab }) => {
       title: "Mô tả",
       dataIndex: "desc",
       render: (text) => {
-        if (text.length > 50) {
-          return text.substring(0, 50) + "...";
+        if (text?.length > 50) {
+          return text?.substring(0, 50) + "...";
         } else {
           return text;
         }

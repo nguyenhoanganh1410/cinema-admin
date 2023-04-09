@@ -13,7 +13,7 @@ const ResultPage = ({setCurrent, setIsSucess}) => {
         <Button type="primary" key="console" onClick={handleReset}>
           Đặt tiếp
         </Button>,
-        <Button key="buy">In hóa đơn</Button>,
+        <Button key="buy">In vé</Button>,
       ]}
     />
   
