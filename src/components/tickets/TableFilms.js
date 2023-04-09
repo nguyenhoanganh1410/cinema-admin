@@ -1,24 +1,29 @@
 import React, { useEffect, useState } from "react";
-import { Button, Table, Modal,Image,message,Badge,Tag, Space, Form, Row, Col, Input, } from "antd";
 import {
-  SearchOutlined,
-  PlusSquareFilled,
-  UserAddOutlined,
-  ToolOutlined,
-  DeleteOutlined,
+  Button,
+  Table,
+  Modal,
+  Image,
+  message,
+  Badge,
+  Tag,
+  Space,
+  Form,
+  Row,
+  Col,
+  Input,
+} from "antd";
+import {
   ReloadOutlined,
   RetweetOutlined,
   EyeOutlined,
 } from "@ant-design/icons";
-import movieApi from "../../api/movieApi";
-import ModelDetailMovie from "./ModelMovieDetail";
-import orderApi from "../../api/orderApi";
-import moment from "moment";
-
 import { useDispatch, useSelector } from "react-redux";
 import { setReload } from "../../redux/actions";
 
-
+import ModelDetailMovie from "./ModelMovieDetail";
+import orderApi from "../../api/orderApi";
+import moment from "moment";
 
 const TableFilms = () => {
   // const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -42,24 +47,24 @@ const TableFilms = () => {
     {
       title: "Mã hóa đơn",
       dataIndex: "id",
-      width: '5%',
+      width: "5%",
     },
     {
       title: "Khách hàng",
       dataIndex: "customer",
-      width: '15%',
+      width: "15%",
       render: (val) => {
-        if(val === "N N"){
-          return "Khách vãng lai"
-        }else{
-          return val
+        if (val === "N N") {
+          return "Khách vãng lai";
+        } else {
+          return val;
         }
-      }
+      },
     },
     {
       title: "Nhân viên",
       dataIndex: "staff",
-      width: '15%',
+      width: "15%",
     },
     {
       title: "Ngày đặt",
@@ -71,13 +76,12 @@ const TableFilms = () => {
       render: (val) => {
         return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
       },
-    
     },
     {
       title: "Trạng thái",
       dataIndex: "status",
       render: (active) => {
-        let color = '';
+        let color = "";
         if (active === 1) {
           color = "green";
         }
@@ -94,35 +98,42 @@ const TableFilms = () => {
     {
       dataIndex: "action",
       render: (text, record) => (
-        console.log('rs',record),
-        <div>
-          <Space>
-          <Button
-            title="Đổi trả hóa đơn"
-            icon={<RetweetOutlined />}
-            disabled={ 
-              record.status === 3 ? true : false || 
-              currentDay > moment(record.showDate).format("YYYY-MM-DD") ? true : false ||
-              currentDay === moment(record.showDate).format("YYYY-MM-DD") && currentTimes > moment(record.showTime).format("HH:mm") ? true : false
-            }
-            onClick={() => showModal(record.id)}
-          >
-          </Button>
-          </Space> 
-          <Space style={{marginLeft:"10px"}} >
-          <Button
-            title="Xem chi tiết"
-            icon={<EyeOutlined />}
-            onClick={() => {
-              showModalDetail(record.id)
-            }}
-          ></Button>
-          </Space> 
-        </div>
-        
+        console.log("rs", record),
+        (
+          <div>
+            <Space>
+              <Button
+                title="Đổi trả hóa đơn"
+                icon={<RetweetOutlined />}
+                disabled={
+                  record.status === 3
+                    ? true
+                    : false ||
+                      currentDay > moment(record.showDate).format("YYYY-MM-DD")
+                    ? true
+                    : false ||
+                      (currentDay ===
+                        moment(record.showDate).format("YYYY-MM-DD") &&
+                        currentTimes > moment(record.showTime).format("HH:mm"))
+                    ? true
+                    : false
+                }
+                onClick={() => showModal(record.id)}
+              ></Button>
+            </Space>
+            <Space style={{ marginLeft: "10px" }}>
+              <Button
+                title="Xem chi tiết"
+                icon={<EyeOutlined />}
+                onClick={() => {
+                  showModalDetail(record.id);
+                }}
+              ></Button>
+            </Space>
+          </div>
+        )
       ),
-    }
-  
+    },
   ];
 
   const columnsSeat = [
@@ -174,26 +185,27 @@ const TableFilms = () => {
     setSelectedId(e);
   };
 
-
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const showModal = async(id) => {
+  const showModal = async (id) => {
     const order = await orderApi.getById(id);
-    order.totalPrice = `${order.totalPrice}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    order.totalPrice = `${order.totalPrice}`.replace(
+      /\B(?=(\d{3})+(?!\d))/g,
+      ","
+    );
     const res = await orderApi.getDetail(id);
-    if(res){
+    if (res) {
       let seats = [];
       let products = [];
       res.forEach((item) => {
-        if(item.type === 1){
+        if (item.type === 1) {
           seats.push({
             position:
-              item?.CinemaHallSeat?.seatColumn +
-              item?.CinemaHallSeat?.seatRow,
+              item?.CinemaHallSeat?.seatColumn + item?.CinemaHallSeat?.seatRow,
             qty: item.qty,
             price: item.price,
             productType: item?.Product?.productName,
           });
-        }else{
+        } else {
           products.push({
             productCode: item?.Product?.productCode,
             name: item?.Product?.productName,
@@ -208,14 +220,14 @@ const TableFilms = () => {
     setOrder(order);
     setIsModalOpen(true);
   };
-  const handleOk = async() => {
+  const handleOk = async () => {
     setIsModalOpen(false);
     const rs = form.getFieldValue("note");
     form.resetFields();
     console.log(rs);
     try {
       const res = await orderApi.refund(order?.id, rs);
-      if(res){
+      if (res) {
         message.success("Đổi trả thành công");
         depatch(setReload(!reload));
       }
@@ -224,7 +236,6 @@ const TableFilms = () => {
     }
 
     //handle code for log out in here
-
   };
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -262,7 +273,7 @@ const TableFilms = () => {
               status: item.status,
             };
           });
-          
+
           setListMovie(newList);
         }
       } catch (error) {
@@ -279,7 +290,6 @@ const TableFilms = () => {
           marginBottom: 16,
         }}
       >
-        
         <Button
           type="primary"
           onClick={handleRefresh}
@@ -296,9 +306,7 @@ const TableFilms = () => {
           {/* {hasSelected ? `Selected ${selectedRowKeys.length} items` : ""} */}
         </span>
       </div>
-      <Table columns={columns} dataSource={listMovie}
-       
-      />
+      <Table columns={columns} dataSource={listMovie} />
       <Modal
         title="Tạo đơn trả hàng"
         open={isModalOpen}
@@ -307,54 +315,57 @@ const TableFilms = () => {
         width={1000}
       >
         <Form form={form} layout="vertical" hideRequiredMark>
-          <Row gutter={16} style={{marginTop:'20px'}}>
+          <Row gutter={16} style={{ marginTop: "20px" }}>
             <Col span={24}>
-              <Form.Item
-                name="note"
-                label="Lý do trả hàng:"
-              >
-                <Input
-                  placeholder="Hãy nhập lý do trả hàng..."
-                />
+              <Form.Item name="note" label="Lý do trả hàng:">
+                <Input placeholder="Hãy nhập lý do trả hàng..." />
               </Form.Item>
             </Col>
           </Row>
           <Row gutter={16}>
             <Col span={24}>
-              <Form.Item
-                name="name"
-                label="Thông tin ghế:"
-              >
-               < Table columns={columnsSeat} size={"small"} dataSource={detailSeats} />
+              <Form.Item name="name" label="Thông tin ghế:">
+                <Table
+                  columns={columnsSeat}
+                  size={"small"}
+                  dataSource={detailSeats}
+                />
               </Form.Item>
             </Col>
           </Row>
           {detailProducts.length > 0 && (
             <>
-            <Row gutter={16}>
-            <Col span={24}>
-              <Form.Item
-                name="name"
-                label="Thông tin sản phẩm:"
-              >
-               < Table columns={columnsProduct} size={"small"} dataSource={detailProducts} />
-              </Form.Item>
-            </Col>
-          </Row>
+              <Row gutter={16}>
+                <Col span={24}>
+                  <Form.Item name="name" label="Thông tin sản phẩm:">
+                    <Table
+                      columns={columnsProduct}
+                      size={"small"}
+                      dataSource={detailProducts}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
             </>
           )}
-          <Row gutter={16} style={{marginTop:'5px',marginBottom:'20px'}}>
-            <Col span={19}>
-            </Col>
+          <Row gutter={16} style={{ marginTop: "5px", marginBottom: "20px" }}>
+            <Col span={19}></Col>
             <Col span={5}>
-              <span style={{
-                fontSize: '15px',
-                fontWeight: 'bold',
-              }}>
+              <span
+                style={{
+                  fontSize: "15px",
+                  fontWeight: "bold",
+                }}
+              >
                 Số tiền hoàn trả:
-                <span style={{
-                  color: 'red',
-                }}> {order?.totalPrice} </span>
+                <span
+                  style={{
+                    color: "red",
+                  }}
+                >
+                  {" "}
+                  {order?.totalPrice}{" "}
+                </span>
               </span>
             </Col>
           </Row>
@@ -368,7 +379,6 @@ const TableFilms = () => {
           selectedId={selectedId}
         />
       ) : null}
-
     </div>
   );
 };

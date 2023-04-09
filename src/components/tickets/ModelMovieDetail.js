@@ -26,10 +26,10 @@ import categoryMovie from "../../api/categoryMovie";
 import cinameApi from "../../api/cinemaApi";
 import movieApi from "../../api/movieApi";
 import moment from "moment";
-const { Option } = Select;
 import orderApi from "../../api/orderApi";
 import promotionRsApi from "../../api/promotionRs";
 
+const { Option } = Select;
 const getBase64 = (file) =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -521,17 +521,17 @@ const ModelDetailMovie = ({
           {orderDetailPromotion.length > 0 && (
             <>
               <Row gutter={16} style={{ marginTop: "20px" }}>
-              <Col span={12}>
-                <span
-                  style={{
-                    fontSize: "20px",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {" "}
-                  Danh sách khuyến mãi
-                </span>
-              </Col>
+                <Col span={12}>
+                  <span
+                    style={{
+                      fontSize: "20px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {" "}
+                    Danh sách khuyến mãi
+                  </span>
+                </Col>
               </Row>
               <Row style={{ marginTop: "15px" }}>
                 <Col span={24}>
