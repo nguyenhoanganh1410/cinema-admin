@@ -33,8 +33,7 @@ const promotionApi = {
   },
 
   checkPromotion: (data) => {
-    const {date, phone, totalMoney, idProduct, qtyBuy} = data
-    return axiosApi.get(`/promotionHeader/check/promotion?date=${date}&phone=${phone}&totalMoney=${totalMoney}&idProductBuy=${idProduct}&qtyBuy=${qtyBuy}`);
+    return axiosApi.post(`/promotionHeader/check/promotion`, data);
   },
 };
 

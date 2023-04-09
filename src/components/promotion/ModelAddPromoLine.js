@@ -78,7 +78,7 @@ const ModelAddPromoLine = ({
     console.log("val", val);
 
     const payloadLine = {
-      promotionCode: val.promotionCode,
+      promotionCode: val.promotionCode.toUpperCase(),
       desc: val.desc,
       type: val.type,
       startDate: startDate,
@@ -175,7 +175,7 @@ const ModelAddPromoLine = ({
     fetchProductSeats();
   }, []);
 
-  console.log("startDate", startDate);
+  console.log("startDate", endDateDb);
   return (
     <>
       <Drawer
@@ -334,12 +334,11 @@ const ModelAddPromoLine = ({
               >
                 <DatePicker
                   disabledDate={(current) =>
-                    current && current < moment(startDateDb).subtract(1, "days") || current > moment(endDateDb)
+                    current && current < moment(startDateDb) || current > moment(endDateDb).add(1, 'days')
                   }
                   onChange={onChangeStartDate}
                   style={{ width: "100%" }}
                   placeholder="Chọn ngày bắt đầu"
-                  defaultValue={dayjs(startDateDb, newDateFormat)}
                   format={newDateFormat}
                 />
               </Form.Item>
@@ -357,12 +356,11 @@ const ModelAddPromoLine = ({
               >
                 <DatePicker
                 disabledDate={(current) =>
-                  current && current < moment(startDate) || current > moment(endDateDb)
+                  current && current < moment(startDate) || current >= moment(endDateDb).add(1, 'days')
                 }
                   onChange={onChangeEndDate}
                   style={{ width: "100%" }}
                   placeholder="Chọn ngày kết thúc"
-                  defaultValue={dayjs(endDateDb, newDateFormat)}
                   format={newDateFormat}
                 />
               </Form.Item>
@@ -424,7 +422,6 @@ const ModelAddPromoLine = ({
                       style={{ width: "100%" }}
                       min={1}
                       max={10}
-                      defaultValue={1}
                       placeholder="Nhập số lượng mua.."
                     />
                   </Form.Item>
@@ -496,7 +493,7 @@ const ModelAddPromoLine = ({
                         width: "100%",
                       }}
                       // onChange={handleChangePosition}
-                      options={listProduct}
+                      options={listProductSeat}
                     />
                   </Form.Item>
                 </Col>
@@ -518,7 +515,6 @@ const ModelAddPromoLine = ({
                       min={1}
                       max={10}
                       style={{ width: "100%" }}
-                      defaultValue={1}
                       placeholder="Nhập số lượng mua.."
                     />
                   </Form.Item>
@@ -538,7 +534,6 @@ const ModelAddPromoLine = ({
                       min={1}
                       style={{ width: "100%" }}
                       max={10}
-                      defaultValue={1}
                       placeholder="Nhập số lượng nhận.."
                     />
                   </Form.Item>

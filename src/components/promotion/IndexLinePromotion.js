@@ -20,7 +20,7 @@ import {
   message
 } from "antd";
 
-import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
+import { PlusOutlined, UploadOutlined,ExportOutlined } from "@ant-design/icons";
 import ModelAddPromoLine from "./ModelAddPromoLine";
 import promotionApi from "../../api/promotionApi";
 import moment from "moment";
@@ -30,6 +30,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { setReload } from "../../redux/actions";
 
 import dayjs from "dayjs";
+import promotionRsApi from "../../api/promotionRs";
+
+import {
+  VND,
+} from "../../constant";
 
 const { TextArea } = Input;
 const getBase64 = (file) =>
@@ -44,7 +49,44 @@ const { Option } = Select;
 const { Title, Text } = Typography;
 
 const newDateFormat = "YYYY-MM-DD";
-const columns = [
+
+
+const IndexLinePromotion = ({ setTab }) => {
+  const [showModalAddCustomer, setShowModalAddCustomer] = useState(false);
+
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewImage, setPreviewImage] = useState("");
+  const [previewTitle, setPreviewTitle] = useState("");
+  const [fileList, setFileList] = useState([]);
+
+  const [ranks, setRanks] = useState([]);
+  const [rankPicked, setRankPicked] = useState([]);
+
+  const [listPromotionLine, setPromotionLine] = useState([]);
+  const [promotionHeader, setPromotionHeader] = useState(null);
+  const idHeaderPromotion = useSelector((state) => state.promotionHeaderId);
+  const [promotionRs, setPromotionRs] = useState([]);
+
+  const [changeImage, setChangeImage] = useState(false);
+
+  const [startDateDb, setStartDateDb] = useState("");
+  const [endDateDb, setEndDateDb] = useState("");
+  const [statusDb, setStatusDb] = useState(0);
+
+  const [form] = Form.useForm();
+
+  const newDateFormat = "YYYY-MM-DD";
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const currentDate = moment().format(newDateFormat);
+
+  const depatch = useDispatch();
+  const reload = useSelector((state) => state.reload);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [totalMoneyProUsed, setTotalMoneyProUsed] = useState(0);
+
+  const columns = [
   {
     title: "Mã Code",
     dataIndex: "promotionCode",
@@ -60,6 +102,17 @@ const columns = [
     title: "Loại khuyến mãi",
     dataIndex: "type",
     key: "type",
+    render: (type) => {
+      let text;
+      if (type === "1") {
+        text = "Tặng quà";
+      } else if (type === "2") {
+        text = "Giảm giá";
+      } else if (type === "3") {
+        text = "Chiết khấu";
+      }
+      return text;
+    },
   },
   {
     title: "Ngày bắt đầu",
@@ -94,66 +147,122 @@ const columns = [
       return <Badge status={color} text={text} />;
     },
   },
+  {
+    dataIndex: "action",
+    render: (text, record) => (
+      <>
+        {currentDate > startDate && (
+          <Space>
+            <Button
+              title="Kết quả khuyến mãi"
+              icon={<ExportOutlined />}
+              onClick={() => showModal(record.id)}
+            >
+            </Button>
+          </Space> 
+        )}
+      </>
+    )
+  }
 ];
+  const columnsRs = [
+    {
+      title: "Mã Code",
+      dataIndex: "promotionCode",
+    },
+    {
+      title: "Miêu tả",
+      dataIndex: "desc",
+    },
+    {
+      title: "Loại khuyến mãi",
+      dataIndex: "type",
+      key: "type",
+      render: (type) => {
+        let text;
+        if (type === "1") {
+          text = "Tặng quà";
+        } else if (type === "2") {
+          text = "Giảm giá";
+        } else if (type === "3") {
+          text = "Chiết khấu";
+        }
+        return text;
+      },
+    },
+    {
+      title: "Ngày áp dụng",
+      dataIndex: "dateUsed",
+    },
+    {
+      title: "Mã hóa đơn",
+      dataIndex: "billCode",
+    },
+    {
+      title: "Tiền khuyến mãi",
+      dataIndex: "discount",
+      render: (discount) => {
+        return discount = discount.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+      }
+    },
+    {
+      title: "Trạng thái",
+      key: "status",
+      dataIndex: "status",
+      render: (status) => {
+        let color;
+        let text;
+        if (status === 1) {
+          color = "green";
+          text = "Thành công";
+        } else {
+          color = "red";
+          text = "Hủy";
+        }
+        return < Tag color={color} key={text}>{text}</Tag>;
+      },
 
-const IndexLinePromotion = ({ setTab }) => {
-  const [showModalAddCustomer, setShowModalAddCustomer] = useState(false);
-
-  const [previewOpen, setPreviewOpen] = useState(false);
-  const [previewImage, setPreviewImage] = useState("");
-  const [previewTitle, setPreviewTitle] = useState("");
-  const [fileList, setFileList] = useState([]);
-
-  const [ranks, setRanks] = useState([]);
-  const [rankPicked, setRankPicked] = useState([]);
-
-  const [listPromotionLine, setPromotionLine] = useState([]);
-  const [promotionHeader, setPromotionHeader] = useState(null);
-  const idHeaderPromotion = useSelector((state) => state.promotionHeaderId);
-
-  const [changeImage, setChangeImage] = useState(false);
-
-  const [startDateDb, setStartDateDb] = useState("");
-  const [endDateDb, setEndDateDb] = useState("");
-  const [statusDb, setStatusDb] = useState(0);
-
-  const [form] = Form.useForm();
-
-  const newDateFormat = "YYYY-MM-DD";
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const currentDate = moment().format(newDateFormat);
-
-  const depatch = useDispatch();
-  const reload = useSelector((state) => state.reload);
-
-  const handleCancel = () => setPreviewOpen(false);
-  const handlePreview = async (file) => {
-    if (!file.url && !file.preview) {
-      file.preview = await getBase64(file.originFileObj);
     }
-    setPreviewImage(file.url || file.preview);
-    setPreviewOpen(true);
-    setPreviewTitle(
-      file.name || file.url.substring(file.url.lastIndexOf("/") + 1)
-    );
-  };
-  const handleChange = ({ fileList: newFileList }) => {
-    setFileList(newFileList);
-    setChangeImage(true);
-  };
-  const uploadButton = (
-    <div>
-      <PlusOutlined />
-      <div
-        style={{
-          marginTop: 8,
-        }}
-      >
-        Upload
-      </div>
-    </div>
-  );
+
+  ];
+
+  const showModal = async(id) => {
+    setIsModalOpen(true);
+      try {
+        const response = await promotionRsApi.getByPromotionLineId(id);
+        if (response) {
+          const promotionApply = response.filter((item) => item.status === 1);
+          const totalMoney = promotionApply.reduce((total, item) => {
+            return total + item.moneyDiscount;
+          }, 0);
+          setTotalMoneyProUsed(totalMoney);
+          
+          const newList = response.map((item) => {
+            return {
+              promotionCode: item.PromotionLine.promotionCode,
+              desc: item.PromotionLine.desc,
+              type: item.PromotionLine.type,
+              dateUsed: moment(item.dateUsed).format("DD/MM/YYYY HH:mm "),
+              billCode: item.idOrder,
+              discount: item.moneyDiscount,
+              status: item.status,
+              budget: item.PromotionLine.budget,
+            };
+          });
+          setPromotionRs(newList);
+        }
+      } catch (error) {
+        console.log("Failed to login ", error);
+      }
+  }
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  }
+
+  const handleOk = () => {
+    setIsModalOpen(false);
+  }
 
   const tagRender = (props) => {
     const { label, value, closable, onClose } = props;
@@ -211,9 +320,9 @@ const IndexLinePromotion = ({ setTab }) => {
     data.append("startDate", startDate)
     data.append("endDate", endDate)
     data.append("statusPromotion", val.statusPromotion)
-    // rankCustomer.forEach((rank) => {
-    //   data.append("rank", rank.value)
-    // })
+    val.rankCustomer.forEach((rank) => {
+      data.append("rank", rank.value)
+    })
     // data.append("rank", rankPicked)
     if(val.image){
       data.append("image", val.image[0].originFileObj)
@@ -253,7 +362,6 @@ const IndexLinePromotion = ({ setTab }) => {
 
     const fetchRanks = async () => {
       const rs = await rankApi.getRanks();
-      console.log(rs);
       if (rs) {
         const options = rs.map((rank) => {
           return {
@@ -297,7 +405,7 @@ const IndexLinePromotion = ({ setTab }) => {
                 url: response?.image,
               },
             ],
-           // rankCustomer: ranksRes,
+           rankCustomer: ranksRes,
           });
           setPromotionHeader(response);
         }
@@ -305,6 +413,9 @@ const IndexLinePromotion = ({ setTab }) => {
         console.log("Failed to login ", error);
       }
     };
+
+    
+
     fetchRanks();
     getPromotionLineByHeader(idHeaderPromotion);
     getPromotionHeaderById(idHeaderPromotion);
@@ -327,6 +438,8 @@ const IndexLinePromotion = ({ setTab }) => {
       onSuccess("ok");
     }, 0);
   };
+
+  console.log("rank", rankPicked);
 
   return (
     <div className="site-card-wrapper" style={{ minWidth: "100vh" }}>
@@ -373,7 +486,7 @@ const IndexLinePromotion = ({ setTab }) => {
             <Form.Item name="id" hidden={true}>
               <Input />
             </Form.Item>
-            <Form.Item name="id" label="Mã CT Khuyến mãi">
+            <Form.Item name="promotionCode" label="Mã CT Khuyến mãi">
               <Input disabled={true} />
             </Form.Item>
           </Col>
@@ -524,7 +637,7 @@ const IndexLinePromotion = ({ setTab }) => {
                 showArrow
                 tagRender={tagRender}
                 onChange={handleChangeRank}
-                options={ranks}
+                options={rankPicked}
               />
             </Form.Item>
           </Col>
@@ -557,6 +670,7 @@ const IndexLinePromotion = ({ setTab }) => {
           style={{
             display: "flex",
             justifyContent: "space-between",
+            marginBottom: "1rem",
           }}
         >
           <Space>
@@ -584,8 +698,54 @@ const IndexLinePromotion = ({ setTab }) => {
           ) : null}
           
         </div>
-        <Table columns={columns} dataSource={listPromotionLine} />
+        <Table columns={columns} dataSource={listPromotionLine}  />
       </div>
+      <Modal
+        title="Kết quả khuyến mãi"
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        width={1000}
+        footer={[
+          <Button key="back" onClick={handleCancel}>
+            Thoát
+          </Button>,
+          <Button type="primary" style={{ background: "green" }} 
+          onClick={handleOk}>
+            Xuất Excel
+          </Button>,
+        ]}
+
+      >
+        <Form form={form} layout="vertical" hideRequiredMark>
+          <Row gutter={16}>
+            <Col span={24}>
+               < Table columns={columnsRs} dataSource={promotionRs} 
+                  footer={ () => {
+                      return (
+                        <>
+                          <div style={{display: "flex", justifyContent: "space-between"}}>
+                            <span style={{fontWeight: "bold", marginRight: "30px", marginBottom: "10px"}}>Tổng Ngân sách: </span>
+                            <span style={{fontWeight: "bold"}}>{VND.format(promotionRs[0]?.budget || 0)}</span>
+                          </div>
+                          <div style={{display: "flex", justifyContent: "space-between"}}>
+                            <span style={{fontWeight: "bold", marginRight: "30px", marginBottom: "10px"}}>Sử dụng: </span>
+                            <span style={{fontWeight: "bold"}}>{VND.format(totalMoneyProUsed)}</span>
+                          </div>
+                          <div style={{display: "flex", justifyContent: "space-between"}}>
+                            <div style={{fontWeight: "bold"}}>Còn lại: </div>
+                            <div style={{fontWeight: "bold", color: "green"}}>{VND.format(promotionRs[0]?.budget - totalMoneyProUsed || 0)}</div>
+                          </div>
+
+                        </>
+                      )
+                  } } 
+                />
+            </Col>
+          </Row>
+        </Form>
+      </Modal>
+
       {showModalAddCustomer ? (
         <ModelAddPromoLine
           showModalAddCustomer={showModalAddCustomer}

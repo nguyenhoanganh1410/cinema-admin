@@ -126,7 +126,7 @@ const ModelDetailMovie = ({
       dataIndex: "promotionCode",
     },
     {
-      title: "Mô tả",
+      title: "Tên khuyến mãi",
       dataIndex: "name",
     },
     {
@@ -181,6 +181,7 @@ const ModelDetailMovie = ({
         if (res) {
           res.createdAt = moment(res.createdAt).format("DD/MM/YYYY HH:mm");
           res.showDate = moment(res.ShowMovie.showDate).format("DD/MM/YYYY");
+          res.refundDate = moment(res.refundDate).format("DD/MM/YYYY HH:mm");
           const name = res.Customer?.firstName + res.Customer?.lastName;
           // res.totalPrice = res.totalPrice.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
           const totalPrice = res.totalPrice
@@ -189,6 +190,8 @@ const ModelDetailMovie = ({
           res.totalPrice = totalPrice;
           if (name === "NN") {
             res.customerName = "Khách vãng lai";
+          } else {
+            res.customerName = name;
           }
 
           setOrder(res);
@@ -363,7 +366,7 @@ const ModelDetailMovie = ({
   return (
     <>
       <Drawer
-        title="Thông tin chi tiết hoán đơn"
+        title="Thông tin chi tiết hoán đơn trả hàng"
         width={720}
         onClose={onClose}
         open={showModalDetailMovie}
@@ -465,6 +468,28 @@ const ModelDetailMovie = ({
               <span>
                 Tổng tiền:
                 <span> {order?.totalPrice} </span>
+              </span>
+            </Col>
+          </Row>
+          <Row gutter={16} style={{ marginBottom: "10px" }}>
+            <Col span={16}>
+              <span>
+                Ngày trả:
+                <span> {order?.refundDate} </span>
+              </span>
+            </Col>
+            <Col span={8}>
+              <span>
+                Tổng tiền hoàn trả:
+                <span> {order?.totalPrice} </span>
+              </span>
+            </Col>
+          </Row>
+          <Row gutter={16} style={{ marginBottom: "10px" }}>
+            <Col span={24}>
+              <span>
+                Lý do hoàn trả:
+                <span> {order?.note} </span>
               </span>
             </Col>
           </Row>

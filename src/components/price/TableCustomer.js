@@ -104,7 +104,7 @@ const TableCustomer = ({ setTab, setSelectedIdHeader }) => {
       },
     },
     {
-      title: "Action",
+      
       dataIndex: "id",
       render: (val) => {
         return (
