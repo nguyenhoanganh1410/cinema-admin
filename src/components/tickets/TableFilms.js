@@ -12,6 +12,7 @@ import {
   Row,
   Col,
   Input,
+  Select,
 } from "antd";
 import {
   ReloadOutlined,
@@ -24,6 +25,7 @@ import { setReload } from "../../redux/actions";
 import ModelDetailMovie from "./ModelMovieDetail";
 import orderApi from "../../api/orderApi";
 import moment from "moment";
+import { MESSAGE_SYSTEM_ERRO, REASON_REFULT } from "../../constant";
 
 const TableFilms = () => {
   // const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -98,40 +100,37 @@ const TableFilms = () => {
     {
       dataIndex: "action",
       render: (text, record) => (
-        console.log("rs", record),
-        (
-          <div>
-            <Space>
-              <Button
-                title="Đổi trả hóa đơn"
-                icon={<RetweetOutlined />}
-                disabled={
-                  record.status === 3
-                    ? true
-                    : false ||
-                      currentDay > moment(record.showDate).format("YYYY-MM-DD")
-                    ? true
-                    : false ||
-                      (currentDay ===
-                        moment(record.showDate).format("YYYY-MM-DD") &&
-                        currentTimes > moment(record.showTime).format("HH:mm"))
-                    ? true
-                    : false
-                }
-                onClick={() => showModal(record.id)}
-              ></Button>
-            </Space>
-            <Space style={{ marginLeft: "10px" }}>
-              <Button
-                title="Xem chi tiết"
-                icon={<EyeOutlined />}
-                onClick={() => {
-                  showModalDetail(record.id);
-                }}
-              ></Button>
-            </Space>
-          </div>
-        )
+        <div>
+          <Space>
+            <Button
+              title="Đổi trả hóa đơn"
+              icon={<RetweetOutlined />}
+              disabled={
+                record.status === 3
+                  ? true
+                  : false ||
+                    currentDay > moment(record.showDate).format("YYYY-MM-DD")
+                  ? true
+                  : false ||
+                    (currentDay ===
+                      moment(record.showDate).format("YYYY-MM-DD") &&
+                      currentTimes > moment(record.showTime).format("HH:mm"))
+                  ? true
+                  : false
+              }
+              onClick={() => showModal(record.id)}
+            ></Button>
+          </Space>
+          <Space style={{ marginLeft: "10px" }}>
+            <Button
+              title="Xem chi tiết"
+              icon={<EyeOutlined />}
+              onClick={() => {
+                showModalDetail(record.id);
+              }}
+            ></Button>
+          </Space>
+        </div>
       ),
     },
   ];
@@ -224,15 +223,19 @@ const TableFilms = () => {
     setIsModalOpen(false);
     const rs = form.getFieldValue("note");
     form.resetFields();
-    console.log(rs);
+    const data = REASON_REFULT.filter((val) => {
+      return val.value === rs;
+    });
+
     try {
-      const res = await orderApi.refund(order?.id, rs);
+      const res = await orderApi.refund(order?.id, { note: data[0]?.label });
       if (res) {
         message.success("Đổi trả thành công");
         depatch(setReload(!reload));
       }
     } catch (error) {
       console.log(error);
+      message.error(MESSAGE_SYSTEM_ERRO);
     }
 
     //handle code for log out in here
@@ -257,7 +260,8 @@ const TableFilms = () => {
     //load movies
     const gettListOrder = async () => {
       try {
-        const response = await orderApi.getAll();
+        //const response = await orderApi.getAll();
+        const response = await orderApi.getByType(1);
         console.log(response);
         //set user info
         if (response) {
@@ -317,8 +321,24 @@ const TableFilms = () => {
         <Form form={form} layout="vertical" hideRequiredMark>
           <Row gutter={16} style={{ marginTop: "20px" }}>
             <Col span={24}>
-              <Form.Item name="note" label="Lý do trả hàng:">
-                <Input placeholder="Hãy nhập lý do trả hàng..." />
+              <Form.Item
+                name="note"
+                label="Lý do trả hàng:"
+                rules={[
+                  {
+                    required: true,
+                    message: "Hãy nhập lý do trả hàng...",
+                  },
+                ]}
+              >
+                <Select
+                  placeholder="Hãy nhập lý do trả hàng"
+                  style={{
+                    width: "100%",
+                  }}
+                  // onChange={handleChangeCategory}
+                  options={REASON_REFULT}
+                />
               </Form.Item>
             </Col>
           </Row>
@@ -333,7 +353,7 @@ const TableFilms = () => {
               </Form.Item>
             </Col>
           </Row>
-          {detailProducts.length > 0 && (
+          {detailProducts?.length > 0 && (
             <>
               <Row gutter={16}>
                 <Col span={24}>
