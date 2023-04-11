@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-
 import {
   Button,
   Col,
@@ -30,13 +29,10 @@ import ModelAddPromoLine from "./ModelAddPromoLine";
 import promotionApi from "../../api/promotionApi";
 import moment from "moment";
 import rankApi from "../../api/rankApi";
-
 import { useDispatch, useSelector } from "react-redux";
 import { setReload } from "../../redux/actions";
-
 import dayjs from "dayjs";
 import promotionRsApi from "../../api/promotionRs";
-
 import { VND } from "../../constant";
 
 const { TextArea } = Input;
