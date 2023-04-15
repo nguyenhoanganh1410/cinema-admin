@@ -13,49 +13,23 @@ import {
 } from "antd";
 import "./ShowChart.scss";
 import moment from "moment";
-
-import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
 import CardTime from "./CardTime";
+import { caculatorDay } from "../../utils/DataCaculator";
+import useShowChartHook from "./useShowChartHook";
 
 const { Title, Text } = Typography;
 const dateFormat = "YYYY/MM/DD";
-const caculatorDay = (dateNumber) => {
-  let day = "";
-  switch (dateNumber) {
-    case 0:
-      day = "Chủ nhật";
-      break;
-    case 1:
-      day = "Thứ 2";
-      break;
-    case 2:
-      day = "Thứ 3";
-      break;
-    case 3:
-      day = "Thứ 4";
-      break;
-    case 4:
-      day = "Thứ 5";
-      break;
-    case 5:
-      day = "Thứ 6";
-      break;
-    case 6:
-      day = "Thứ bảy";
-  }
 
-  return day;
-};
 const ShowChart = ({ setTab }) => {
-  //back to
-  const handleReturn = () => {
-    setTab(0);
-  };
+  const { cinema, selectCinemaOptions, dataFilm, handleReturn } =
+    useShowChartHook({
+      setTab,
+    });
+
   return (
     <div className="site-card-wrapper">
       <Breadcrumb style={{ marginBottom: "1rem", marginTop: "1rem" }}>
         <Breadcrumb.Item onClick={() => handleReturn()}>
-          {" "}
           <a>Lịch chiếu</a>
         </Breadcrumb.Item>
         <Breadcrumb.Item>Biểu đồ lịch</Breadcrumb.Item>
@@ -71,34 +45,23 @@ const ShowChart = ({ setTab }) => {
       >
         <div>
           <Select
-            placeholder="Chọn chi nhánh"
-            style={{ width:150}}
-          >
-            {/* <Option value="jack">Jack</Option>
-            <Option value="lucy">Lucy</Option>
-            <Option value="disabled" disabled>
-              Disabled
-            </Option>
-            <Option value="Yiminghe">yiminghe</Option> */}
-          </Select>
-
+            defaultValue={cinema?.name}
+            style={{
+              width: 200,
+            }}
+            disabled
+            options={selectCinemaOptions}
+          />
           <Select
             style={{ margin: "0 0.5rem", width: 300 }}
             placeholder="Chọn phim"
-          >
-            {/* <Option value="jack">Jack</Option>
-            <Option value="lucy">Lucy</Option>
-            <Option value="disabled" disabled>
-              Disabled
-            </Option>
-            <Option value="Yiminghe">yiminghe</Option> */}
-          </Select>
+            options={dataFilm}
+          ></Select>
         </div>
         <div
           style={{
             justifyContent: "flex-end",
           }}
-
         >
           <DatePicker
             defaultValue={moment()}
@@ -122,7 +85,6 @@ const ShowChart = ({ setTab }) => {
       </div>
 
       <Row
-        // style={{ margin: "1rem 0 1rem 0" }}
         gutter={{
           xs: 8,
           sm: 16,
@@ -165,7 +127,6 @@ const ShowChart = ({ setTab }) => {
             </tr>
             <tbody className="style-table">
               <tr className="css-row">
-                {" "}
                 <td className="time-row">Sáng </td>
                 <td>
                   <CardTime />
@@ -183,7 +144,6 @@ const ShowChart = ({ setTab }) => {
                 <td></td>
               </tr>
               <tr className="css-row">
-                {" "}
                 <td className="time-row">Chiều </td>
                 <td></td>
                 <td>
@@ -199,7 +159,6 @@ const ShowChart = ({ setTab }) => {
                 <td></td>
               </tr>
               <tr className="css-row">
-                {" "}
                 <td className="time-row">Tối </td>
                 <td></td>
                 <td></td>

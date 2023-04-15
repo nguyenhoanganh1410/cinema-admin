@@ -15,15 +15,14 @@ function App() {
 
   React.useEffect(() => {
     const userInLocalStorage = tokenService.getUser();
-    console.log(userInLocalStorage);
     if (userInLocalStorage) {
       depatch(setUser(userInLocalStorage.staff));
       navigator("/");
-      const getCinemaId = async (id) =>{
+      const getCinemaId = async (id) => {
         const data = await cinameApi.getCinemaById(id);
-        depatch(setCinema(data))
-      } 
-      getCinemaId(userInLocalStorage?.staff?.cinema_id)
+        depatch(setCinema(data));
+      };
+      getCinemaId(userInLocalStorage?.staff?.cinema_id);
     } else {
       navigator("/login");
     }
@@ -33,8 +32,6 @@ function App() {
     <Routes>
       <Route path="/login" element={<LoginForm />} />
       <Route path="/" element={<HomePage />} />
-      {/* <Route path="/login" element={<LoginPage setToken={setToken} />} /> */}
-
       <Route
         path="*"
         element={

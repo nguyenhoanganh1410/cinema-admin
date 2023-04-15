@@ -9,17 +9,17 @@ const movieApi = {
   },
 
   createMovie: (data) => {
-    return axiosApi.post("/movie", data,{
+    return axiosApi.post("/movie", data, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     });
   },
-  getMovieById: (id)=>{
+  getMovieById: (id) => {
     return axiosApi.get(`/movie/${id}`);
   },
 
-  getMovieByIdCinema: (id)=>{
+  getMovieByIdCinema: (id) => {
     return axiosApi.get(`/movie/cinema/${id}`);
   },
 
@@ -29,7 +29,7 @@ const movieApi = {
 
   deleteMovie: (id) => {
     return axiosApi.delete(`/movie/${id}`);
-  }
+  },
 };
 
 export default movieApi;
