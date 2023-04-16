@@ -46,7 +46,7 @@ import IndexRoutePrice from "../components/price/IndexRoutePrice";
 import IndexBooking from "../components/booking/IndexBooking";
 import IndexTicketRefund from "../components/ticketsRefund/IndexFilm";
 
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer, toast } from "react-toastify";
 import IndexTicket from "../components/tickets/IndexFilm";
 import { notifyWarn } from "../utils/Notifi";
 import { MESSAGE_NOT_ACCEPT } from "../constant";
@@ -75,9 +75,7 @@ const items = [
     getItem("Danh sách phim", "3"),
     getItem("Quản lý suất chiếu", "4"),
   ]),
-  getItem("Quản lý rạp", "sub4", <HomeOutlined />, [
-    getItem("Rạp", "13"),
-  ]),
+  getItem("Quản lý rạp", "sub4", <HomeOutlined />, [getItem("Rạp", "13")]),
 
   getItem("Quản lý khuyến mãi", "19", <ThunderboltOutlined />),
 
@@ -131,14 +129,13 @@ const HomePage = () => {
 
   //onclich item in menu
   function onClick(info) {
-    if(itemClicked !== 2 && isBooking){
-      notifyWarn(MESSAGE_NOT_ACCEPT)
-      console.log('reun 1');
-    }else{
+    if (itemClicked !== 2 && isBooking) {
+      notifyWarn(MESSAGE_NOT_ACCEPT);
+      console.log("reun 1");
+    } else {
       setItemClicked(+info.key);
-      console.log('reun 2');
+      console.log("reun 2");
     }
-
   }
 
   const onClickMenuUser = (info) => {
@@ -153,19 +150,17 @@ const HomePage = () => {
 
   // console.log("home page");
   const RenderHome = () => {
-
     if (itemClicked === 1) {
       return <IndexDashboard />;
-    }else if(itemClicked === 2){
-      return <IndexBooking />
-    } 
-    else if (itemClicked === 11) {
+    } else if (itemClicked === 2) {
+      return <IndexBooking />;
+    } else if (itemClicked === 11) {
       return <IndexCustomer />;
     } else if (itemClicked === 11) {
     } else if (itemClicked === 15) {
       return <IndexEmployee />;
     } else if (itemClicked === 3) {
-      return <IndexFilm />
+      return <IndexFilm />;
     } else if (itemClicked === 4) {
       return <IndexRouter />;
     } else if (itemClicked === 100) {
@@ -178,13 +173,11 @@ const HomePage = () => {
       return <IndexRoutePrice />;
     } else if (itemClicked === 13) {
       return <IndexRouteHall />;
-    } 
-    else if (itemClicked === 9) {
+    } else if (itemClicked === 9) {
       return <IndexTicket />;
-    }
-    else if (itemClicked === 10) {
+    } else if (itemClicked === 10) {
       return <IndexTicketRefund />;
-    } 
+    }
     return <IndexDashboard />;
   };
 
@@ -202,7 +195,6 @@ const HomePage = () => {
     tokenService.removeUser();
   };
 
- 
   return (
     <Layout
       style={{
@@ -246,11 +238,14 @@ const HomePage = () => {
             }}
           >
             <div>
-            <p style={{fontWeight:"700",fontSize:"16px"}}>{cinema?.name}</p>
+              <p style={{ fontWeight: "700", fontSize: "16px" }}>
+                {cinema?.name}
+              </p>
             </div>
             <div style={{ display: "flex", alignItems: "center" }}>
-             
-              <p style={{marginRight:"1rem", fontWeight:"500"}}>Hi, Anh Nguyen</p>
+              <p style={{ marginRight: "1rem", fontWeight: "500" }}>
+                Hi, {user?.firstName + " " + user?.lastName}
+              </p>
               <Dropdown
                 overlay={
                   <>
@@ -444,7 +439,7 @@ const HomePage = () => {
         draggable
         pauseOnHover
         theme="colored"
-        />
+      />
     </Layout>
   );
 };
