@@ -203,7 +203,6 @@ const ModelDetailMovie = ({
     };
     const fetchOrderDetail = async () => {
       const res = await orderApi.getDetail(selectedId);
-      console.log("orderDetail", res);
       if (res) {
         let listSeat = [];
         let listProduct = [];
