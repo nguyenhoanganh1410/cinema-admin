@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 import {
   Button,
@@ -28,6 +28,8 @@ import movieApi from "../../api/movieApi";
 import moment from "moment";
 import orderApi from "../../api/orderApi";
 import promotionRsApi from "../../api/promotionRs";
+import ReactToPrint from "react-to-print";
+import "./index.scss";
 
 const { Option } = Select;
 const getBase64 = (file) =>
@@ -56,6 +58,8 @@ const ModelDetailMovie = ({
       url: "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png",
     },
   ]);
+  let componentRef = useRef();
+
   const [nameMovie, setNameMovie] = useState("");
   const [cast, setCast] = useState("");
   const [director, setDirector] = useState("");
@@ -339,26 +343,257 @@ const ModelDetailMovie = ({
     getCategories();
   }, []);
 
-  const normFile = (e) => {
-    console.log("Upload event:", e);
-    if (Array.isArray(e)) {
-      return e;
-    }
-    return e?.fileList;
-  };
-
-  const dummyRequest = ({ file, onSuccess }) => {
-    setImage(file);
-    setTimeout(() => {
-      onSuccess("ok");
-    }, 0);
-  };
-
   const handleExportExcel = () => {
     console.log("export excel");
   };
 
   console.log("d", orderDetailSeat);
+
+  const PrintTemplate = () => {
+    return (
+      <>
+        <div className="print-template">
+          <div
+            className="print-template__header"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              marginTop: "50px",
+            }}
+          >
+            <span
+              style={{
+                fontSize: "30px",
+                fontWeight: "bold",
+              }}
+            >
+              HỆ THỐNG RẠP CHIẾU PHIM CINEMA-START
+            </span>
+            <span
+              style={{
+                marginTop: "10px",
+                fontSize: "20px",
+              }}
+            >
+              123 Nguyễn Văn Bảo, Phường 4, Quận Gò Vấp, TP. Hồ Chí Minh
+            </span>
+            <span
+              style={{
+                fontSize: "20px",
+              }}
+            >
+              Điện thoại: 1900.545.436
+            </span>
+            <span
+              style={{
+                fontSize: "30px",
+                fontWeight: "bold",
+              }}
+            >
+              HÓA ĐƠN THANH TOÁN
+            </span>
+          </div>
+          <div
+            className="print-template__body"
+            style={{
+              marginTop: "10px",
+            }}
+          >
+            <div
+              className="print-template__body__info"
+              style={{
+                marginRight: "50px",
+                marginLeft: "50px",
+              }}
+            >
+              <Row gutter={16} style={{ marginBottom: "10px" }}>
+                <Col span={24}>
+                  <span className="info">
+                    Phim:
+                    <span> {order?.ShowMovie?.Show?.Movie?.nameMovie} </span>
+                  </span>
+                </Col>
+              </Row>
+              <Row gutter={16} style={{ marginBottom: "10px" }}>
+                <Col span={12}>
+                  <span className="info">
+                    Mã hoán đơn:
+                    <span> {order?.id}</span>
+                  </span>
+                </Col>
+                <Col span={12}>
+                  <span className="info">
+                    Ngày tạo:
+                    <span> {order?.createdAt} </span>
+                  </span>
+                </Col>
+              </Row>
+              <Row gutter={16} style={{ marginBottom: "10px" }}>
+                <Col span={12}>
+                  <span className="info">
+                    Nhân viên:
+                    <span>
+                      {" "}
+                      {order?.Staff?.firstName + order?.Staff?.lastName}{" "}
+                    </span>
+                  </span>
+                </Col>
+                <Col span={12}>
+                  <span className="info">
+                    Khách hàng:
+                    <span> {order?.customerName} </span>
+                  </span>
+                </Col>
+              </Row>
+              <Row gutter={16} style={{ marginBottom: "10px" }}>
+                <Col span={12}>
+                  <span className="info">
+                    Rạp:
+                    <span> {order?.ShowMovie?.Show?.Cinema?.name} </span>
+                  </span>
+                </Col>
+                <Col span={12}>
+                  <span className="info">
+                    Phòng chiếu:
+                    <span> {order?.ShowMovie?.Show?.CinemaHall?.name} </span>
+                  </span>
+                </Col>
+              </Row>
+              <Row gutter={16} style={{ marginBottom: "10px" }}>
+                <Col span={12}>
+                  <span className="info">
+                    Ngày chiếu:
+                    <span> {order?.showDate} </span>
+                  </span>
+                </Col>
+                <Col span={12}>
+                  <span className="info">
+                    Suất chiếu:
+                    <span> {order?.ShowMovie?.ShowTime?.showTime} </span>
+                  </span>
+                </Col>
+              </Row>
+              <Row gutter={16} style={{ marginTop: "30px" }}>
+                <Col span={12}>
+                  <span
+                    style={{
+                      fontSize: "20px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {" "}
+                    Danh sách ghế mua
+                  </span>
+                </Col>
+              </Row>
+              <Row style={{ marginTop: "15px" }}>
+                <Col span={24}>
+                  <Table
+                    columns={columnsSeat}
+                    dataSource={orderDetailSeat}
+                    size={"middle"}
+                    pagination={false}
+                    bordered={true}
+                  />
+                </Col>
+              </Row>
+              {orderDetailProduct.length > 0 && (
+                <>
+                  <Row gutter={16} style={{ marginTop: "20px" }}>
+                    <Col span={12}>
+                      <span
+                        style={{
+                          fontSize: "20px",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {" "}
+                        Danh sách sản phẩm mua
+                      </span>
+                    </Col>
+                  </Row>
+                  <Row style={{ marginTop: "15px" }}>
+                    <Col span={24}>
+                      <Table
+                        columns={columnsProduct}
+                        dataSource={orderDetailProduct}
+                        size={"middle"}
+                        pagination={false}
+                        bordered={true}
+                      />
+                    </Col>
+                  </Row>
+                </>
+              )}
+              {orderDetailPromotion.length > 0 && (
+                <>
+                  <Row gutter={16} style={{ marginTop: "20px" }}>
+                    <Col span={12}>
+                      <span
+                        style={{
+                          fontSize: "20px",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {" "}
+                        Danh sách khuyến mãi
+                      </span>
+                    </Col>
+                  </Row>
+                  <Row style={{ marginTop: "15px" }}>
+                    <Col span={24}>
+                      <Table
+                        columns={columnsPromotion}
+                        dataSource={orderDetailPromotion}
+                        size={"middle"}
+                        pagination={false}
+                        bordered={true}
+                      />
+                    </Col>
+                  </Row>
+                </>
+              )}
+              <Row gutter={16} style={{ marginTop: "20px" }}>
+                <Col span={18}>
+                  <span
+                    style={{
+                      fontSize: "20px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {" "}
+                    Tổng tiền
+                  </span>
+                </Col>
+                <Col span={6}>
+                  <span
+                    style={{
+                      fontSize: "20px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {" "}
+                    {order?.totalPrice} VNĐ
+                  </span>
+                </Col>
+              </Row>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  };
+
+  class ComponentToPrint extends React.Component {
+    render() {
+      return (
+        <div>
+          <PrintTemplate />
+        </div>
+      );
+    }
+  }
 
   return (
     <>
@@ -383,15 +618,17 @@ const ModelDetailMovie = ({
                 Thông tin cơ bản
               </span>
             </Col>
-            <Col span={12}>
-              <Button
-                style={{ float: "right" }}
-                onClick={handleExportExcel}
-                icon={<FileExcelOutlined />}
-              >
-                Xuất excel
-              </Button>
+            <Col span={6}></Col>
+            <Col span={6}>
+              <ReactToPrint
+                trigger={() => <Button type="primary">Xuất hóa đơn</Button>}
+                content={() => componentRef}
+              />
             </Col>
+
+            <div style={{ display: "none" }}>
+              <ComponentToPrint ref={(el) => (componentRef = el)} />
+            </div>
           </Row>
         </Space>
         <Form form={form} id="myForm" layout="vertical">

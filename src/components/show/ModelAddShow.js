@@ -14,17 +14,23 @@ import {
   Space,
   TimePicker,
   Upload,
+  message,
+  Popover,
 } from "antd";
 
-import { PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined, InfoCircleTwoTone } from "@ant-design/icons";
 import movieApi from "../../api/movieApi";
 import cinameApi from "../../api/cinemaApi";
 import showTimeApi from "../../api/showTimeApi";
+import moment from "moment/moment";
+
+import { useDispatch, useSelector } from "react-redux";
+import { setReload } from "../../redux/actions";
+import showApi from "../../api/showApi";
 
 const { Option } = Select;
 
 const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
-
   const [listMovie, setListMovie] = useState([]);
   const [moviePicked, setMoviePicked] = useState("");
   const [listCinema, setListCinema] = useState([]);
@@ -33,8 +39,17 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
   const [hallPicked, setHallPicked] = useState("");
   const [listTime, setListTime] = useState([]);
   const [timePicked, setTimePicked] = useState([]);
-  const [startDatePicked,setStartDatePicked] = useState("");
+  const [startDatePicked, setStartDatePicked] = useState("");
+  const [durationPicked, setDurationPicked] = useState(0);
+  const [durationString, setDurationString] = useState("");
+  const [status, setStatus] = useState("");
+  const [endDatePicked, setEndDatePicked] = useState("");
 
+
+  const [form] = Form.useForm();
+
+  const depatch = useDispatch();
+  const reload = useSelector((state) => state.reload);
 
   const onSearch = (value) => {
     console.log("search:", value);
@@ -45,8 +60,37 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
   };
 
   //handle submit form create new customer...
-  const handleSubmit = () => {
-    //write code in here...
+  const handleSubmit = async (values) => {
+    const payload = {
+      startDate: startDatePicked,
+      endDate: endDatePicked,
+      showTime: timePicked,
+      idCinemaHall: values.hall,
+      idMovie: values.movie,
+      idCinema: values.cinema,
+    };
+    
+    try {
+      const res = await showApi.createShow(payload);
+      if (res) {
+        message.success("Thêm lịch chiếu thành công");
+        setShowModalAddCustomer(false);
+        depatch(setReload(!reload));
+      }
+    } catch (error) {
+      
+      console.log("error", error);
+      const { data } = error.response;
+      let errorString;
+      if (data) {
+        for (const val of data.data) {
+          const time = await showTimeApi.getTime(val.idShowTime);
+          errorString = `Thêm lịch chiếu thất bại: ${val.showDate}, khung giờ ${time.showTime} đã tồn tại trong lịch chiếu có id là ${val.idShow}`;
+          message.error(errorString, 10);
+        }
+      }
+     }
+
   };
 
   //change position
@@ -56,13 +100,20 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
 
   //choise date start worling
   const onChangeDate = (date, dateString) => {
-    console.log(date, dateString);
-    setStartDatePicked(dateString)
+    setStartDatePicked(dateString);
   };
 
-  const onChangeMovie = (value) => {
-    console.log(`selected ${value}`);
+  const onChangeDateEnd = (date, dateString) => {
+    setEndDatePicked(dateString);
+  };
+
+  const onChangeMovie = async (value) => {
     setMoviePicked(value);
+    const { duration } = await movieApi.getMovieById(value);
+    const hours = Math.floor(duration / 60);
+    const minutes = duration % 60;
+    const durationString = `${hours} giờ ${minutes} phút`;
+    setDurationString(durationString);
   };
 
   const onChangeCinema = (value) => {
@@ -75,11 +126,17 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
     setHallPicked(value);
   };
 
-  const onChangeTime = (value) => {
-    setTimePicked(value);
-    
+  const onChangeTime = async (value) => {
+    // console.log("value", value);
+    const { duration } = await movieApi.getMovieById(moviePicked);
+    if (!duration) {
+      message.error("Vui lòng chọn phim trước");
+      setTimePicked([]);
+      return;
+    } else {
+      setTimePicked(value);
+    }
   };
-
 
   // fetch list movies
   useEffect(() => {
@@ -87,7 +144,7 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
     const getMovies = async () => {
       try {
         const response = await movieApi.getMovies();
-        if(response){
+        if (response) {
           const arrMovie = response.map((item) => {
             return {
               value: item.id,
@@ -119,35 +176,70 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
       }
     };
 
+    getCinemas();
+    getMovies();
+  }, []);
+
+  useEffect(() => {
     const getTimes = async () => {
       try {
         const response = await showTimeApi.getListShowTime();
-        if(response){
-          const arrTime = response.map((item) => {
-            return {
-              value: item.id,
-              label: item.showTime,
+        const { duration } = await movieApi.getMovieById(moviePicked);
+        if (response) {
+          let arrTime = [];
+          for (let i = 0; i < response.length; i++) {
+            const options = {
+              value: response[i].id,
+              label: response[i].showTime,
             };
-          });
+            arrTime.push(options);
+          }
+          console.log("timePicked--", timePicked);
+          const timePic = timePicked[timePicked.length - 1];
+          console.log("timePic", timePic);
+
+          // get list time start from timePicked[0] with condition between element in list time is greater than duration
+          const index = arrTime.findIndex((item) => item.value === timePic);
+          console.log("index--", index);
+          if (index !== -1) {
+            for (let i = 0; i < arrTime.length; i++) {
+              if (i < index && !timePicked.includes(arrTime[i].value)) {
+                arrTime[i].disabled = true;
+              } else {
+                if (arrTime[i + 1]) {
+                  const betweenTime = Math.abs(
+                    moment(arrTime[index].label, "HH:mm").diff(
+                      moment(arrTime[i + 1].label, "HH:mm"),
+                      "minutes"
+                    )
+                  );
+                  if (betweenTime < duration) {
+                    arrTime[i + 1].disabled = true;
+                  }
+                }
+              }
+            }
+          }
           setListTime(arrTime);
+          console.log("========================");
         }
       } catch (error) {
         console.log("Failed to fetch movies list: ", error);
       }
     };
 
-    getTimes();
-    getCinemas();
-    getMovies();
-  }, []);
+    if (moviePicked) {
+      getTimes();
+    }
+  }, [moviePicked, timePicked]);
 
   useEffect(() => {
     const getHalls = async () => {
       try {
-        if(cinemaPicked){
-          console.log('cinemaPicked',cinemaPicked);
+        if (cinemaPicked) {
+          console.log("cinemaPicked", cinemaPicked);
           const response = await cinameApi.getHallByCinema(cinemaPicked);
-          console.log('hall',response);
+          console.log("hall", response);
           if (response) {
             const newArr = response.map((val) => {
               return { value: val.id, label: val.name };
@@ -163,15 +255,199 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
     getHalls();
   }, [cinemaPicked]);
 
+  const content = (
+    <div>
+      <p>
+        {` Bạn có thể chọn những khung giờ chiếu lớn hơn hoặc bằng thời lượng phim: ${durationString}`}
+      </p>
+    </div>
+  );
 
-
-
-
+  // return (
+  //   <>
+  //     <Drawer
+  //       title="Thêm suất chiếu"
+  //       width={720}
+  //       onClose={onClose}
+  //       open={showModalAddCustomer}
+  //       bodyStyle={{
+  //         paddingBottom: 80,
+  //       }}
+  //       extra={
+  //         <Space>
+  //           <Button onClick={onClose}>Thoát</Button>
+  //           <Button form="myFormShow" htmlType="submit" type="primary">
+  //             Submit
+  //           </Button>
+  //         </Space>
+  //       }
+  //     >
+  //       <Form
+  //         form={form}
+  //         onFinish={handleSubmit}
+  //         id="myFormShow"
+  //         layout="vertical"
+  //       >
+  //         <Row gutter={16}>
+  //           <Col span={12}>
+  //             <Form.Item
+  //               name="movie"
+  //               label="Chọn phim"
+  //               rules={[
+  //                 {
+  //                   required: true,
+  //                   message: "Hãy chọn bộ phim...",
+  //                 },
+  //               ]}
+  //             >
+  //               <Select
+  //                 placeholder="Chọn phim"
+  //                 style={{
+  //                   width: "100%",
+  //                 }}
+  //                 onChange={onChangeMovie}
+  //                 options={listMovie}
+  //               />
+  //             </Form.Item>
+  //           </Col>
+  //           <Col span={12}>
+  //             <Form.Item
+  //               name="cinema"
+  //               label="Chọn chi nhánh"
+  //               rules={[
+  //                 {
+  //                   required: true,
+  //                   message: "Hãy chọn chi nhánh...",
+  //                 },
+  //               ]}
+  //             >
+  //               <Select
+  //                 placeholder="Chọn chi nhánh"
+  //                 style={{
+  //                   width: "100%",
+  //                 }}
+  //                 onChange={onChangeCinema}
+  //                 options={listCinema}
+  //               />
+  //             </Form.Item>
+  //           </Col>
+  //         </Row>
+  //         <Row gutter={16}>
+  //           <Col span={12}>
+  //             <Form.Item
+  //               name="hall"
+  //               label="Chọn phòng chiếu"
+  //               rules={[
+  //                 {
+  //                   required: true,
+  //                   message: "Hãy chọn phòng chiếu...",
+  //                 },
+  //               ]}
+  //             >
+  //               <Select
+  //                 placeholder="Chọn phòng chiếu"
+  //                 style={{
+  //                   width: "100%",
+  //                 }}
+  //                 onChange={onChangeHall}
+  //                 options={listHall}
+  //               />
+  //             </Form.Item>
+  //           </Col>
+  //         </Row>
+  //         <Row gutter={16}>
+  //           <Col span={12}>
+  //             <Form.Item
+  //               name="startDate"
+  //               label="Ngày bắt đầu"
+  //               rules={[
+  //                 ({ getFieldValue }) => ({
+  //                   validator(rule, value) {
+  //                     if (value < new Date()) {
+  //                       return Promise.reject(
+  //                         "Ngày bắt đầu phải lớn hơn ngày hiện tại!"
+  //                       );
+  //                     }
+  //                   },
+  //                 }),
+  //               ]}
+  //             >
+  //               <DatePicker
+  //                 onChange={onChangeDate}
+  //                 style={{ width: "100%" }}
+  //                 placeholder="Chọn ngày chiếu"
+  //               />
+  //             </Form.Item>
+  //           </Col>
+  //           <Col span={12}>
+  //             <Form.Item
+  //               name="endDate"
+  //               label="Ngày kết thúc"
+  //               rules={[
+  //                 ({ getFieldValue }) => ({
+  //                   validator(rule, value) {
+  //                     if (value < new Date(startDatePicked)) {
+  //                       return Promise.reject(
+  //                         "Ngày kết thúc phải lớn hơn hoặc ngày bắt đầu!"
+  //                       );
+  //                     }
+  //                   },
+  //                 }),
+  //               ]}
+  //             >
+  //               <DatePicker
+  //                 // onChange={onChangeDate}
+  //                 style={{ width: "100%" }}
+  //                 placeholder="Chọn ngày kết thúc"
+  //               />
+  //             </Form.Item>
+  //           </Col>
+  //         </Row>
+  //         <Row gutter={16}>
+  //           <Col span={24}>
+  //             <Form.Item
+  //               name="showTime"
+  //               label={
+  //                 <p>
+  //                   Chọn suất chiếu
+  //                   {durationString && (
+  //                     <Popover content={content} title="Chọn suất chiếu">
+  //                       <InfoCircleTwoTone />
+  //                     </Popover>
+  //                   )}
+  //                 </p>
+  //               }
+  //               rules={[
+  //                 {
+  //                   required: true,
+  //                   message: "Hãy chọn suất chiếu...",
+  //                 },
+  //               ]}
+  //             >
+  //               <Select
+  //                 mode="multiple"
+  //                 tokenSeparators={[","]}
+  //                 placeholder="Chọn suất chiếu"
+  //                 value={timePicked}
+  //                 style={{
+  //                   width: "100%",
+  //                 }}
+  //                 options={listTime}
+  //                 onChange={onChangeTime}
+  //                 status={status}
+  //               />
+  //             </Form.Item>
+  //           </Col>
+  //         </Row>
+  //       </Form>
+  //     </Drawer>
+  //   </>
+  // );
 
   return (
     <>
       <Drawer
-        title="Thêm suất chiếu"
+        title="Tạo mới bảng giá"
         width={720}
         onClose={onClose}
         open={showModalAddCustomer}
@@ -180,14 +456,13 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
         }}
         extra={
           <Space>
-            <Button onClick={onClose}>Cancel</Button>
-            <Button onClick={handleSubmit} type="primary">
-              Submit
+            <Button form="myForm" htmlType="submit" type="primary">
+              Thêm
             </Button>
           </Space>
         }
       >
-        <Form layout="vertical" hideRequiredMark>
+        <Form form={form} onFinish={handleSubmit} id="myForm" layout="vertical">
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
@@ -233,7 +508,7 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
             </Col>
           </Row>
           <Row gutter={16}>
-          <Col span={12}>
+            <Col span={12}>
               <Form.Item
                 name="hall"
                 label="Chọn phòng chiếu"
@@ -254,22 +529,27 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
                 />
               </Form.Item>
             </Col>
-            
           </Row>
           <Row gutter={16}>
-          <Col span={12}>
+            <Col span={12}>
               <Form.Item
                 name="startDate"
                 label="Ngày bắt đầu"
                 rules={[
-                  ({getFieldValue})=>({
-                    validator(rule,value){
-                      console.log('val',value)
-                      if(value < new Date()){
-                        return Promise.reject("Ngày bắt đầu phải lớn hơn ngày hiện tại!");
+                  {
+                    required: true,
+                    message: "Hãy chọn ngày bắt đầu...",
+                  },
+                  ({ getFieldValue }) => ({
+                    validator(rule, value) {
+                      if (value < new Date()) {
+                        return Promise.reject(
+                          "Ngày bắt đầu phải lớn hơn ngày hiện tại!"
+                        );
                       }
-                    }
-                  })
+                      return Promise.resolve();
+                    },
+                  }),
                 ]}
               >
                 <DatePicker
@@ -284,19 +564,25 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
                 name="endDate"
                 label="Ngày kết thúc"
                 rules={[
-                  ({getFieldValue})=>({
-                    validator(rule,value){
-                      console.log('val',value)
-                      console.log('start',new Date(startDatePicked))
-                      if(value < new Date(startDatePicked)){
-                        return Promise.reject("Ngày kết thúc phải lớn hơn hoặc ngày bắt đầu!");
+                  {
+                    required: true,
+                    message: "Hãy chọn ngày kết thúc...",
+                  },
+                  ({ getFieldValue }) => ({
+                    validator(rule, value) {
+                      if (value < new Date(startDatePicked)) {
+                        return Promise.reject(
+                          "Ngày kết thúc phải lớn hơn hoặc ngày bắt đầu!"
+                        );
                       }
-                    }
-                  })
+                      return Promise.resolve();
+                    },
+                  }),
                 ]}
               >
                 <DatePicker
                   // onChange={onChangeDate}
+                  onChange={onChangeDateEnd}
                   style={{ width: "100%" }}
                   placeholder="Chọn ngày kết thúc"
                 />
@@ -304,10 +590,19 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
             </Col>
           </Row>
           <Row gutter={16}>
-          <Col span={24}>
+            <Col span={24}>
               <Form.Item
                 name="showTime"
-                label="Chọn suất chiếu"
+                label={
+                  <p>
+                    Chọn suất chiếu
+                    {durationString && (
+                      <Popover content={content} title="Chọn suất chiếu">
+                        <InfoCircleTwoTone />
+                      </Popover>
+                    )}
+                  </p>
+                }
                 rules={[
                   {
                     required: true,
@@ -316,15 +611,16 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
                 ]}
               >
                 <Select
-                  mode="tags"
-                  tokenSeparators={[',']}
+                  mode="multiple"
+                  tokenSeparators={[","]}
                   placeholder="Chọn suất chiếu"
+                  value={timePicked}
                   style={{
                     width: "100%",
                   }}
                   options={listTime}
                   onChange={onChangeTime}
-
+                  status={status}
                 />
               </Form.Item>
             </Col>

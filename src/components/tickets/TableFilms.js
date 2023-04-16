@@ -225,8 +225,11 @@ const TableFilms = () => {
     const rs = form.getFieldValue("note");
     form.resetFields();
     console.log(rs);
+    const payload = {
+      note: rs,
+    }
     try {
-      const res = await orderApi.refund(order?.id, rs);
+      const res = await orderApi.refund(order?.id, payload);
       if (res) {
         message.success("Đổi trả thành công");
         depatch(setReload(!reload));

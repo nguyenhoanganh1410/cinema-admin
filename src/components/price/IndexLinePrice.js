@@ -576,7 +576,7 @@ const IndexLinePrice = ({ setTab, selectedIdHeader }) => {
         onCancel={handleCancelDelete}
       >
         <p>
-          Bản có chắc muốn xóa sản phẩm khỏi bảng giá không?
+          Bạn có chắc muốn xóa sản phẩm khỏi bảng giá không?
         </p>
       </Modal>
       {showModalAddCustomer ? (
