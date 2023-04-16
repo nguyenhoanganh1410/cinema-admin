@@ -92,7 +92,7 @@ const TableFilms = () => {
         }
         return (
           <Tag color={color} key={active}>
-            {active === 1 ? "HOÀN THÀNH" : "TRẢ HÀNG"}
+            {active === 1 ? "ĐẶT THÀNH CÔNG" : "TRẢ HÀNG"}
           </Tag>
         );
       },
