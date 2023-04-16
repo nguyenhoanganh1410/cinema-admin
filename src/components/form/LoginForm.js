@@ -17,6 +17,8 @@ import { useDispatch } from "react-redux";
 import { setUser } from "../../redux/actions";
 import { useNavigate } from "react-router-dom";
 import tokenService from "../../service/token.service";
+import { notifyError } from "../../utils/Notifi";
+import { ToastContainer } from "react-toastify";
 
 const { Title, Text } = Typography;
 const LoginForm = () => {
@@ -55,8 +57,8 @@ const LoginForm = () => {
         }
       } catch (error) {
         console.log("Failed to login ", error);
-        alert("Failed to login")
-        setLoadingStatus(false);
+        notifyError('Tên tài khoản hoặc mật khẩu không chính xác.')
+        setLoadingStatus(false)
       }
     };
     loginUser(userName, password);
@@ -141,6 +143,18 @@ const LoginForm = () => {
         </div>
       </Col>
       <Col span={8}></Col>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+        />
     </Row>
   );
 };

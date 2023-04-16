@@ -15,7 +15,6 @@ function App() {
 
   React.useEffect(() => {
     const userInLocalStorage = tokenService.getUser();
-    console.log(userInLocalStorage);
     if (userInLocalStorage) {
       depatch(setUser(userInLocalStorage.staff));
       navigator("/");
@@ -33,8 +32,6 @@ function App() {
     <Routes>
       <Route path="/login" element={<LoginForm />} />
       <Route path="/" element={<HomePage />} />
-      {/* <Route path="/login" element={<LoginPage setToken={setToken} />} /> */}
-
       <Route
         path="*"
         element={
