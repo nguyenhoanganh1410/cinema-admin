@@ -394,36 +394,13 @@ const PickSeatComponent = ({next}) => {
                                     key={seat?.createdAt}
                                   
                                     style={!seat?.status ? {background:"#BDBDD7", color:"white", cursor:"not-allowed"} : {}}
-                                  >
+                                  >booking_content-top
                                     <span>
                                       <MdChair />
                                     </span>
                                   </td>
                                   }
                                 </>
-
-                                //   <td
-                                //     onClick={() => handleShowModel(val, idx + 1, seat)}
-                                //     title={seat?.status ? val + tmp : val + tmp + " ghế đã đặt"}
-                                //     key={seat?.createdAt}
-                                  
-                                //     style={!seat?.status ? {background:"#BDBDD7", color:"white", cursor:"not-allowed"} : {}}
-                                //   >
-                                //     <span>
-                                //       <MdChair />
-                                //       <MdChair />
-                                //     </span>
-                                //   </td> : 
-                                //   <td
-                                //     onClick={() => handleShowModel(val, idx + 1, seat)}
-                                //   title={seat?.status ? val + tmp : val + tmp + " ghế đã đặt"}
-                                //   key={seat.createdAt}
-                                //   style={!seat?.status ? {background:"#BDBDD7", color:"white", cursor:"not-allowed"} : {}}
-                                // >
-                                //   <span>
-                                //     <MdChair />
-                                //   </span>
-                                // </td>
                               }
                               
                               </>
