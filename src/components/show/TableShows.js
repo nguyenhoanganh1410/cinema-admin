@@ -14,12 +14,18 @@ import showTimeApi from "../../api/showTimeApi";
 import moment from "moment/moment";
 import TableShowTime from "./TableShowTime";
 
+import { useDispatch, useSelector } from "react-redux";
+import { setReload } from "../../redux/actions";
+
 const TableShows = ({ setShowModalAddCustomer, setTab }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [listShow, setListShow] = useState([]);
   const [selectedId, setSelectedId] = useState(0);
   const [listShowTime, setListShowTime] = useState([]);
+
+  const depatch = useDispatch();
+  const reload = useSelector((state) => state.reload);
 
   const columns = [
     {
@@ -165,6 +171,7 @@ const TableShows = ({ setShowModalAddCustomer, setTab }) => {
             return {
               key: index,
               id: item.id,
+              idMovie: item.Movie.id,
               filmShow: item.Movie.nameMovie,
               startDate: item.startDate,
               endDate: item.endDate,
@@ -181,7 +188,7 @@ const TableShows = ({ setShowModalAddCustomer, setTab }) => {
       }
     };
     getListShow();
-  }, []);
+  }, [reload]);
 
   return (
     <div>

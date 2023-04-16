@@ -223,12 +223,12 @@ const TableFilms = () => {
     setIsModalOpen(false);
     const rs = form.getFieldValue("note");
     form.resetFields();
-    const data = REASON_REFULT.filter((val) => {
-      return val.value === rs;
-    });
-
+    console.log(rs);
+    const payload = {
+      note: rs,
+    }
     try {
-      const res = await orderApi.refund(order?.id, { note: data[0]?.label });
+      const res = await orderApi.refund(order?.id, payload);
       if (res) {
         message.success("Đổi trả thành công");
         depatch(setReload(!reload));

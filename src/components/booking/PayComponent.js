@@ -21,6 +21,8 @@ import {
   
 } from "@ant-design/icons";
 
+import ReactToPrint from "react-to-print";
+
 const tagRender = (props) => {
   const { label, value, closable, onClose } = props;
   const onPreventMouseDown = (event) => {
@@ -43,7 +45,7 @@ const tagRender = (props) => {
 };
 
 const { TextArea } = Input;
-const PayComponent = ({ next, setIsSucess }) => {
+const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
   const depatch = useDispatch();
   const booking = useSelector((state) => state.booking);
   const cinema = useSelector((state) => state.cinema);
@@ -255,6 +257,7 @@ const PayComponent = ({ next, setIsSucess }) => {
       const result = await orderApi.createOrder(dataPayload);
       if(result){
         console.log("result", result);
+        setIdOrder(result.data.id)
         notifySucess("Đặt Vé Thành công.");
         depatch(setBooking(null));
         setIsSucess(true);

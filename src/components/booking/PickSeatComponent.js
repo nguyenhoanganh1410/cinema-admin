@@ -46,8 +46,12 @@ const PickSeatComponent = ({next}) => {
         const response = await cinemaHallApi.getCinemaHallSeatById(
           _id
         );
+
         if (response) {
+
           const {show} = booking
+          console.log("show", show.id);
+
           getReservationData(show?.id)
           .then(result =>{
             const dataClear = result.filter(seat =>{

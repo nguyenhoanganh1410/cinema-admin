@@ -1,5 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { Button, Table, Modal, Select, Badge, Tag } from "antd";
+import {
+  Button,
+  Table,
+  Modal,
+  Select,
+  Badge,
+  Tag,
+  message,
+  Form,
+  Row,
+  Col,
+} from "antd";
 import {
   SearchOutlined,
   PlusSquareFilled,
@@ -10,17 +21,35 @@ import {
   PlusSquareOutlined,
   PlusCircleOutlined,
   MinusCircleOutlined,
+  EyeOutlined,
 } from "@ant-design/icons";
 import showApi from "../../api/showApi";
 import showTimeApi from "../../api/showTimeApi";
 import moment from "moment/moment";
 
+import { useDispatch, useSelector } from "react-redux";
+import { setReload } from "../../redux/actions";
+import movieApi from "../../api/movieApi";
+
 const TableShowTime = ({ record }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [listShow, setListShow] = useState([]);
-  const [selectedId, setSelectedId] = useState(0);
+  const [records, setRecord] = useState({});
   const [listShowTime, setListShowTime] = useState([]);
+  const [isModalOpenDelete, setIsModalOpenDelete] = useState(false);
+  const [isModalOpenDetail, setIsModalOpenDetail] = useState(false);
+  const [timePicked, setTimePicked] = useState([]);
+  const [listTime, setListTime] = useState([]);
+
+  const newDateFormat = "YYYY-MM-DD";
+  const currentDate = moment().format(newDateFormat);
+
+  const depatch = useDispatch();
+  const reload = useSelector((state) => state.reload);
+
+  const [form] = Form.useForm();
+
 
   const columns = [
     {
@@ -65,40 +94,39 @@ const TableShowTime = ({ record }) => {
         });
       },
     },
-    // {
-    //   title: "Trạng thái",
-    //   dataIndex: "status",
-    //   render: (val) => {
-    //     let color = "";
-    //     let nameStatus = "";
-    //     if (val === 1) {
-    //       color = "green";
-    //       nameStatus = "Đang chiếu";
-    //     } else if (val === 2) {
-    //       color = "blue";
-    //       nameStatus = "Sắp chiếu";
-    //     } else if (val === 3) {
-    //       color = "red";
-    //       nameStatus = "Đã kết thúc";
-    //     }
-    //     return (
-    //       <Badge status={color} text={nameStatus} />
-    //     );
-    //   },
-    // },
     {
       dataIndex: "id",
-      render: (val) => {
+      render: (val, record) => {
+        setRecord(record);
         return (
-          <MinusCircleOutlined
-            style={{
-              color: "#ff4d4f",
-              fontSize: "15px",
-            }}
-          />
+          <>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Button
+                title="Xem chi tiết"
+                icon={<EyeOutlined />}
+                onClick={() => showModalDetail()}
+              ></Button>
+              <Button
+                style={{
+                  marginLeft: "10px",
+                }}
+                onClick={() => {
+                  setIsModalOpenDelete(true);
+                  // setIdPriceLine(record.id);
+                }}
+                danger
+                icon={<MinusCircleOutlined color="red" />}
+              ></Button>
+            </div>
+          </>
         );
       },
-      width: 30,
     },
   ];
 
@@ -122,27 +150,7 @@ const TableShowTime = ({ record }) => {
     };
 
     fetchShowTimeByShowId();
-  }, []);
-
-  // const response = showTimeApi.getShowTimeByShowId(selectedId).then((res) => {
-  //   let data = [];
-  //   if (res) {
-  //     for (const index in res) {
-  //       data.push({
-  //         showDate: index,
-  //         showTime: res[index].map((item, index) => {
-  //           return item.showTime;
-  //         }),
-  //       });
-  //     }
-  //   }
-  //   return Promise.resolve(data);
-  // });
-
-  //     console.log('listShowTime', listShowTime);
-
-  //   return <Table columns={columns} pagination={false} dataSource={listShowTime} />;
-  // };
+  }, [record.id, reload]);
 
   const onSelectChange = (selectedId) => {
     setSelectedRowKeys(selectedId);
@@ -182,57 +190,108 @@ const TableShowTime = ({ record }) => {
 
     ////////
   };
+
+  const showModalDetail = () => {
+    setIsModalOpenDetail(true);
+    const fetchShowTimeByShowId = async () => {
+      const res = await showTimeApi.getTimeByShowIdAndDate(
+        record.id,
+        records.showDate
+      );
+      if(res) {
+        res.map((item) => {
+          console.log(item.ShowTime.id);
+          return setTimePicked(item.ShowTime.id);
+        });
+      }
+    };
+    fetchShowTimeByShowId();
+  };
+  console.log("timePicked", timePicked);
+
+  // useEffect(() => {
+  //   const fetchShowTimeByShowId = async () => {
+  //     try {
+  //       const response = await showTimeApi.getListShowTime();
+  //       const { duration } = await movieApi.getMovieById(record.idMovie);
+  //       if (response) {
+  //         let arrTime = [];
+  //         for (let i = 0; i < response.length; i++) {
+  //           const options = {
+  //             value: response[i].id,
+  //             label: response[i].showTime,
+  //           };
+  //           arrTime.push(options);
+  //         }
+  //         console.log("timePicked", timePicked);
+  //         const timePic = timePicked[timePicked.length - 1];
+  //         const index = arrTime.findIndex((item) => item.value === timePic);
+  //         console.log("index--", index);
+  //         if (index !== -1) {
+  //           for (let i = 0; i < arrTime.length; i++) {
+  //             if (i < index && !timePicked.includes(arrTime[i].value)) {
+  //               arrTime[i].disabled = true;
+  //             } else {
+  //               if (arrTime[i + 1]) {
+  //                 const betweenTime = Math.abs(
+  //                   moment(arrTime[index].label, "HH:mm").diff(
+  //                     moment(arrTime[i + 1].label, "HH:mm"),
+  //                     "minutes"
+  //                   )
+  //                 );
+  //                 if (betweenTime < duration) {
+  //                   arrTime[i + 1].disabled = true;
+  //                 }
+  //               }
+  //             }
+  //           }
+  //         }
+  //         setListTime(arrTime);
+  //       }
+  //     } catch (error) {
+  //       console.log("error", error);
+  //     }
+  //   };
+  //   if(isModalOpenDetail) { 
+  //     fetchShowTimeByShowId();
+  //   }
+  // }, [ record.id, records.showDate]);
+
   const handleCancel = () => {
     setIsModalOpen(false);
   };
-  /////
 
-  // const handleOpenAddShow = () => {
-  //   setShowModalAddCustomer(true);
-  // };
-
-  // //show chart
-  // const handleShowChart = () => {
-  //   setTab(1);
-  // };
-
-  useEffect(() => {
-    //load movies
-    const getListShow = async () => {
-      try {
-        const response = await showApi.getShow();
-        console.log(response);
-        //set user info
-        if (response) {
-          const data = response.map((item, index) => {
-            let statusName = "";
-            if (item.status === 1) {
-              statusName = "Đang chiếu";
-            } else if (item.status === 2) {
-              statusName = "Sắp chiếu";
-            } else if (item.status === 3) {
-              statusName = "Đã kết thúc";
-            }
-            return {
-              key: index,
-              id: item.id,
-              filmShow: item.Movie.nameMovie,
-              startDate: item.startDate,
-              endDate: item.endDate,
-              locationShow: item.Cinema.name,
-              roomShow: item.CinemaHall.name,
-              status: statusName,
-            };
-          });
-
-          setListShow(data);
-        }
-      } catch (error) {
-        console.log("Failed to login ", error);
+  const handleOkDelete = async () => {
+    setIsModalOpenDelete(false);
+    try {
+      console.log(records);
+      const res = await showTimeApi.deleteShowTime(record.id, records.showDate);
+      console.log(res);
+      if (res) {
+        message.success("Xóa thành công");
+        depatch(setReload(!reload));
       }
-    };
-    getListShow();
-  }, []);
+    } catch (error) {
+      console.log(error);
+      message.error("Xóa thất bại");
+    }
+  };
+
+  const handleOkDetail = () => {
+    setIsModalOpenDetail(false);
+  };
+
+  const handleCancelDelete = () => {
+    setIsModalOpenDelete(false);
+  };
+
+  const handleCancelDetail = () => {
+    setIsModalOpenDetail(false);
+  };
+
+  const onChangeTime = async (value) => {
+    setTimePicked(value);
+  };
 
   return (
     <div
@@ -242,6 +301,63 @@ const TableShowTime = ({ record }) => {
       }}
     >
       <Table columns={columns} dataSource={listShowTime} pagination={false} />
+
+      <Modal
+        title="Xoá ngày chiếu khỏi lịch chiếu"
+        open={isModalOpenDelete}
+        onOk={handleOkDelete}
+        onCancel={handleCancelDelete}
+        footer={[
+          <Button key="back" onClick={handleCancelDelete}>
+            Hủy
+          </Button>,
+          <Button key="submit" type="primary" onClick={handleOkDelete}>
+            Xác nhận
+          </Button>,
+        ]}
+      >
+        <p>Bạn có chắc muốn xóa ngày chiếu khỏi lịch chiếu không?</p>
+      </Modal>
+      <Modal
+        title="Cập nhật ngày chiếu"
+        open={isModalOpenDetail}
+        onOk={handleOkDetail}
+        onCancel={handleCancelDetail}
+        width={700}
+        footer={[
+          <Button key="back" onClick={handleCancel}>
+            Hủy
+          </Button>,
+          <Button key="submit" type="primary">
+            Cập nhật
+          </Button>,
+        ]}
+      >
+        <>
+          <Row gutter={16}>
+            <Col span={24}>
+              <Select
+                mode="multiple"
+                style={{ width: "100%" }}
+                placeholder="Chọn giờ chiếu"
+                value={timePicked}
+                onChange={onChangeTime}
+                options={listTime}
+
+                // onChange={handleChange}
+              >
+                {/* {listTime.map((item, index) => {
+                    return (
+                      <Option key={index} value={item}>
+                        {item}
+                      </Option>
+                    );
+                  })} */}
+              </Select>
+            </Col>
+          </Row>
+        </>
+      </Modal>
     </div>
   );
 };

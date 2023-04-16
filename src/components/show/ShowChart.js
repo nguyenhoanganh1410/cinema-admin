@@ -127,7 +127,7 @@ const ShowChart = ({ setTab }) => {
           xs: 8,
           sm: 16,
           md: 16,
-          lg: 16,
+          lg: 16,   
         }}
       >
         <Col span={24}>
@@ -170,10 +170,10 @@ const ShowChart = ({ setTab }) => {
                 <td>
                   <CardTime />
                   <CardTime />
-                  <CardTime />
-                  <CardTime />
                 </td>
-                <td></td>
+                <td>
+                <CardTime />
+                </td>
                 <td>
                   <CardTime />
                 </td>
