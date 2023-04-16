@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-
 import {
   Button,
   Col,
@@ -17,24 +16,24 @@ import {
   Table,
   Breadcrumb,
   Badge,
-  message
+  message,
 } from "antd";
 
-import { PlusOutlined, UploadOutlined,ExportOutlined } from "@ant-design/icons";
+import {
+  PlusOutlined,
+  UploadOutlined,
+  EyeOutlined,
+  ExportOutlined,
+} from "@ant-design/icons";
 import ModelAddPromoLine from "./ModelAddPromoLine";
 import promotionApi from "../../api/promotionApi";
 import moment from "moment";
 import rankApi from "../../api/rankApi";
-
 import { useDispatch, useSelector } from "react-redux";
 import { setReload } from "../../redux/actions";
-
 import dayjs from "dayjs";
 import promotionRsApi from "../../api/promotionRs";
-
-import {
-  VND,
-} from "../../constant";
+import { VND } from "../../constant";
 
 const { TextArea } = Input;
 const getBase64 = (file) =>
@@ -49,7 +48,6 @@ const { Option } = Select;
 const { Title, Text } = Typography;
 
 const newDateFormat = "YYYY-MM-DD";
-
 
 const IndexLinePromotion = ({ setTab }) => {
   const [showModalAddCustomer, setShowModalAddCustomer] = useState(false);
@@ -87,92 +85,16 @@ const IndexLinePromotion = ({ setTab }) => {
   const [totalMoneyProUsed, setTotalMoneyProUsed] = useState(0);
 
   const columns = [
-  {
-    title: "Mã Code",
-    dataIndex: "promotionCode",
-    key: "promotionCode",
-    render: (text) => <a>{text}</a>,
-  },
-  {
-    title: "Miêu tả",
-    dataIndex: "desc",
-    key: "age",
-  },
-  {
-    title: "Loại khuyến mãi",
-    dataIndex: "type",
-    key: "type",
-    render: (type) => {
-      let text;
-      if (type === "1") {
-        text = "Tặng quà";
-      } else if (type === "2") {
-        text = "Giảm giá";
-      } else if (type === "3") {
-        text = "Chiết khấu";
-      }
-      return text;
-    },
-  },
-  {
-    title: "Ngày bắt đầu",
-    dataIndex: "startDate",
-    key: "startDate",
-    render: (startDate) => {
-      return dayjs(startDate).format(newDateFormat);
-    },
-  },
-  {
-    title: "Ngày kết thức",
-    dataIndex: "endDate",
-    key: "endDate",
-    render: (endDate) => {
-      return dayjs(endDate).format(newDateFormat);
-    },
-  },
-  {
-    title: "Trạng thái",
-    key: "status",
-    dataIndex: "status",
-    render: (status) => {
-      let color;
-      let text;
-      if (status === 1) {
-        color = "green";
-        text = "Hoạt động";
-      } else {
-        color = "red";
-        text = "Ngưng hoạt động";
-      }
-      return <Badge status={color} text={text} />;
-    },
-  },
-  {
-    dataIndex: "action",
-    render: (text, record) => (
-      <>
-        {currentDate > startDate && (
-          <Space>
-            <Button
-              title="Kết quả khuyến mãi"
-              icon={<ExportOutlined />}
-              onClick={() => showModal(record.id)}
-            >
-            </Button>
-          </Space> 
-        )}
-      </>
-    )
-  }
-];
-  const columnsRs = [
     {
       title: "Mã Code",
       dataIndex: "promotionCode",
+      key: "promotionCode",
+      render: (text) => <a>{text}</a>,
     },
     {
       title: "Miêu tả",
       dataIndex: "desc",
+      key: "age",
     },
     {
       title: "Loại khuyến mãi",
@@ -191,6 +113,61 @@ const IndexLinePromotion = ({ setTab }) => {
       },
     },
     {
+      title: "Ngày bắt đầu",
+      dataIndex: "startDate",
+      key: "startDate",
+      render: (startDate) => {
+        return dayjs(startDate).format(newDateFormat);
+      },
+    },
+    {
+      title: "Ngày kết thức",
+      dataIndex: "endDate",
+      key: "endDate",
+      render: (endDate) => {
+        return dayjs(endDate).format(newDateFormat);
+      },
+    },
+    {
+      title: "Trạng thái",
+      key: "status",
+      dataIndex: "status",
+      render: (status) => {
+        let color;
+        let text;
+        if (status === 1) {
+          color = "green";
+          text = "Hoạt động";
+        } else {
+          color = "red";
+          text = "Ngưng hoạt động";
+        }
+        return <Badge status={color} text={text} />;
+      },
+    },
+    {
+      dataIndex: "action",
+      render: (text, record) => (
+        <>
+          {currentDate > startDate && (
+            <Space>
+              <Button
+                title="Kết quả khuyến mãi"
+                icon={<EyeOutlined />}
+                onClick={() => showModal(record.id)}
+              ></Button>
+            </Space>
+          )}
+        </>
+      ),
+    },
+  ];
+  const columnsRs = [
+    {
+      title: "Mã Code",
+      dataIndex: "promotionCode",
+    },
+    {
       title: "Ngày áp dụng",
       dataIndex: "dateUsed",
     },
@@ -202,8 +179,10 @@ const IndexLinePromotion = ({ setTab }) => {
       title: "Tiền khuyến mãi",
       dataIndex: "discount",
       render: (discount) => {
-        return discount = discount.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
-      }
+        return (discount = discount
+          .toString()
+          .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,"));
+      },
     },
     {
       title: "Trạng thái",
@@ -219,50 +198,52 @@ const IndexLinePromotion = ({ setTab }) => {
           color = "red";
           text = "Hủy";
         }
-        return < Tag color={color} key={text}>{text}</Tag>;
+        return (
+          <Tag color={color} key={text}>
+            {text}
+          </Tag>
+        );
       },
-
-    }
-
+    },
   ];
 
-  const showModal = async(id) => {
+  const showModal = async (id) => {
     setIsModalOpen(true);
-      try {
-        const response = await promotionRsApi.getByPromotionLineId(id);
-        if (response) {
-          const promotionApply = response.filter((item) => item.status === 1);
-          const totalMoney = promotionApply.reduce((total, item) => {
-            return total + item.moneyDiscount;
-          }, 0);
-          setTotalMoneyProUsed(totalMoney);
-          
-          const newList = response.map((item) => {
-            return {
-              promotionCode: item.PromotionLine.promotionCode,
-              desc: item.PromotionLine.desc,
-              type: item.PromotionLine.type,
-              dateUsed: moment(item.dateUsed).format("DD/MM/YYYY HH:mm "),
-              billCode: item.idOrder,
-              discount: item.moneyDiscount,
-              status: item.status,
-              budget: item.PromotionLine.budget,
-            };
-          });
-          setPromotionRs(newList);
-        }
-      } catch (error) {
-        console.log("Failed to login ", error);
+    try {
+      const response = await promotionRsApi.getByPromotionLineId(id);
+      if (response) {
+        const promotionApply = response.filter((item) => item.status === 1);
+        const totalMoney = promotionApply.reduce((total, item) => {
+          return total + item.moneyDiscount;
+        }, 0);
+        setTotalMoneyProUsed(totalMoney);
+
+        const newList = response.map((item) => {
+          return {
+            promotionCode: item.PromotionLine.promotionCode,
+            desc: item.PromotionLine.desc,
+            type: item.PromotionLine.type,
+            dateUsed: moment(item.dateUsed).format("DD/MM/YYYY HH:mm "),
+            billCode: item.idOrder,
+            discount: item.moneyDiscount,
+            status: item.status,
+            budget: item.PromotionLine.budget,
+          };
+        });
+        setPromotionRs(newList);
       }
-  }
+    } catch (error) {
+      console.log("Failed to login ", error);
+    }
+  };
 
   const handleCancel = () => {
     setIsModalOpen(false);
-  }
+  };
 
   const handleOk = () => {
     setIsModalOpen(false);
-  }
+  };
 
   const tagRender = (props) => {
     const { label, value, closable, onClose } = props;
@@ -315,21 +296,24 @@ const IndexLinePromotion = ({ setTab }) => {
     console.log(val);
     console.log(rankPicked);
     const data = new FormData();
-    data.append("namePromotion", val.namePromotion)
-    data.append("desc", val.desc)
-    data.append("startDate", startDate)
-    data.append("endDate", endDate)
-    data.append("statusPromotion", val.statusPromotion)
+    data.append("namePromotion", val.namePromotion);
+    data.append("desc", val.desc);
+    data.append("startDate", startDate);
+    data.append("endDate", endDate);
+    data.append("statusPromotion", val.statusPromotion);
     val.rankCustomer.forEach((rank) => {
-      data.append("rank", rank.value)
-    })
+      data.append("rank", rank.value);
+    });
     // data.append("rank", rankPicked)
-    if(val.image){
-      data.append("image", val.image[0].originFileObj)
+    if (val.image) {
+      data.append("image", val.image[0].originFileObj);
     }
 
     try {
-      const response = await promotionApi.updatePromotionHeader(data, idHeaderPromotion);
+      const response = await promotionApi.updatePromotionHeader(
+        data,
+        idHeaderPromotion
+      );
       if (response) {
         depatch(setReload(!reload));
         message.success("Cập nhật thành công");
@@ -338,9 +322,6 @@ const IndexLinePromotion = ({ setTab }) => {
     } catch (error) {
       console.log("Failed to login ", error);
     }
-
-
-    
   };
   useEffect(() => {
     //load movies
@@ -405,7 +386,7 @@ const IndexLinePromotion = ({ setTab }) => {
                 url: response?.image,
               },
             ],
-           rankCustomer: ranksRes,
+            rankCustomer: ranksRes,
           });
           setPromotionHeader(response);
         }
@@ -413,8 +394,6 @@ const IndexLinePromotion = ({ setTab }) => {
         console.log("Failed to login ", error);
       }
     };
-
-    
 
     fetchRanks();
     getPromotionLineByHeader(idHeaderPromotion);
@@ -438,8 +417,6 @@ const IndexLinePromotion = ({ setTab }) => {
       onSuccess("ok");
     }, 0);
   };
-
-  console.log("rank", rankPicked);
 
   return (
     <div className="site-card-wrapper" style={{ minWidth: "100vh" }}>
@@ -503,7 +480,10 @@ const IndexLinePromotion = ({ setTab }) => {
                 },
               ]}
             >
-              <Input disabled={statusDb === true ? true : false} placeholder="Hãy nhập tên CT khuyến mãi..." />
+              <Input
+                disabled={statusDb === true ? true : false}
+                placeholder="Hãy nhập tên CT khuyến mãi..."
+              />
             </Form.Item>
           </Col>
           <Col span={6}>
@@ -518,10 +498,12 @@ const IndexLinePromotion = ({ setTab }) => {
               ]}
             >
               <DatePicker
-              disabledDate={(current) =>
-                current && current < moment().endOf(startDate)
-              }
-              disabled={ currentDate > startDate || statusDb === true ? true : false}
+                disabledDate={(current) =>
+                  current && current < moment().endOf(startDate)
+                }
+                disabled={
+                  currentDate > startDate || statusDb === true ? true : false
+                }
                 onChange={onChangeDate}
                 style={{ width: "100%" }}
                 placeholder="Chọn ngày bắt đầu"
@@ -542,15 +524,14 @@ const IndexLinePromotion = ({ setTab }) => {
               ]}
             >
               <DatePicker
-              disabledDate={(current) =>{
-                if(currentDate > startDateDb){
-                  return current && current < moment(currentDate)
-                }else{
-                  return current && current < moment().endOf(startDate)
-                }
-              }                
-              }
-              disabled={ statusDb === true ? true : false}
+                disabledDate={(current) => {
+                  if (currentDate > startDateDb) {
+                    return current && current < moment(currentDate);
+                  } else {
+                    return current && current < moment().endOf(startDate);
+                  }
+                }}
+                disabled={statusDb === true ? true : false}
                 onChange={onChangeDate}
                 style={{ width: "100%" }}
                 placeholder="Chọn ngày kết thúc"
@@ -579,7 +560,6 @@ const IndexLinePromotion = ({ setTab }) => {
                 listType="picture"
                 maxCount={1}
                 accept=".jpg,.jpeg,.png"
-
               >
                 <Button icon={<UploadOutlined />}>Click to upload</Button>
               </Upload>
@@ -628,7 +608,9 @@ const IndexLinePromotion = ({ setTab }) => {
               ]}
             >
               <Select
-              disabled={ currentDate > startDate || statusDb === true ? true : false}
+                disabled={
+                  currentDate > startDate || statusDb === true ? true : false
+                }
                 placeholder="Chọn trạng thái"
                 style={{
                   width: "100%",
@@ -655,7 +637,7 @@ const IndexLinePromotion = ({ setTab }) => {
               ]}
             >
               <TextArea
-              disabled={statusDb === true ? true : false}
+                disabled={statusDb === true ? true : false}
                 rows={4}
                 placeholder="Nhập chi tiết CTKM"
                 // maxLength={6}
@@ -685,20 +667,19 @@ const IndexLinePromotion = ({ setTab }) => {
           </Space>
           {currentDate < startDate && statusDb === false ? (
             <Button
-            type="primary"
-            onClick={() => handleOpenModel()}
-            style={{
-              marginRight: "1rem",
-              marginBottom: "1rem",
-              width: "100px",
-            }}
-          >
-            Thêm
-          </Button>
+              type="primary"
+              onClick={() => handleOpenModel()}
+              style={{
+                marginRight: "1rem",
+                marginBottom: "1rem",
+                width: "100px",
+              }}
+            >
+              Thêm
+            </Button>
           ) : null}
-          
         </div>
-        <Table columns={columns} dataSource={listPromotionLine}  />
+        <Table columns={columns} dataSource={listPromotionLine} />
       </div>
       <Modal
         title="Kết quả khuyến mãi"
@@ -710,37 +691,79 @@ const IndexLinePromotion = ({ setTab }) => {
           <Button key="back" onClick={handleCancel}>
             Thoát
           </Button>,
-          <Button type="primary" style={{ background: "green" }} 
-          onClick={handleOk}>
+          <Button
+            type="primary"
+            style={{ background: "green" }}
+            onClick={handleOk}
+          >
             Xuất Excel
           </Button>,
         ]}
-
       >
         <Form form={form} layout="vertical" hideRequiredMark>
           <Row gutter={16}>
             <Col span={24}>
-               < Table columns={columnsRs} dataSource={promotionRs} 
-                  footer={ () => {
-                      return (
-                        <>
-                          <div style={{display: "flex", justifyContent: "space-between"}}>
-                            <span style={{fontWeight: "bold", marginRight: "30px", marginBottom: "10px"}}>Tổng Ngân sách: </span>
-                            <span style={{fontWeight: "bold"}}>{VND.format(promotionRs[0]?.budget || 0)}</span>
-                          </div>
-                          <div style={{display: "flex", justifyContent: "space-between"}}>
-                            <span style={{fontWeight: "bold", marginRight: "30px", marginBottom: "10px"}}>Sử dụng: </span>
-                            <span style={{fontWeight: "bold"}}>{VND.format(totalMoneyProUsed)}</span>
-                          </div>
-                          <div style={{display: "flex", justifyContent: "space-between"}}>
-                            <div style={{fontWeight: "bold"}}>Còn lại: </div>
-                            <div style={{fontWeight: "bold", color: "green"}}>{VND.format(promotionRs[0]?.budget - totalMoneyProUsed || 0)}</div>
-                          </div>
-
-                        </>
-                      )
-                  } } 
-                />
+              <Table
+                columns={columnsRs}
+                dataSource={promotionRs}
+                footer={() => {
+                  return (
+                    <>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontWeight: "bold",
+                            marginRight: "30px",
+                            marginBottom: "10px",
+                          }}
+                        >
+                          Tổng Ngân sách:{" "}
+                        </span>
+                        <span style={{ fontWeight: "bold" }}>
+                          {VND.format(promotionRs[0]?.budget || 0)}
+                        </span>
+                      </div>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontWeight: "bold",
+                            marginRight: "30px",
+                            marginBottom: "10px",
+                          }}
+                        >
+                          Sử dụng:{" "}
+                        </span>
+                        <span style={{ fontWeight: "bold" }}>
+                          {VND.format(totalMoneyProUsed)}
+                        </span>
+                      </div>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <div style={{ fontWeight: "bold" }}>Còn lại: </div>
+                        <div style={{ fontWeight: "bold", color: "green" }}>
+                          {VND.format(
+                            promotionRs[0]?.budget - totalMoneyProUsed || 0
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  );
+                }}
+              />
             </Col>
           </Row>
         </Form>
