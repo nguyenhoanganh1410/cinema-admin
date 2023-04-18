@@ -8,6 +8,8 @@ import {
   Modal,
   Breadcrumb,
   DatePicker,
+  Form,
+  Select,
 } from "antd";
 
 import {
@@ -25,10 +27,19 @@ const { Title, Text } = Typography;
 const dateFormat = "YYYY/MM/DD";
 const IndexPromotion = ({ setTab }) => {
   const [showModalAddCustomer, setShowModalAddCustomer] = useState(false);
-
+  const [valueStatusPick, setValueStatusPick] = useState(1)
+  const [searchText, setSearchText] = useState('')
   const showModal = () => {
     setShowModalAddCustomer(true);
   };
+
+  const handleChange = (value) =>{
+    setValueStatusPick(value)
+  }
+  
+  const handleChangeSearch = (e) =>{
+    setSearchText(e.target.value)
+  }
 
   return (
     <div className="site-card-wrapper">
@@ -45,6 +56,7 @@ const IndexPromotion = ({ setTab }) => {
       >
         <Col span={10}>
           <Input
+            onChange={(e) => handleChangeSearch(e)}
             placeholder="Nhập tên khuyễn mãi..."
             prefix={<SearchOutlined />}
           />
@@ -61,16 +73,29 @@ const IndexPromotion = ({ setTab }) => {
           </Button>
         </Col>
         <Col span={4}>
-          <DatePicker
-            defaultValue={moment()}
-            format={dateFormat}
-            style={{ margin: "0 0.5rem" }}
-          />
-        </Col>
-        <Col span={2}>
-          <Button type="primary" title="Xóa lọc">
-            Xóa lọc
-          </Button>
+          <Form.Item>
+            <Select
+              defaultValue={1}
+              style={{
+                width: 220,
+              }}
+              onChange={handleChange}
+              options={[
+                {
+                  value: 1,
+                  label: "Tất cả",
+                },
+                {
+                  value: 2,
+                  label: "Hoạt động",
+                },
+                {
+                  value: 3,
+                  label: "Ngưng Hoạt động",
+                },
+              ]}
+            />
+          </Form.Item>
         </Col>
       </Row>
 
@@ -84,7 +109,7 @@ const IndexPromotion = ({ setTab }) => {
         }}
       >
         <Col span={24}>
-          <TablePromotionHeader setTab={setTab} />
+          <TablePromotionHeader searchText={searchText} setTab={setTab} valueStatusPick={valueStatusPick}/>
         </Col>
       </Row>
       {showModalAddCustomer ? (

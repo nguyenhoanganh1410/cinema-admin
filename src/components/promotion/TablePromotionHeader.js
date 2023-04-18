@@ -1,30 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { Button, Table, Modal, Space, Badge } from "antd";
-import {
-  SearchOutlined,
-  PlusSquareFilled,
-  UserAddOutlined,
-  ToolOutlined,
-  DeleteOutlined,
-  MinusCircleOutlined,
-} from "@ant-design/icons";
-import movieApi from "../../api/movieApi";
 import promotionApi from "../../api/promotionApi";
 import { setPromotionHeader } from "../../redux/actions";
-
 import { useDispatch, useSelector } from "react-redux";
 import { setReload } from "../../redux/actions";
+import moment from "moment";
 
-const TablePromotionHeader = ({ setTab }) => {
+const TablePromotionHeader = ({ setTab, valueStatusPick, searchText }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [promotionHeaderList, setPromotionHeaderList] = useState([]);
+
+  const [promotionHeaderListTmp, setPromotionHeaderListTmp] = useState([]);
   const dispatch = useDispatch();
   const reload = useSelector((state) => state.reload);
-  const onSelectChange = (newSelectedRowKeys) => {
-    console.log("selectedRowKeys changed: ", newSelectedRowKeys);
-    setSelectedRowKeys(newSelectedRowKeys);
-  };
 
   //handle delete customer in here...
   const handleDelete = () => {
@@ -57,19 +46,18 @@ const TablePromotionHeader = ({ setTab }) => {
       try {
         const response = await promotionApi.getPromotionHeader();
         if (response) {
+          console.log(response);
           //handle data
-          const newList = response.map((item) => {
+          const sortRes = response.sort((a, b) => {
+            return moment(b.startDate).diff(a.startDate);
+          });
+          const newList = sortRes.map((item) => {
             item.startDate = item.startDate.substring(0, 10);
             item.endDate = item.endDate.substring(0, 10);
-            // if (item.statusPromotion) {
-            //   item.statusPromotion = "Active";
-            // } else {
-            //   item.statusPromotion = "Disabled";
-            // }
             item.statusPromotion = item.statusPromotion;
-
             return item;
           });
+          setPromotionHeaderListTmp(newList);
           setPromotionHeaderList(newList);
         }
       } catch (error) {
@@ -79,8 +67,35 @@ const TablePromotionHeader = ({ setTab }) => {
     getListPromotionHeader();
   }, [reload]);
 
+  useEffect(() => {
+    if (valueStatusPick === 2) {
+      const newArr = promotionHeaderListTmp.filter((val) => {
+        return val?.statusPromotion === true;
+      });
+      setPromotionHeaderList(newArr);
+      return;
+    } else if (valueStatusPick === 3) {
+      const newArr = promotionHeaderListTmp.filter((val) => {
+        return val?.statusPromotion === false;
+      });
+      setPromotionHeaderList(newArr);
+      return;
+    }
+    setPromotionHeaderList(promotionHeaderListTmp);
+  }, [valueStatusPick]);
+
+  useEffect(() => {
+    if(!searchText){
+      setPromotionHeaderList(promotionHeaderListTmp);
+      return;
+    }
+    const newArr = promotionHeaderListTmp.filter((val) => {
+      return val?.promotionCode.toLowerCase().search(searchText.toLowerCase()) !== -1
+    });
+    setPromotionHeaderList(newArr);
+  }, [searchText]);
+
   const handleOnclik = (id) => {
-    //set id in headerId;
     dispatch(setPromotionHeader(id));
     setTab(1);
   };
@@ -95,7 +110,12 @@ const TablePromotionHeader = ({ setTab }) => {
       dataIndex: "namePromotion",
       key: "name",
       render: (text, record) => (
-        <a onClick={() => handleOnclik(record.id)}>{text}</a>
+        <a
+          style={{ textTransform: "capitalize" }}
+          onClick={() => handleOnclik(record.id)}
+        >
+          {text.toLowerCase()}
+        </a>
       ),
     },
     {
@@ -127,7 +147,7 @@ const TablePromotionHeader = ({ setTab }) => {
           return <Badge status="error" text="Ngưng hoạt đông" />;
         }
       },
-    }
+    },
   ];
 
   return (
