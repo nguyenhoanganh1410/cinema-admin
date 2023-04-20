@@ -31,6 +31,10 @@ const customerApi = {
     getCustomerByPhone: (phone) => {
         return axiosApi.get(`/customer/phone/${phone}`);
     },
+
+    createInCinema: (data) => {
+        return axiosApi.post(`/customer/cinema`,data);
+    }
 };
 
 export default customerApi;

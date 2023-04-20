@@ -1,5 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Button, Form, Input, InputNumber, Row, Select, Tag, Col, Popover, message } from "antd";
+import {
+  Button,
+  Form,
+  Input,
+  InputNumber,
+  Row,
+  Select,
+  Tag,
+  Col,
+  Popover,
+  message,
+  Modal,
+  Table,
+} from "antd";
 import "../cinemahall/IndexRoomMap.scss";
 import "./index.scss";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,8 +30,8 @@ import { setBooking, setIsBooking } from "../../redux/actions";
 import { setReload } from "../../redux/actions";
 import {
   QuestionCircleTwoTone,
-  InfoCircleTwoTone
-  
+  InfoCircleTwoTone,
+  UserAddOutlined,
 } from "@ant-design/icons";
 
 import ReactToPrint from "react-to-print";
@@ -61,12 +74,18 @@ const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
   const [promotionWarning, setPromotionWarning] = useState([]);
   const [promotionApplicalbe, setPromotionApplicalbe] = useState([]);
   const [totalDiscount, setTotalDiscount] = useState(0);
+  const [typeCustomer, setTypeCustomer] = useState("KH000");
 
   const [producs, setProducts] = useState([]);
 
   const [promotion, setPromotion] = useState([]);
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newCustomer, setNewCustomer] = useState({});
+
+
+  const [form] = Form.useForm();
 
   const reload = useSelector((state) => state.reload);
 
@@ -142,10 +161,10 @@ const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
             return val?.warning === false || val?.warning === undefined;
           });
           const totalDiscount = promotionApplicalbe.reduce((acc, val) => {
-              console.log("dis", val?.discount);
-              console.log("acc", acc);
-              const dis = val?.discount ? val?.discount : 0;
-              return acc + dis;
+            console.log("dis", val?.discount);
+            console.log("acc", acc);
+            const dis = val?.discount ? val?.discount : 0;
+            return acc + dis;
             return acc + 0;
           }, 0);
           setTotalDiscount(totalDiscount);
@@ -179,6 +198,7 @@ const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
     setMoneyCustomer(money);
   };
   const handleChange = async (value) => {
+    setTypeCustomer(value);
     if (value === "KH001") {
       const data = await customerApi.getCustomerByPhone(SDT_VANG_LAI);
       if (data.id) {
@@ -222,15 +242,6 @@ const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
         return product;
       }
     });
-    // const dataPromotionPayLoad = promotionClear?.map((product) => {
-    //   return {
-    //     type: product?.type,
-    //     promotionLine_id: product?.promotionLine_id,
-    //     qtyReceived: product?.qtyReceived || 0,
-    //     productReceived_id: product?.productReceived?.id || null,
-    //     discount: product?.discount || 0,
-    //   };
-    // });
     const dataPromotionPayLoad = promotionApplicalbe?.map((pro) => {
       return {
         promotionLine_id: pro?.promotionLine_id,
@@ -255,9 +266,9 @@ const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
 
     try {
       const result = await orderApi.createOrder(dataPayload);
-      if(result){
+      if (result) {
         console.log("result", result);
-        setIdOrder(result.data.id)
+        setIdOrder(result.data.id);
         notifySucess("Đặt Vé Thành công.");
         depatch(setBooking(null));
         setIsSucess(true);
@@ -271,15 +282,44 @@ const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
     }
   };
 
+  const handleCancel = () => {
+    setIsModalOpen(false);
+    form.resetFields();
+  };
+
+  const handleOk = async () => {
+    const firstName = form.getFieldValue("firstName");
+    const lastName = form.getFieldValue("lastName");
+    const phone = form.getFieldValue("phone");
+    const payload = {
+      firstName,
+      lastName,
+      phone,
+    };
+    console.log("payload", payload);
+    try {
+      const res = await customerApi.createInCinema(payload);
+      console.log(res);
+      if (res) {
+        setPay([...pay, { customer: res }]);
+        message.success("Thêm khách hàng thành công");
+        depatch(setReload(!reload));
+        form.resetFields();
+        setIsModalOpen(false);
+
+      }
+    } catch (error) {
+      console.log(error.response.data.message);
+      // const {message} = error.response.data
+      message.error(error.response.data.message);
+    }
+
+  };
 
   const content = (
     <div>
       {promotionWarning?.map((val) => {
-        return (
-          <p style={{ color: "#389e0d" }}>
-            {val?.message}
-          </p>
-        );
+        return <p style={{ color: "#389e0d" }}>{val?.message}</p>;
       })}
     </div>
   );
@@ -288,24 +328,22 @@ const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
     <>
       {promotionApplicalbe?.map((val) => {
         return (
-         <>
-          <p>
-            <Popover content={val?.message} title="Khuyến mãi áp dụng">
+          <>
+            <p>
+              <Popover content={val?.message} title="Khuyến mãi áp dụng">
                 <Tag color="green-inverse">{val?.promotionCode}</Tag>
-            </Popover>
-            <div className="block_discount">
-              <span style={{ textAlign: "end" }}>
-               - {VND.format(val?.discount)}
-              </span>
-            </div>
-          </p>
-            
-         </>
+              </Popover>
+              <div className="block_discount">
+                <span style={{ textAlign: "end" }}>
+                  - {VND.format(val?.discount)}
+                </span>
+              </div>
+            </p>
+          </>
         );
       })}
     </>
-  )
-
+  );
 
   return (
     <div className="pick_seat pay_style site-card-wrapper">
@@ -397,11 +435,23 @@ const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
                   },
                 ]}
               />
+              {typeCustomer === "KH000" && (
+                <>
+                  <Button
+                    style={{ marginLeft: "1rem" }}
+                    title="Thêm khách hàng"
+                    icon={<UserAddOutlined />}
+                    onClick={() => setIsModalOpen(true)}
+                  ></Button>
+                </>
+              )}
             </Form.Item>
+
             <Form.Item style={{ position: "relative" }} label="SĐT khách: ">
               <Input
                 placeholder="Nhập số điện thoại khách..."
                 onChange={handleSearchCustomer}
+                value={pay[0]?.customer ? pay[0]?.customer?.phone : ""}
               />
               {customerSearched ? (
                 <ul className="search_results">
@@ -441,9 +491,7 @@ const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
                 <span>{VND.format(totalPrice)}</span>
               </p>
               <div>
-                {promotionApplicalbe.length > 0 ? (
-                  contentPromotion
-                ) : null}
+                {promotionApplicalbe.length > 0 ? contentPromotion : null}
                 {/* <div className="block_discount">
                   <span style={{ textAlign: "end" }}>
                     {VND.format(discountMoney)}
@@ -457,13 +505,14 @@ const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
                 </div> */}
               </div>
               <p className="total_price_final">
-                <span className="total_text_final">Thành tiền: { promotionWarning.length > 0 && 
-                (
-                  <Popover content={content} title="Khuyến mãi hấp đẫn ✨">
-                    <InfoCircleTwoTone />
-                  </Popover>
-                )}
-                 </span>
+                <span className="total_text_final">
+                  Thành tiền:{" "}
+                  {promotionWarning.length > 0 && (
+                    <Popover content={content} title="Khuyến mãi hấp đẫn ✨">
+                      <InfoCircleTwoTone />
+                    </Popover>
+                  )}
+                </span>
                 <span className="total_price_final">
                   {VND.format(totalPrice - totalDiscount)}
                 </span>
@@ -487,6 +536,86 @@ const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
           </Form>
         </Col>
       </Row>
+      <Modal
+        title="Tạo khách hàng"
+        open={isModalOpen}
+        width={400}
+        footer={[
+          <Button key="back" onClick={handleCancel}>
+            Hủy
+          </Button>,
+          <Button key="submit" type="primary" onClick={handleOk}>
+            Lưu
+          </Button>,
+        ]}
+      >
+        <Form form={form} layout="vertical">
+          <Row gutter={16} style={{ marginTop: "20px" }}>
+            <Col span={24}>
+              <Form.Item
+                name="firstName"
+                label="Họ"
+                rules={[
+                  {
+                    required: true,
+                    message: "Hãy nhập họ khách hàng",
+                  },
+                ]}
+              >
+                <Input placeholder="Nhập họ khách hàng" />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={24}>
+              <Form.Item
+                name="lastName"
+                label="Tên"
+                rules={[
+                  {
+                    required: true,
+                    message: "Hãy nhập tên khách hàng",
+                  },
+                ]}
+              >
+                <Input placeholder="Nhập tên khách hàng" />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={24}>
+              <Form.Item
+                name="phone"
+                label="Hãy nhập số điện thoại"
+                hasFeedback
+                rules={[
+                  {
+                    required: true,
+                    message: "Hãy nhập số điện thoại",
+                  },
+                ]}
+                // rules={[
+                //   ({ getFieldValue }) => ({
+                //     validator(rule, value) {
+                //       if (value !== undefined && value.length < 10) {
+                //         return Promise.reject("Số điện thoại phải có 10 số");
+                //       } else if (isExistPhone === false) {
+                //         return Promise.reject("Số điện thoại đã tồn tại");
+                //       }
+                //       return Promise.resolve();
+                //     },
+                //   }),
+                // ]}
+              >
+                <Input
+                  // onChange={onChangePhone}
+                  placeholder="Hãy nhập số điện thoại..."
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      </Modal>
     </div>
   );
 };

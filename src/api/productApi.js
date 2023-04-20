@@ -1,8 +1,8 @@
 import axiosApi from "./axisosApi";
 
 const productApi = {
-    getProducts: () => {
-        return axiosApi.get("/product");
+    getProducts: (query) => {
+        return axiosApi.get(`/product?keyword=${query}`);
     },
     getProductById: (id) => {
         return axiosApi.get(`/product/${id}`);

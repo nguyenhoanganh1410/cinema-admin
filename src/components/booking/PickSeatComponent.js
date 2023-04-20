@@ -399,6 +399,7 @@ const PickSeatComponent = ({next}) => {
                                   
                                     style={!seat?.status ? {background:"#BDBDD7", color:"white", cursor:"not-allowed"} : {}}
                                   >
+                                    {/* booking_content-top */}
                                     <span>
                                       <MdChair />
                                     </span>
