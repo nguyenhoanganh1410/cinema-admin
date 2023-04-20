@@ -14,13 +14,16 @@ import openAddressApi from "../../api/openApi";
 import { useDispatch, useSelector } from "react-redux";
 import { setReload } from "../../redux/actions";
 
-const TableProduct = () => {
+const TableProduct = ({keyword}) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [listProduct, setListProduct] = useState([]);
   const [selectedId, setSelectedId] = useState([]);
   const [showModalDetailProduct, setShowModalDetailProduct] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [idPick, setIdPick] = useState(0);
+
+
   const depatch = useDispatch();
   const reload = useSelector((state) => state.reload);
 
@@ -33,55 +36,73 @@ const TableProduct = () => {
     {
       title: "Id",
       dataIndex: "id",
-
-      render: (val) => {
+      width: "5%",
+      
+    },
+    {
+      title: "Mã sản phẩm",
+      dataIndex: "productCode",
+      width: "10%",
+      render: (val,record) => {
         return (
           <a
             onClick={() => {
-              showModalDetail(val);
+              showModalDetail(record.id);
             }}
           >
             {val}
           </a>
         );
       },
-    },
-    {
-      title: "Mã sản phẩm",
-      dataIndex: "productCode",
+
     },
     {
       title: "Thể loại",
       dataIndex: "type",
+      width: "10%",
       render: (type) => {
         let name = "";
         if (type === "SP") {
           name = "Sản phẩm";
         } else if (type === "Ghe") {
           name = "Ghế";
-        } else {
-          name = "Combo";
         }
         return name;
       },
     },
     {
-      
       title: "Tên sản phẩm",
       dataIndex: "productName",
-      render: (productName) => {
-        return <Select.Option value={productName}>{productName}</Select.Option>;
-      },
+      width: "30%",
 
     },
     {
       title: "Mô tả",
       dataIndex: "desc",
+      width: "30%",
+
     },
     {
       title: "Hình ảnh",
       dataIndex: "image",
+      width: "20%",
+
       render: (image) => <Image width={50} src={image} />,
+    },
+    {
+      
+      render: (val,record) => {
+        return (
+          <Button
+            icon={<DeleteOutlined  style={{ color: '#ff4d4f' }}/>}
+            onClick={()=>{
+              setIdPick(record.id)
+              handleDelete()
+            }}
+          >
+          </Button>
+        );
+      },
     },
   ];
 
@@ -89,7 +110,7 @@ const TableProduct = () => {
     //get list customer in here
     const fetchListCustomer = async () => {
       try {
-        const response = await productApi.getProducts();
+        const response = await productApi.getProducts(keyword);
 
         if (response) {
           const data = response.map((item) => {
@@ -106,7 +127,7 @@ const TableProduct = () => {
       }
     };
     fetchListCustomer();
-  }, [reload]);
+  }, [reload,keyword]);
 
   const onSelectChange = (selectedId) => {
     setSelectedRowKeys(selectedId);
@@ -154,22 +175,19 @@ const TableProduct = () => {
     setIsModalOpen(false);
     const fetchDeleteProduct = async () => {
       try {
-        const response = await productApi.deleteProduct(selectedId);
+        const response = await productApi.deleteProduct(idPick);
         if (response == 1) {
           depatch(setReload(!reload));
+          message.success("Xóa thành công");
+
         } else {
-          setTimeout(() => {
             message.success("Xóa thất bại");
-          }, 1000);
         }
       } catch (error) {
         console.log("Failed to fetch product list: ", error);
       }
     };
     fetchDeleteProduct();
-    setTimeout(() => {
-      message.success("Xóa thành công");
-    }, 1000);
   };
 
   const handleCancel = () => {
@@ -183,52 +201,24 @@ const TableProduct = () => {
           marginBottom: 16,
         }}
       >
-        <Button
-          type="primary"
-          danger
-          onClick={handleDelete}
-          disabled={!hasSelected}
-          loading={loading}
-          icon={<DeleteOutlined />}
-          style={{ marginRight: "1rem" }}
-        >
-          Xóa
-        </Button>
-        <Button
-          type="primary"
-          onClick={handleRefresh}
-          loading={loading}
-          icon={<ReloadOutlined />}
-          style={{ marginRight: "1rem" }}
-        >
-          Làm mới
-        </Button>
-        <span
-          style={{
-            marginLeft: 8,
-          }}
-        >
-          {hasSelected ? `Selected ${selectedRowKeys.length} items` : ""}
-        </span>
       </div>
       <Table
-        rowSelection={{
-          selectedRowKeys,
-          onChange: onSelectChange,
-          onSelect: (record) => {
-            setSelectedId(record.id);
-          },
-        }}
         columns={columns}
         dataSource={listProduct}
       />
       <Modal
-        title="Xóa khách hàng"
+        title="Xóa sản phẩm"
         open={isModalOpen}
-        onOk={handleOk}
-        onCancel={handleCancel}
+        footer={[
+          <Button key="back" onClick={handleCancel}>
+            Hủy
+          </Button>,
+          <Button key="submit" danger type="primary" onClick={handleOk}>
+            Xóa
+          </Button>,
+        ]}
       >
-        <p>Bạn muốn xóa khách hàng không?</p>
+        <p>Bạn muốn xóa sản phẩm không?</p>
       </Modal>
       {showModalDetailProduct ? (
         <ModelDetailProduct

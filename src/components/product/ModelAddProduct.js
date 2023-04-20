@@ -12,7 +12,8 @@ import {
   Select,
   Space,
   Upload,
-  Table
+  Table,
+  InputNumber
 } from "antd";
 
 import productApi from "../../api/productApi";
@@ -25,9 +26,7 @@ const { Option } = Select;
 const ModelAddProduct = ({
   showModalAddProduct,
   setShowModalAddProduct,
-
 }) => {
-
   const depatch = useDispatch();
   const reload = useSelector((state) => state.reload);
 
@@ -85,7 +84,7 @@ const ModelAddProduct = ({
   const handleSubmit = async (val) => {
     console.log("submit", val);
     const { productName, productCode, type, typeHall,desc,image } = val;
-    console.log("name", productName);
+    console.log("name", productCode.valueAsNumber);
 
     const data = new FormData();
     data.append("type", type? type : "");
@@ -103,9 +102,7 @@ const ModelAddProduct = ({
         onClose();
         depatch(setReload(!reload));
         form.resetFields();
-        setTimeout(() => {
           message.success("Thêm khách hàng thành công!");
-        }, 500);
       }
     } catch (error) {
       console.log(error);
@@ -126,7 +123,7 @@ const ModelAddProduct = ({
   return (
     <>
       <Drawer
-        title="Thông tin khách hàng"
+        title="Thêm sản phảm"
         width={720}
         onClose={onClose}
         open={showModalAddProduct}
@@ -135,9 +132,9 @@ const ModelAddProduct = ({
         }}
         extra={
           <Space>
-            <Button onClick={onClose}>Cancel</Button>
+            <Button onClick={onClose}>Hủy</Button>
             <Button form="myForm" htmlType="submit" type="primary">
-              Submit
+              Lưu
             </Button>
           </Space>
         }
@@ -145,7 +142,14 @@ const ModelAddProduct = ({
         <Form form={form} onFinish={handleSubmit} id="myForm" layout="vertical">
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item name="type" label="Loại sản phẩm">
+              <Form.Item name="type" label="Loại sản phẩm"
+                rules={[
+                  {
+                    required: true,
+                    message: "Hãy chọn loại sản phẩm",
+                  },
+                ]}
+              >
                 <Select
                   placeholder="Chọn loại sản phẩm"
                   style={{
@@ -162,24 +166,45 @@ const ModelAddProduct = ({
                       value: "SP",
                       label: "Sản phẩm",
                     },
-                    {
-                      value: "CB",
-                      label: "Combo",
-                    },
                   ]}
                 />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="productCode" label="Mã sản phẩm">
-                <Input />
+              <Form.Item name="productCode" label="Mã sản phẩm"
+                rules={[
+                  {
+                    required: true,
+                    message: "Hãy nhập mã sản phẩm",
+                  },
+                ]}
+              >
+                <Input placeholder="Hãy nhập mã sản phẩm" 
+                  addonBefore="PRD"
+                  min={1}
+                  maxLength={5}
+                  showCount
+                  style={{ width: "100%"}}
+                  onKeyPress={(e) => {
+                    if (!/[0-9]/.test(e.key)) {
+                      e.preventDefault();
+                    }
+                  }}
+                />
               </Form.Item>
             </Col>
             <Col span={12}></Col>
           </Row>
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item name="productName" label="Tên sản phẩm">
+              <Form.Item name="productName" label="Tên sản phẩm"
+                rules={[
+                  {
+                    required: true,
+                    message: "Hãy nhập tên sản phẩm",
+                  },
+                ]}
+              >
                 <Input />
               </Form.Item>
             </Col>
@@ -202,46 +227,9 @@ const ModelAddProduct = ({
                   <Button icon={<UploadOutlined />}>Click to upload</Button>
                 </Upload>
               </Form.Item>
-              {/* <Form.Item name="typeHall" label="Phòng chiếu">
-                <Select
-                 disabled={ !type || type === "SP" ? true : false }
-                  placeholder="Chọn loại Phòng chiếu"
-                  style={{
-                    width: "100%",
-                  }}
-                  onChange={onChangeHall}
-                  options={[
-                    {
-                      value: "2D",
-                      label: "2D",
-                    },
-                    {
-                      value: "3D",
-                      label: "3D",
-                    },
-                  ]}
-                />
-              </Form.Item> */}
             </Col>
           </Row>
-          <Row gutter={16}>
-          <Button style={{
-            marginBottom: "16px",
-            marginLeft: "530px"
-
-          }} 
-          type="primary">Thêm sản phẩm</Button>
-          <Col span={24}>
-              <Form.Item name="comboLine">
-                <Table
-                  columns={columns}
-                  pagination={false}
-                  size="small"
-                />
-              </Form.Item>
-            </Col>
-          </Row> 
-          <Row style={{ marginTop: "16px" }} gutter={16}>
+          <Row  gutter={16}>
             <Col span={24}>
               <Form.Item name="desc" label="Mô tả">
                 <Input.TextArea rows={4} placeholder="Nhập mô tả..." />

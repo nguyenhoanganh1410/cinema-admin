@@ -1,8 +1,8 @@
 import axiosApi from "./axisosApi";
 
 const movieApi = {
-  getMovies: () => {
-    return axiosApi.get("/movie");
+  getMovies: (query) => {
+    return axiosApi.get(`/movie?keyword=${query?.keyword}&startDate=${query?.startDate}&endDate=${query?.endDate}`);
   },
   searchMovies: (nameMovie) => {
     return axiosApi.get(`/movie/name/search/${nameMovie}`);
@@ -24,7 +24,13 @@ const movieApi = {
   },
 
   updateMovie: (id, data) => {
-    return axiosApi.patch(`/movie/${id}`, data);
+    return axiosApi.put(`/movie/${id}`, data,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+    );
   },
 
   deleteMovie: (id) => {

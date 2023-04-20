@@ -34,22 +34,21 @@ const TableCustomer = () => {
     {
       title: "Id",
       dataIndex: "id",
-
-      render: (val) => {
+    },
+    {
+      title: "Họ và Tên",
+      dataIndex: "name",
+      render: (val,record) => {
         return (
           <a
             onClick={() => {
-              showModalDetail(val);
+              showModalDetail(record.id);
             }}
           >
             {val}
           </a>
         );
       },
-    },
-    {
-      title: "Họ và Tên",
-      dataIndex: "name",
     },
     {
       title: "Số điện thoại",
@@ -64,11 +63,7 @@ const TableCustomer = () => {
       dataIndex: "email",
     },
     {
-      title: "Ngày sinh",
-      dataIndex: "dob",
-    },
-    {
-      title: "Rank",
+      title: "Cấp bậc",
       dataIndex: "rank",
       key: "rank",
       render: (rank) => {
@@ -107,22 +102,31 @@ const TableCustomer = () => {
 
         const data = await Promise.all(
           response.map(async (item, index) => {
-            const ward = await openAddressApi.getWardByCode(item.ward_id);
-            const district = await openAddressApi.getDistrictByCode(
-              item.district_id
-            );
-            const city = await openAddressApi.getProvinceByCode(item.city_id);
-            item.ward_id = ward?.name;
-            item.district_id = district?.name;
-            item.city_id = city?.name;
+            let address;
+            if (
+              item.city_id && item.district_id && item.ward_id
+            ) {
+              const ward = await openAddressApi.getWardByCode(item?.ward_id);
+              const district = await openAddressApi.getDistrictByCode(
+                item?.district_id
+              );
+              const city = await openAddressApi.getProvinceByCode(item?.city_id);
+              item.ward_id = ward?.name;
+              item.district_id = district?.name;
+              item.city_id = city?.name;
+
+              address = ` ${item?.ward_id + " /"} ${item?.district_id + " /"} ${
+                item?.city_id
+              }`;
+            } else {
+              address = "";
+            }
             return {
               key: index,
               id: item.id,
               name: `${item.firstName} ${item.lastName}`,
               phone: item.phone,
-              address: ` ${item?.ward_id + " /"} ${item?.district_id + " /"} ${
-                item?.city_id
-              }`,
+              address: address,
               email: item.email,
               dob: item.dob,
               rank: item.Rank?.nameRank,
@@ -208,39 +212,6 @@ const TableCustomer = () => {
 
   return (
     <div>
-      <div
-        style={{
-          marginBottom: 16,
-        }}
-      >
-        <Button
-          type="primary"
-          danger
-          onClick={handleDelete}
-          disabled={!hasSelected}
-          loading={loading}
-          icon={<DeleteOutlined />}
-          style={{ marginRight: "1rem" }}
-        >
-          Xóa
-        </Button>
-        <Button
-          type="primary"
-          onClick={handleRefresh}
-          loading={loading}
-          icon={<ReloadOutlined />}
-          style={{ marginRight: "1rem" }}
-        >
-          Làm mới
-        </Button>
-        <span
-          style={{
-            marginLeft: 8,
-          }}
-        >
-          {hasSelected ? `Selected ${selectedRowKeys.length} items` : ""}
-        </span>
-      </div>
       <Table
         rowSelection={{
           selectedRowKeys,

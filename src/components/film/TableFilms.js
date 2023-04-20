@@ -11,14 +11,21 @@ import {
 import movieApi from "../../api/movieApi";
 import ModelDetailMovie from "./ModelMovieDetail";
 
+import { useDispatch, useSelector } from "react-redux";
+import { setReload } from "../../redux/actions";
 
-const TableFilms = () => {
+
+
+
+const TableFilms = ({keyword,startDatePicker,endDatePicker}) => {
   // const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [listMovie, setListMovie] = useState([]);
-  const [refresh, setRefresh] = useState(false);
   const [showModalDetailMovie, setShowModalDetailMovie] = useState(false);
   const [selectedId, setSelectedId] = useState(0);
+
+  const depatch = useDispatch();
+  const reload = useSelector((state) => state.reload);
 
   const showModalDetail = (e) => {
     setShowModalDetailMovie(true);
@@ -26,31 +33,31 @@ const TableFilms = () => {
   };
 
   const columns = [
-    {
-      
-      render: (val) => {
-        return (
-          <Button
-            icon={<DeleteOutlined  style={{ color: '#ff4d4f' }}/>}
-            onClick={handleDelete}
-          >
-          </Button>
-        );
-      },
-    },
+    
     {
       title: "Id",
       dataIndex: "id",
       key: "id",
-      render: (val) => {
+    },
+    {
+      title: "Mã phim",
+      dataIndex: "code",
+      render: (val,record) => {
         return <a onClick={()=>{
-          showModalDetail(val);
+          showModalDetail(record.id);
         }}>{val}</a>;
       }
     },
     {
       title: "Tên phim",
       dataIndex: "nameMovie",
+      render: (text) => {
+        if (text?.length > 30) {
+          return text?.substring(0, 30) + "...";
+        } else {
+          return text;
+        }
+      },
     },
     {
       title: "Thời lượng",
@@ -59,29 +66,51 @@ const TableFilms = () => {
     {
       title: "Ngày phát hành",
       dataIndex: "releaseDate",
+      sorter: (a, b) => {
+        return new Date(a.releaseDate) - new Date(b.releaseDate);
+      },
     },
     {
       title: "Ngày kết thúc",
       dataIndex: "endDate",
     },
     {
-      title: "Trạng thái",
+      title: "Tình trạng",
       dataIndex: "status",
       render: (status) => {
-        let color = "";
-        if (status === "Đang chiếu") {
-          color = "green";
-        }
-        if (status === "Sắp chiếu") {
-          color = "blue";
-        }
-        if (status === "Ngừng chiếu") {
-          color = "red";
-        }
+          let color = "green";
+          let text = "Đang chiếu";
+          if (status === 1) {
+            color = "success";
+            text = "Đang chiếu";
+          }
+          if (status === 0) {
+            color = "processing";
+            text = "Sắp chiếu";
+          }
+          if (status === 2) {
+            color = "error";
+            text = "Đã kết thúc";
+          }
         return (
-          <Badge status={color} text={status} />
+          <Badge status={color} text={text} />
         );
-      }
+      },
+      filters: [
+        {
+          text: "Đang chiếu",
+          value: 1,
+        },
+        {
+          text: "Sắp chiếu",
+          value: 0,
+        },
+        {
+          text: "Đã kết thúc",
+          value: 2,
+        },
+      ],
+      onFilter: (value, record) => record.status === value,
     },
     {
       title: "Hình ảnh",
@@ -94,20 +123,47 @@ const TableFilms = () => {
       ),
     },
     {
-      title: "Active",
+      title: "Trạng thái",
       dataIndex: "active",
       render: (active) => {
         let color = "green";
         if (active === "Hoạt động") {
-          color = "green";
+          color = "success";
         }
         if (active === "Ngừng hoạt động") {
-          color = "blue";
+          color = "error";
         }
         return (
           <Tag color={color} key={active}>
             {active.toUpperCase()}
           </Tag>
+        );
+      },
+      filters: [
+        {
+          text: "Hoạt động",
+          value: "Hoạt động",
+        },
+        {
+          text: "Ngừng hoạt động",
+          value: "Ngừng hoạt động",
+        },
+      ],
+      onFilter: (value, record) => record.active.indexOf(value) === 0,
+    },
+    {
+      render: (val,record) => {
+        return (
+          <Button
+            disabled={record.active === "Hoạt động" ? true : false}
+            icon={<DeleteOutlined />}
+            onClick={() => {
+              setSelectedId(record.id);
+              handleDelete();
+            }}
+            danger
+          >
+          </Button>
         );
       },
     },
@@ -151,34 +207,37 @@ const TableFilms = () => {
   };
   const handleOk = () => {
     setIsModalOpen(false);
-
-    //handle code for log out in here
-
-    ////////
+    const deleteMovie = async () => {
+      try {
+        const response = await movieApi.deleteMovie(selectedId);
+        console.log(response);
+        if (response) {
+          //handle data
+          depatch(setReload(!reload));
+          message.success("Xóa thành công");
+        }
+      } catch (error) {
+        console.log("Failed to fetch: ", error);
+        message.error("Xóa thất bại");
+      }
+    };
+    deleteMovie();
   };
   const handleCancel = () => {
     setIsModalOpen(false);
   };
   /////
 
-  const handleRefresh = () => {
-    setLoading(true);
-    // ajax request after empty completing
-    setTimeout(() => {
-      // setSelectedRowKeys([]);
-      setLoading(false);
-      setRefresh(!refresh);
-      message.success("Tải lại thành công");
-    }, 1000);
-  };
 
   useEffect(() => {
     //load movies
     const gettListMovie = async () => {
       try {
-        const response = await movieApi.getMovies();
-
-        console.log(response);
+        const response = await movieApi.getMovies({
+          keyword: keyword,
+          startDate: startDatePicker,
+          endDate: endDatePicker ,
+        });
         //set user info
         if (response) {
           //handle data
@@ -186,16 +245,8 @@ const TableFilms = () => {
             movie.releaseDate = movie?.releaseDate?.substring(0, 10);
             movie.duration = movie?.duration + " " + "phút";
             movie.endDate = movie?.endDate?.substring(0, 10);
-            const status = Number(movie?.status);
-            let statusName = "";
-            if (status === 1) {
-              statusName = "Đang chiếu";
-            } else if (status === 0) {
-              statusName = "Sắp chiếu";
-            } else if(status === 2) {
-              statusName = "Ngừng chiếu";
-            }
-            movie.status = statusName;
+            movie.status = movie?.status;
+            movie.code = movie?.codeMovie;
 
             const active = movie?.isActived;
             console.log('ac',active);
@@ -216,32 +267,10 @@ const TableFilms = () => {
       }
     };
     gettListMovie();
-  }, [refresh]);
+  }, [reload,keyword,startDatePicker,endDatePicker]);
 
   return (
     <div>
-      <div
-        style={{
-          marginBottom: 16,
-        }}
-      >
-        
-        <Button
-          type="primary"
-          onClick={handleRefresh}
-          loading={loading}
-          icon={<ReloadOutlined />}
-        >
-          Làm mới
-        </Button>
-        <span
-          style={{
-            marginLeft: 8,
-          }}
-        >
-          {/* {hasSelected ? `Selected ${selectedRowKeys.length} items` : ""} */}
-        </span>
-      </div>
       <Table columns={columns} dataSource={listMovie}
        
       />

@@ -16,6 +16,8 @@ import {
 import openAddressApi from "../../api/openApi";
 import productApi from "../../api/productApi";
 import moment from "moment";
+import { useDispatch, useSelector } from "react-redux";
+import { setReload } from "../../redux/actions";
 
 const { Option } = Select;
 
@@ -29,6 +31,10 @@ const ModelDetailCustomer = ({
   const [image, setImage] = useState("");
   const [type, setType] = useState("");
   const [typeHall, setTypeHall] = useState("");
+  const [imagePicker, setImagePicker] = useState([]);
+
+  const depatch = useDispatch();
+  const reload = useSelector((state) => state.reload);
 
   const normFile = (e) => {
     console.log("Upload event:", e);
@@ -51,51 +57,36 @@ const ModelDetailCustomer = ({
   };
 
   const handleSubmit = async (val) => {
-    // console.log("submit", val);
-    // const { id, firstName, lastname, phone, email, address, dob, note, image } =
-    //   val;
-    // const data = new FormData();
-    // data.append("firstName", firstName);
-    // data.append("lastName", lastname);
-    // data.append("phone", phone);
-    // data.append("email", email);
-    // data.append("address", address);
-    // data.append("dob", dob);
-    // data.append("note", note);
-    // data.append("city_id", provincePicked);
-    // data.append("district_id", districtPicked);
-    // data.append("ward_id", wardPicked);
-    // data.append("street", address);
-    // console.log("data", image);
-    // if (image) {
-    //   data.append("image", image[0].originFileObj);
-    // }
+    console.log("submit", val);
+    
+    const { id, productCode, productName, type, desc, image } = val;
+    const data = new FormData();
+    data.append("productCode", productCode);
+    data.append("productName", productName);
+    data.append("type", type);
+    data.append("desc", desc);
+    if (imagePicker) {
+      if (imagePicker.length === 0){
+        console.log("image no");
+      } else {
+        data.append("image", image[0].originFileObj);
+      }
+    } else {
+      data.append("image", image);
+    }
 
-    // // const data = {
-    // //   firstName: firstName,
-    // //   lastName: lastname,
-    // //   phone: phone,
-    // //   email: email,
-    // //   address: address,
-    // //   dob: dob,
-    // //   note: note,
-    // //   city_id: provincePicked,
-    // //   district_id: districtPicked,
-    // //   ward_id: wardPicked,
-    // //   street: address,
-    // // };
-    // try {
-    //   const response = await customerApi.updateCustomer(id, data);
-    //   console.log(response);
-    //   if (response) {
-    //     onClose();
-    //     setTimeout(() => {
-    //       message.success("Cập nhật thành công");
-    //     }, 1000);
-    //   }
-    // } catch (error) {
-    //   console.log(error);
-    // }
+    try {
+      const res = await productApi.updateProduct(id, data);
+      if (res) {
+        console.log("res", res);
+        onClose();
+        depatch(setReload(!reload));
+        message.success("Cập nhật thành công");
+      }
+    } catch (error) {
+      console.log(error);
+      message.error("Cập nhật thất bại", error);
+    }
   };
 
   useEffect(() => {
@@ -112,7 +103,7 @@ const ModelDetailCustomer = ({
             ...response,
             image: [
               {
-                uid: "-1",
+                uid: "rc-upload-1681828335338-25",
                 name: response.image,
                 status: "done",
                 url: response.image,
@@ -127,7 +118,7 @@ const ModelDetailCustomer = ({
     console.log("selectedId", selectedId);
     fetchProductInfo(selectedId);
   }, []);
-
+  // rc-upload-1681828335338-18
 
 
   const dummyRequest = ({ file, onSuccess }) => {
@@ -136,7 +127,6 @@ const ModelDetailCustomer = ({
       onSuccess("ok");
     }, 0);
   };
-  console.log("typeHall", typeHall);
 
   return (
     <>
@@ -150,9 +140,9 @@ const ModelDetailCustomer = ({
         }}
         extra={
           <Space>
-            <Button onClick={onClose}>Cancel</Button>
+            <Button onClick={onClose}>Hủy</Button>
             <Button form="myForm" htmlType="submit" type="primary">
-              Submit
+              Cập nhật
             </Button>
           </Space>
         }
@@ -160,14 +150,10 @@ const ModelDetailCustomer = ({
         <Form form={form} onFinish={handleSubmit} id="myForm" layout="vertical">
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item name="id" label="ID">
+              <Form.Item name="id" label="id">
                 <Input disabled={true} />
               </Form.Item>
             </Col>
-
-            <Col span={12}></Col>
-          </Row>
-          <Row gutter={16}>
             <Col span={12}>
               <Form.Item name="type" label="Loại sản phẩm">
                 <Select
@@ -195,6 +181,13 @@ const ModelDetailCustomer = ({
                 />
               </Form.Item>
             </Col>
+          </Row>
+          <Row gutter={16}>
+          <Col span={12}>
+              <Form.Item name="productName" label="Tên sản phẩm">
+                <Input />
+              </Form.Item>
+            </Col>
             <Col span={12}>
               <Form.Item name="productCode" label="Mã sản phẩm">
                 <Input disabled={true}/>
@@ -203,42 +196,6 @@ const ModelDetailCustomer = ({
             <Col span={12}></Col>
           </Row>
           <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item name="productName" label="Tên sản phẩm">
-                <Input />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="typeHall" label="Phòng chiếu">
-                <Select
-                 disabled={!typeHall}
-                  placeholder="Chọn loại Phòng chiếu"
-                  style={{
-                    width: "100%",
-                  }}
-                  onChange={onChangeHall}
-                  options={[
-                    {
-                      value: "2D",
-                      label: "2D",
-                    },
-                    {
-                      value: "3D",
-                      label: "3D",
-                    },
-                  ]}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row style={{ marginTop: "16px" }} gutter={16}>
-            <Col span={24}>
-              <Form.Item name="desc" label="Mô tả">
-                <Input.TextArea rows={4} placeholder="Nhập mô tả..." />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16} style={{ marginTop: "24px" }}>
             <Col span={12}>
               <Form.Item
                 name="image"
@@ -254,6 +211,10 @@ const ModelDetailCustomer = ({
                   listType="picture"
                   maxCount={1}
                   accept=".jpg,.jpeg,.png"
+                  onChange={(e) => {
+                    setImagePicker(e.fileList[0]);
+                  }
+                  }
                 >
                   <Button icon={<UploadOutlined />}>Click to upload</Button>
                 </Upload>
@@ -261,8 +222,13 @@ const ModelDetailCustomer = ({
             </Col>
             <Col span={12}></Col>
           </Row>
-
-          
+          <Row  gutter={16}>
+            <Col span={24}>
+              <Form.Item name="desc" label="Mô tả">
+                <Input.TextArea rows={4} placeholder="Nhập mô tả..." />
+              </Form.Item>
+            </Col>
+          </Row>
         </Form>
       </Drawer>
     </>

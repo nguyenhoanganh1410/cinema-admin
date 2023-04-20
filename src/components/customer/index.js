@@ -39,21 +39,17 @@ const IndexCustomer = () => {
             prefix={<SearchOutlined />}
           />
         </Col>
-        <Col span={9}>
+        <Col span={6}>
+        </Col>
+        <Col span={3}>
+          <Button  type="default" icon={<DownloadOutlined />}>
+            Xuất file
+          </Button>
+        </Col>
+        <Col span={2}>
           {" "}
           <Button type="primary" icon={<UserAddOutlined />} onClick={showModal}>
             Thêm
-          </Button>
-        </Col>
-        {/* <Col style={{ margin: "0 1rem" }}>
-          {" "}
-          <Button type="primary" size="large" icon={<ToolOutlined />}>
-            Cập nhật
-          </Button>
-        </Col> */}
-        <Col span={1}>
-          <Button type="primary" icon={<DownloadOutlined />}>
-            Xuất file
           </Button>
         </Col>
       </Row>

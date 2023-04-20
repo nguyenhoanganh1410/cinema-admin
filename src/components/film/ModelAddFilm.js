@@ -13,7 +13,8 @@ import {
   Space,
   
   Upload,
-  message
+  message,
+  InputNumber,
 } from "antd";
 
 import { useFormik } from "formik";
@@ -22,8 +23,14 @@ import categoryMovie from "../../api/categoryMovie";
 import { fimlValidator } from "./FilmSchema";
 import cinameApi from "../../api/cinemaApi";
 import movieApi from "../../api/movieApi";
-import { notifyError } from "../../utils/Notifi";
+import { notifyError,
+  notifySucess
+ } from "../../utils/Notifi";
+import moment from "moment";
 const { Option } = Select;
+
+import { setReload } from "../../redux/actions";
+import { useDispatch, useSelector } from "react-redux";
 
 const getBase64 = (file) =>
   new Promise((resolve, reject) => {
@@ -36,69 +43,27 @@ const getBase64 = (file) =>
 const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
   const [form] = Form.useForm();
 
+  const { RangePicker } = DatePicker;
+  const [startDatePicker, setStartDatePicker] = useState("");
+  const [endDatePicker, setEndDatePicker] = useState("");
   const [listCategory, setListCategory] = useState([]);
   const [listCinema, setListCinema] = useState([]);
-  const [previewOpen, setPreviewOpen] = useState(false);
-  const [previewImage, setPreviewImage] = useState("");
-  const [previewTitle, setPreviewTitle] = useState("");
-  const [fileList, setFileList] = useState([
-    {
-      uid: "-1",
-      name: "image.png",
-      status: "done",
-      url: "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png",
-    },
-  ]);
-  const [nameMovie, setNameMovie] = useState("");
-  const [cast, setCast] = useState("");
-  const [director, setDirector] = useState("");
-  const [linkTrailer, setLinkTrailer] = useState("");
   const [category, setCategory] = useState("");
   const [time, setTime] = useState(0);
-  const [releaseDate, setReleaseDate] = useState("");
-  const [desc, setDesc] = useState("");
   const [classify, setClassify] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [status, setStatus] = useState("");
   const [image, setImage] = useState("");
 
-  // const handleCancel = () => setPreviewOpen(false);
-  // const handlePreview = async (file) => {
-  //   console.log(file);
-  //   if (!file.url && !file.preview) {
-  //     file.preview = await getBase64(file.originFileObj);
-  //   }
-  //   setPreviewImage(file.url || file.preview);
-  //   setPreviewOpen(true);
-  //   setPreviewTitle(
-  //     file.name || file.url.substring(file.url.lastIndexOf("/") + 1)
-  //   );
-  // };
-  // const handleChange = ({ fileList: newFileList }) => {
-  //   console.log(newFileList);
-  //   if (fileList.length < 1) {
-  //     setFileList(newFileList);
-  //   }
-  // };
-  // const uploadButton = (
-  //   <div>
-  //     <PlusOutlined />
-  //     <div
-  //       style={{
-  //         marginTop: 8,
-  //       }}
-  //     >
-  //       Upload
-  //     </div>
-  //   </div>
-  // );
+  const currentDate = moment().format("YYYY-MM-DD");
 
-  // const onSearch = (value) => {
-  //   console.log("search:", value);
-  // };
+  const depatch = useDispatch();
+  const reload = useSelector((state) => state.reload);
 
   const onClose = () => {
     setShowModalAddCustomer(false);
+  };
+
+  const handleChangeCode = (e) => {
+
   };
 
   //change position
@@ -114,53 +79,46 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
 
   //choise date start worling
   const onChangeDate = (date, dateString) => {
-    setReleaseDate(dateString);
-  };
-  const onChangeEndDate = (date, dateString) => {
-    setEndDate(dateString);
+    setStartDatePicker(dateString[0]);
+    setEndDatePicker(dateString[1]);
   };
 
   const onChangeClassify = (value) => {
     setClassify(value);
   };
 
-  const onChangeStatus = (value) => {
-    setStatus(value);
-  };
-
-
-
-
-
-  const handleSubmit = async() => {
-    //call api create a new movie
+  const handleSubmit = async(val) => {
+    console.log(val);
+    const {
+      category, classify, codeMovie, 
+      daoDien, description, dienVien, 
+      image, link, name, time
+    } = val;
+    console.log(startDatePicker, endDatePicker);
     const data = new FormData();
-    data.append("nameMovie", nameMovie);
-    data.append("cast", cast);
-    data.append("director", director);
-    data.append("linkTrailer", linkTrailer);
+    data.append("nameMovie", name);
+    data.append("codeMovie", codeMovie);
+    data.append("cast", daoDien);
+    data.append("director", dienVien);
+    data.append("linkTrailer", link);
     data.append("idCategoryMovie", category);
     data.append("duration", time);
-    data.append("releaseDate", releaseDate);
-    data.append("idCinema", 1);
-    data.append("desc", desc);
+    data.append("releaseDate", startDatePicker);
+    data.append("desc", description);
     data.append("classify", classify);
-    data.append("endDate", endDate);
-    data.append("status", status);
-    if(image){
-      data.append("image", image);
+    data.append("endDate", endDatePicker);
+    if(image || (image && image.length > 0)){
+      data.append("image", image[0].originFileObj);
     }
     try {
       const rs = await movieApi.createMovie(data);
       console.log(rs);
       if(rs){
         setShowModalAddCustomer(false);
-        setTimeout(() => {
-          message.success("Thêm phim thành công");
-        }, 500);
+        notifySucess("Thêm bộ phim thành công.")
+        depatch(setReload(!reload));
       }
     } catch (error) {
-     
       notifyError("Chọn sai định dạng ảnh.")
     }
    
@@ -236,15 +194,42 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
         }}
         extra={
           <Space>
-            <Button onClick={onClose}>Cancel</Button>
+            <Button onClick={onClose}>Hủy</Button>
             <Button form="myForm" htmlType="submit" type="primary">
-              Submit
+              Lưu
             </Button>
           </Space>
         }
       >
         <Form layout="vertical"  onFinish={handleSubmit} id="myForm" form={form}>
-          <Row gutter={16}>
+        <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="codeMovie"
+                label="Mã phim"
+                rules={[
+                  {
+                    required: true,
+                    message: "Hãy nhập mã phim...",
+                  },
+                ]}
+              >
+                <Input placeholder="Hãy nhập mã phim tối đa 5 ký tự..." 
+                  addonBefore="MOV"
+                  min={1}
+                  maxLength={5}
+                  showCount
+                  style={{ width: "100%"}}
+                  // onChange={handleChangeCode}
+                  onKeyPress={(e) => {
+                    if (!/[0-9]/.test(e.key)) {
+                      e.preventDefault();
+                    }
+                  }}
+
+                />
+              </Form.Item>
+            </Col>
             <Col span={12}>
               <Form.Item
                 name="name"
@@ -257,11 +242,12 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
                 ]}
               >
                 <Input
-                  onChange={(e) => setNameMovie(e.target.value)}
                   placeholder="Hãy nhập tên bộ phim..."
                 />
               </Form.Item>
             </Col>
+          </Row>
+          <Row gutter={16}>
             <Col span={12}>
               <Form.Item
                 name="category"
@@ -283,9 +269,6 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
                 />
               </Form.Item>
             </Col>
-          </Row>
-
-          <Row gutter={16}>
             <Col span={12}>
               <Form.Item
                 name="time"
@@ -320,7 +303,35 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
                       value: "180",
                       label: "180 phút",
                     },
+                    {
+                      value: "210",
+                      label: "210 phút",
+                    },
                   ]}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="date"
+                label="Thời hạn phim"
+                rules={[
+                  {
+                    required: true,
+                    message: "Hãy chọn thời hạn bộ phim...",
+                  },
+                ]}
+              >
+                <RangePicker 
+                  placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
+                  onChange={onChangeDate}
+                  disabledDate={
+                    (current) => {
+                      return current && current < moment().endOf('day');
+                    }
+                  }
                 />
               </Form.Item>
             </Col>
@@ -357,45 +368,7 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
               </Form.Item>
             </Col>
           </Row>
-          <Row gutter={16}>
-            <Col span={12}>
-            <Form.Item
-                name="releaseDate"
-                label="Ngày phát hành"
-                rules={[
-                  {
-                    required: true,
-                    message: "Hãy chọn ngày phát hành bộ phim...",
-                  },
-                ]}
-              >
-                <DatePicker
-                  onChange={onChangeDate}
-                  style={{ width: "100%" }}
-                  placeholder="Chọn ngày phát hành"
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="endDate"
-                label="Ngày kết thúc"
-                rules={[
-                  {
-                    required: true,
-                    message: "Hãy chọn ngày kết thúc bộ phim...",
-                  },
-                ]}
-              >
-                <DatePicker
-                  onChange={onChangeEndDate}
-                  style={{ width: "100%" }}
-                  placeholder="Chọn ngày kết thúc"
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row style={{ marginBottom: "26px" }} gutter={16}>
+          <Row  gutter={16}>
             <Col span={12}>
               <Form.Item
                 name="daoDien"
@@ -403,7 +376,6 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
                
               >
                 <Input
-                  onChange={(e) => setDirector(e.target.value)}
                   placeholder="Hãy nhập tên đạo diễn..."
                 />
               </Form.Item>
@@ -414,79 +386,19 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
                 label="Diễn viên"
               >
                 <Input
-                  onChange={(e) => setCast(e.target.value)}
                   placeholder="Hãy nhập tên diễn viên..."
                 />
               </Form.Item>
             </Col>
           </Row>
-          <Row style={{ marginBottom: "26px" }} gutter={16}>
+          <Row gutter={16}>
             <Col span={12}>
               <Form.Item
                 name="link"
                 label="Link trailer"
-               
               >
                 <Input
-                  onChange={(e) => setLinkTrailer(e.target.value)}
                   placeholder="Hãy nhập link trailer..."
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="chonRap"
-                label="Chọn rạp"
-                rules={[
-                  {
-                    required: true,
-                    message: "Hãy chọn rạp...",
-                  },
-                ]}
-              >
-                <Select
-                  placeholder="Chọn rạp"
-                  style={{
-                    width: "100%",
-                  }}
-                  onChange={handleChangePosition}
-                  options={listCinema}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row style={{ marginBottom: "26px" }} gutter={16}>
-            <Col span={12}>
-            <Form.Item
-                name="status"
-                label="Trạng thái"
-                rules={[
-                  {
-                    required: true,
-                    message: "Hãy chọn trạng thái...",
-                  },
-                ]}
-              >
-                <Select
-                  placeholder="Chọn trạng thái"
-                  style={{
-                    width: "100%",
-                  }}
-                  onChange={onChangeStatus}
-                  options={[
-                    {
-                      value: "1"  ,
-                      label: "Đang chiếu",
-                    },
-                    {
-                      value: "2",
-                      label: "Sắp chiếu",
-                    },
-                    {
-                      value: "3",
-                      label: "Ngừng chiếu",
-                    },
-                  ]}
                 />
               </Form.Item>
             </Col>
@@ -502,16 +414,15 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
               <Upload name="logo" customRequest={dummyRequest}
                  listType="picture" maxCount={1} accept=".jpg,.jpeg,.png"
               >
-                <Button  icon={<UploadOutlined />}>Click to upload</Button>
+                <Button  icon={<UploadOutlined />}> Tải ảnh lên</Button>
               </Upload>
             </Form.Item>
             </Col>
           </Row>
-          <Row style={{ marginTop: "16px" }} gutter={16}>
+          <Row  gutter={16}>
             <Col span={24}>
-              <Form.Item name="description" label="Miêu tả">
+              <Form.Item name="description" label="Mô tả">
                 <Input.TextArea
-                  onChange={(e) => setDesc(e.target.value)}
                   rows={4}
                   placeholder="Nhập miêu tả..."
                 />

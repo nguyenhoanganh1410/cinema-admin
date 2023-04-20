@@ -15,6 +15,7 @@ import ModelAddProduct from "./ModelAddProduct";
 const { Title, Text } = Typography;
 const IndexProduct = () => {
   const [showModalAddProduct, setShowModalAddProduct] = useState(false);
+  const [keyword, setKeyword] = useState("");
 
   const showModal = () => {
     setShowModalAddProduct(true);
@@ -35,8 +36,13 @@ const IndexProduct = () => {
       >
         <Col span={12}>
           <Input
-            placeholder="Nhập tên, số điện thoại hoặc email..."
+            placeholder="Nhập tên, mã sản phẩm"
             prefix={<SearchOutlined />}
+            onKeyUp={(e) => {
+              if (e.keyCode === 13) {
+                setKeyword(e.target.value);
+              }
+            }}
           />
         </Col>
 
@@ -67,7 +73,7 @@ const IndexProduct = () => {
         }}
       >
         <Col span={24}>
-          <TableProduct />
+          <TableProduct keyword={keyword} />
         </Col>
       </Row>
       {showModalAddProduct ? (

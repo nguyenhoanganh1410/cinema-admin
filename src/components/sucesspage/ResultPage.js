@@ -1,36 +1,35 @@
 import { Result } from "antd";
 import ReactToPrint from "react-to-print";
 import { useDispatch, useSelector } from "react-redux";
-import React,{ useRef,useEffect, useState  } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import styled from "styled-components";
-import {
-  Button,
-  Col,
-  Row,
-} from "antd";
-import "./Telidon Hv Italic.ttf"
-import "./index.scss"
-import Barcode from 'react-barcode';
+import { Button, Col, Row } from "antd";
+import "./Telidon Hv Italic.ttf";
+import "./index.scss";
+import Barcode from "react-barcode";
 import QRCode from "react-qr-code";
 import orderApi from "../../api/orderApi";
 import moment from "moment";
 import openAddressApi from "../../api/openApi";
 
-
 const ResultPage = ({ setCurrent, setIsSucess, idOrder }) => {
   const booking = useSelector((state) => state.booking);
   let componentRef = useRef();
-  console.log("b",idOrder)
+  console.log("b", idOrder);
 
   const [order, setOrder] = useState(null);
   const [orderDetail, setOrderDetail] = useState([]);
+  const [detailSeatNomal, setDetailSeatNomal] = useState([]);
+  const [detailSeatVip, setDetailSeatVip] = useState([]);
 
-  const getAddress = async(address) => {
+  const getAddress = async (address) => {
     const city = await openAddressApi.getProvinceByCode(address.city_id);
-    const district = await openAddressApi.getDistrictByCode(address.district_id);
+    const district = await openAddressApi.getDistrictByCode(
+      address.district_id
+    );
     const ward = await openAddressApi.getWardByCode(address.ward_id);
     return `${ward?.name + " /"} ${district?.name + " /"} ${city?.name}`;
-  }
+  };
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -52,8 +51,8 @@ const ResultPage = ({ setCurrent, setIsSucess, idOrder }) => {
           const name = res.Customer?.firstName + res.Customer?.lastName;
           // res.totalPrice = res.totalPrice.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
           const totalPrice = res.totalPrice
-          .toString()
-          .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            .toString()
+            .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
           res.totalPrice = totalPrice;
 
           setOrder(res);
@@ -84,121 +83,217 @@ const ResultPage = ({ setCurrent, setIsSucess, idOrder }) => {
           };
         });
         setOrderDetail(listSeat);
+        listSeat.forEach((item) => {
+          if (item.productCode === "G001") {
+            setDetailSeatNomal((detailSeatNomal) => [...detailSeatNomal, item]);
+          } else {
+            setDetailSeatVip((detailSeatVip) => [...detailSeatVip, item]);
+          }
+        });
       }
     };
     fetchOrder();
     fetchOrderDetail();
-  }, []);
+  }, [idOrder]);
 
-const PageBreakWrapper = styled.div`
-  && {
-    page-break-after: always;
-  }
-`;
+  const PageBreakWrapper = styled.div`
+    && {
+      page-break-after: always;
+    }
+  `;
 
-console.log("order",order)
+  console.log("order", order);
 
-const PrintTemplate = ({detail,orderTmp,idOrderTmp}) => {
-
-  return (
-    <>
-      {order && (
-        <>
-          <div className=" print_ticket" style={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        fontFamily: "Telidon",
-      }}>
-        <div className="print print-top" style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <span style={{ fontSize: "10px" }}>THE VAO</span>
-          <span style={{ fontSize: "10px" }}>PHONG CHIEU PHIM</span>
-        </div>
-        <Row className="print">
-            <span style={{ fontSize: "10px", marginLeft: "10px",}}>{orderTmp?.ShowMovie?.Show?.Cinema?.name}</span>
-        </Row>
-        <Row className="print-content">
-            <span>{orderTmp?.addressCinema}</span>
-        </Row>
-        <Row className="print-content">
-            <span>{orderTmp?.createdAt}</span>
-        </Row>
-        <Row className="print-content">
-            <span>Staff:</span>
-            <span>{orderTmp.Staff.firstName + orderTmp.Staff.lastName}</span> 
-        </Row>
-        <Row className="print-content">
-            <span>===================================================</span>
-        </Row>
-        <Row className="print-content content-body">
-            <span >{orderTmp.ShowMovie.Show.Movie.nameMovie}</span>
-            <span style={{marginLeft: "5px"}}>[{orderTmp.ShowMovie.Show.Movie.classify.substring(0,3)}]</span>
-        </Row>
-        <Row className="print-content" >
-            <span>{orderTmp.showDate}</span>
-            <span style={{marginLeft: "5px"}}>{orderTmp.ShowMovie.ShowTime.showTime} - {orderTmp.endTime}</span>
-        </Row>
-        <Row className="print-content content-body" >
-            <span>Room-{orderTmp.ShowMovie.Show.CinemaHall.type}</span>
-            <span style={{marginLeft: "5px"}}>{orderTmp.ShowMovie.Show.CinemaHall.name}</span>
-        </Row>
-        <Row className="print-content">
-            <span>===================================================</span>
-        </Row>
-        <Row className="print-content content-body" style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }} >
-            <span>Seat: {detail?.position} </span>
-            <span>{detail?.productCode}</span>
-            <span>{detail?.price}</span>
-        </Row>
-        <Row className="print-content">
-            <span>--------------------------------------------------</span>
-        </Row>
-        <Row className="print-content" style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "center",
-        }}>
-          <QRCode
-            size={50}
-            value={idOrderTmp}
-            viewBox={`0 0 256 256`}
-          />
-        </Row>
-        <Row className="print-content" style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          fontSize: "5px",
-        }} >
-            <span>www.cinema-start.vn - Hotline: 190012345</span>
-            <span>THANK YOU FOR CHOOSING US TODAY !</span>
-        </Row>
-      </div>
-      <PageBreakWrapper>&nbsp;</PageBreakWrapper>
-        </>
-      )}
-    </>
-  );
-};
+  const PrintTemplate = ({
+    detail,
+    orderTmp,
+    idOrderTmp,
+    seatNomal,
+    seatVip,
+  }) => {
+    return (
+      <>
+        {order && (
+          <>
+            <div
+              className=" print_ticket"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                fontFamily: "Telidon",
+              }}
+            >
+              <div
+                className="print print-top"
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
+                <span style={{ fontSize: "10px" }}>THE VAO</span>
+                <span style={{ fontSize: "10px" }}>PHONG CHIEU PHIM</span>
+                <span
+                  style={{
+                    fontSize: "10px",
+                    marginLeft: "10px",
+                    marginTop: "10px",
+                  }}
+                >
+                  {orderTmp?.ShowMovie?.Show?.Cinema?.name}
+                </span>
+              </div>
+              <Row className="print-content">
+                <span>{orderTmp?.addressCinema}</span>
+              </Row>
+              <Row className="print-content">
+                <span>{orderTmp?.createdAt}</span>
+              </Row>
+              <Row className="print-content">
+                <span>Nhân viên:</span>
+                <span>
+                  {orderTmp.Staff.firstName + orderTmp.Staff.lastName}
+                </span>
+              </Row>
+              <Row className="print-content">
+                <span>===================================================</span>
+              </Row>
+              <Row className="print-content content-body">
+                <span>{orderTmp.ShowMovie.Show.Movie.nameMovie}</span>
+                <span style={{ marginLeft: "5px" }}>
+                  [{orderTmp.ShowMovie.Show.Movie.classify.substring(0, 3)}]
+                </span>
+              </Row>
+              <Row className="print-content">
+                <span>{orderTmp.showDate}</span>
+                <span style={{ marginLeft: "5px" }}>
+                  {orderTmp.ShowMovie.ShowTime.showTime} - {orderTmp.endTime}
+                </span>
+              </Row>
+              <Row className="print-content content-body">
+                <span>Room-{orderTmp.ShowMovie.Show.CinemaHall.type}</span>
+                <span style={{ marginLeft: "5px" }}>
+                  {orderTmp.ShowMovie.Show.CinemaHall.name}
+                </span>
+              </Row>
+              {seatNomal.length > 0 && (
+                <>
+                  <Row className="print-content">
+                    <span>
+                      ===================================================
+                    </span>
+                  </Row>
+                  <Row
+                    className="print-content content-body"
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "normal",
+                    }}
+                  >
+                    {seatNomal.map((item, index) => (
+                      <>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <span>Seat: {item?.position} </span>
+                          <span>{item?.productCode}</span>
+                          <span>{item?.price}</span>
+                        </div>
+                      </>
+                    ))}
+                  </Row>
+                  <Row className="print-content">
+                    <span>
+                      --------------------------------------------------
+                    </span>
+                  </Row>
+                </>
+              )}
+              {seatVip.length > 0 && (
+                <>
+                  <Row
+                    className="print-content content-body"
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "normal",
+                    }}
+                  >
+                    {seatVip.map((item, index) => (
+                      <>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <span>Seat: {item?.position} </span>
+                          <span>{item?.productCode}</span>
+                          <span>{item?.price}</span>
+                        </div>
+                      </>
+                    ))}
+                  </Row>
+                  <Row className="print-content">
+                    <span>
+                      ===================================================
+                    </span>
+                  </Row>
+                </>
+              )}
+              <Row
+                className="print-content"
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                }}
+              >
+                <QRCode size={50} value={idOrderTmp} viewBox={`0 0 256 256`} />
+              </Row>
+              <Row
+                className="print-content"
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  fontSize: "5px",
+                }}
+              >
+                <span>www.cinema-start.vn - Hotline: 190012345</span>
+                <span>THANK YOU FOR CHOOSING US TODAY !</span>
+              </Row>
+            </div>
+            <PageBreakWrapper>&nbsp;</PageBreakWrapper>
+          </>
+        )}
+      </>
+    );
+  };
 
   class ComponentToPrint extends React.Component {
     render() {
-      let printingPages = [];
-      for (let i = 0; i < orderDetail.length; i++) {
-        if( order ) {
-          const template = <PrintTemplate detail={orderDetail[i]} orderTmp={order} idOrderTmp={idOrder} />;
-          printingPages.push(template);
-        }
+      console.log("nomal", detailSeatNomal);
+      console.log("vip", detailSeatVip);
+      if (order) {
+        const template = (
+          <PrintTemplate
+            detail={orderDetail}
+            orderTmp={order}
+            idOrderTmp={idOrder}
+            seatNomal={detailSeatNomal}
+            seatVip={detailSeatVip}
+          />
+        );
+        return <div>{template}</div>;
       }
-      return (
-        <div>
-          {printingPages}
-        </div>
-      );
     }
   }
 
@@ -214,8 +309,7 @@ const PrintTemplate = ({detail,orderTmp,idOrderTmp}) => {
     setCurrent(0);
   };
 
-  const handlePrint = () => {
-  };
+  const handlePrint = () => {};
 
   return (
     <Result
@@ -227,7 +321,7 @@ const PrintTemplate = ({detail,orderTmp,idOrderTmp}) => {
         </Button>,
         <>
           <ReactToPrint
-            trigger={() => <Button type="primary">In vé</Button> }
+            trigger={() => <Button type="primary">In vé</Button>}
             content={() => componentRef}
             pageStyle="@page {
               size: 52mm 74mm;
@@ -245,7 +339,7 @@ const PrintTemplate = ({detail,orderTmp,idOrderTmp}) => {
               }`;"
           />
           <div style={{ display: "none" }}>
-            { order && <ComponentToPrint  ref={(el) => (componentRef = el)} />}
+            {order && <ComponentToPrint ref={(el) => (componentRef = el)} />}
           </div>
         </>,
       ]}
