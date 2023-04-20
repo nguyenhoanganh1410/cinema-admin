@@ -26,11 +26,11 @@ import movieApi from "../../api/movieApi";
 import { notifyError,
   notifySucess
  } from "../../utils/Notifi";
+ 
+ import { setReload } from "../../redux/actions";
+ import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 const { Option } = Select;
-
-import { setReload } from "../../redux/actions";
-import { useDispatch, useSelector } from "react-redux";
 
 const getBase64 = (file) =>
   new Promise((resolve, reject) => {

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-
 import {
   Button,
   Col,
@@ -14,20 +13,15 @@ import {
   Upload,
   message,
 } from "antd";
-
-import { useFormik } from "formik";
 import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import categoryMovie from "../../api/categoryMovie";
 import { fimlValidator } from "./FilmSchema";
 import cinameApi from "../../api/cinemaApi";
 import movieApi from "../../api/movieApi";
 import moment from "moment";
-const { Option } = Select;
 import dayjs from "dayjs";
-
 import { useDispatch, useSelector } from "react-redux";
 import { setReload } from "../../redux/actions";
-
 import { notifyError,
   notifySucess
  } from "../../utils/Notifi";
@@ -60,7 +54,6 @@ const ModelDetailMovie = ({ showModalDetailMovie, setShowModalDetailMovie,select
   const [endDatePicker, setEndDatePicker] = useState("");
   const [imagePicker, setImagePicker] = useState([]);
 
-
   const [form] = Form.useForm();
 
   const depatch = useDispatch();
@@ -69,9 +62,6 @@ const ModelDetailMovie = ({ showModalDetailMovie, setShowModalDetailMovie,select
   const { RangePicker } = DatePicker;
 
   const formatDate = "YYYY-MM-DD";
-
-
-  const handleCancel = () => setPreviewOpen(false);
 
   const onSearch = (value) => {
     console.log("search:", value);
@@ -92,10 +82,6 @@ const ModelDetailMovie = ({ showModalDetailMovie, setShowModalDetailMovie,select
     setCategory(value);
   };
 
-  //choise date start worling
-  // const onChangeDate = (date, dateString) => {
-  //   setReleaseDate(dateString);
-  // };
   const onChangeEndDate = (date, dateString) => {
     setEndDate(dateString);
   };
