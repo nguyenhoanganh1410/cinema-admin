@@ -96,11 +96,16 @@ const ModelAddPromotionHeader = ({
                   ({ getFieldValue }) => ({
                     validator(rule, value) {
                       if (!value) {
-                        return Promise.reject("Hãy nhập ngày bắt đầu!");
+                        return Promise.reject("Hãy nhập ngày bắt đầu.");
                       }
                       if ( value < new Date()) {
                         return Promise.reject(
                           "Ngày bắt đầu nhỏ hơn ngày kết thúc!"
+                        );
+                      }
+                      if (value > moment(endDate)) {
+                        return Promise.reject(
+                          "Ngày bắt đầu phải nhỏ hơn ngày kết thúc."
                         );
                       }
                       return Promise.resolve();

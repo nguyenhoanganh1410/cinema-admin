@@ -34,32 +34,14 @@ import { setReload } from "../../redux/actions";
 import dayjs from "dayjs";
 import promotionRsApi from "../../api/promotionRs";
 import { VND } from "../../constant";
+import { yupSync } from "./useModelAddPromotionHeaderHook";
 
 const { TextArea } = Input;
-const getBase64 = (file) =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = (error) => reject(error);
-  });
-const { Option } = Select;
-
-const { Title, Text } = Typography;
-
-const newDateFormat = "YYYY-MM-DD";
 
 const IndexLinePromotion = ({ setTab }) => {
   const [showModalAddCustomer, setShowModalAddCustomer] = useState(false);
-
-  const [previewOpen, setPreviewOpen] = useState(false);
-  const [previewImage, setPreviewImage] = useState("");
-  const [previewTitle, setPreviewTitle] = useState("");
-  const [fileList, setFileList] = useState([]);
-
   const [ranks, setRanks] = useState([]);
   const [rankPicked, setRankPicked] = useState([]);
-
   const [listPromotionLine, setPromotionLine] = useState([]);
   const [promotionHeader, setPromotionHeader] = useState(null);
   const idHeaderPromotion = useSelector((state) => state.promotionHeaderId);
@@ -275,7 +257,7 @@ const IndexLinePromotion = ({ setTab }) => {
   };
 
   const handleChangeRank = (value) => {
-    setRankPicked(value);
+    setRankPicked(value)
   };
 
   const handleOpenModel = () => {
@@ -293,22 +275,21 @@ const IndexLinePromotion = ({ setTab }) => {
   };
 
   const handleSubmit = async (val) => {
-    console.log(val);
-    console.log(rankPicked);
     const data = new FormData();
     data.append("namePromotion", val.namePromotion);
     data.append("desc", val.desc);
     data.append("startDate", startDate);
     data.append("endDate", endDate);
     data.append("statusPromotion", val.statusPromotion);
-    val.rankCustomer.forEach((rank) => {
-      data.append("rank", rank.value);
+    rankPicked.forEach((rank) => {
+      data.append("rank", rank);
     });
-    // data.append("rank", rankPicked)
-    if (val.image) {
+    data.append("rank", rankPicked)
+    if (val?.image[0]?.originFileObj) {
       data.append("image", val.image[0].originFileObj);
+    } else if(val.image.length === 0){
+      data.append("image", []);
     }
-
     try {
       const response = await promotionApi.updatePromotionHeader(
         data,
@@ -323,6 +304,7 @@ const IndexLinePromotion = ({ setTab }) => {
       console.log("Failed to login ", error);
     }
   };
+
   useEffect(() => {
     //load movies
     const getPromotionLineByHeader = async (id) => {
@@ -373,6 +355,7 @@ const IndexLinePromotion = ({ setTab }) => {
           setEndDate(response.endDate);
           form.setFieldsValue({
             id: response.id,
+            promotionCode: response.promotionCode,
             namePromotion: response.namePromotion,
             desc: response.desc,
             startDate: dayjs(response.startDate, newDateFormat),
@@ -405,7 +388,6 @@ const IndexLinePromotion = ({ setTab }) => {
   };
 
   const normFile = (e) => {
-    console.log("Upload event:", e);
     if (Array.isArray(e)) {
       return e;
     }
@@ -473,12 +455,7 @@ const IndexLinePromotion = ({ setTab }) => {
             <Form.Item
               name="namePromotion"
               label="Tên CT Khuyến mãi"
-              rules={[
-                {
-                  required: true,
-                  message: "Hãy nhập tên CT khuyến mãi...",
-                },
-              ]}
+              rules={[yupSync]}
             >
               <Input
                 disabled={statusDb === true ? true : false}
@@ -491,10 +468,24 @@ const IndexLinePromotion = ({ setTab }) => {
               label="Ngày bắt đầu"
               name="startDate"
               rules={[
-                {
-                  required: true,
-                  message: "Hãy chọn ngày bắt đầu...",
-                },
+                ({ getFieldValue }) => ({
+                  validator(rule, value) {
+                    if (!value) {
+                      return Promise.reject("Hãy nhập ngày bắt đầu.");
+                    }
+                    if ( value < new Date()) {
+                      return Promise.reject(
+                        "Ngày bắt đầu nhỏ hơn ngày kết thúc!"
+                      );
+                    }
+                    if (value > moment(endDate)) {
+                      return Promise.reject(
+                        "Ngày bắt đầu phải nhỏ hơn ngày kết thúc."
+                      );
+                    }
+                    return Promise.resolve();
+                  },
+                }),
               ]}
             >
               <DatePicker
@@ -517,10 +508,19 @@ const IndexLinePromotion = ({ setTab }) => {
               name="endDate"
               label="Ngày kết thúc"
               rules={[
-                {
-                  required: true,
-                  message: "Hãy chọn ngày kết thúc...",
-                },
+                ({ getFieldValue }) => ({
+                  validator(rule, value) {
+                    if (!value) {
+                      return Promise.reject("Hãy nhập ngày kết thúc.");
+                    }
+                    if (value < moment(startDate)) {
+                      return Promise.reject(
+                        "Ngày kết thúc phải lớn hơn hoặc ngày bắt đầu."
+                      );
+                    }
+                    return Promise.resolve();
+                  },
+                }),
               ]}
             >
               <DatePicker
@@ -603,7 +603,7 @@ const IndexLinePromotion = ({ setTab }) => {
               rules={[
                 {
                   required: true,
-                  message: "Hãy chọn trạng thái...",
+                  message: "Hãy Chọn nhóm khách hàng áp dụng.",
                 },
               ]}
             >
@@ -611,7 +611,7 @@ const IndexLinePromotion = ({ setTab }) => {
                 disabled={
                   currentDate > startDate || statusDb === true ? true : false
                 }
-                placeholder="Chọn trạng thái"
+                placeholder="Chọn nhóm khách hàng áp dụng"
                 style={{
                   width: "100%",
                 }}
@@ -619,7 +619,7 @@ const IndexLinePromotion = ({ setTab }) => {
                 showArrow
                 tagRender={tagRender}
                 onChange={handleChangeRank}
-                options={rankPicked}
+                options={ranks}
               />
             </Form.Item>
           </Col>
@@ -629,12 +629,6 @@ const IndexLinePromotion = ({ setTab }) => {
             <Form.Item
               name="desc"
               label="Mô tả CTKM"
-              rules={[
-                {
-                  required: true,
-                  message: "Hãy nhập chi tiết CTKH...",
-                },
-              ]}
             >
               <TextArea
                 disabled={statusDb === true ? true : false}

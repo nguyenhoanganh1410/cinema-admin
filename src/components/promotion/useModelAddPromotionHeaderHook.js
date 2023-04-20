@@ -82,7 +82,7 @@ let schema = yup.object().shape({
     .round(),
 });
 
-const yupSync = {
+export const yupSync = {
   async validator({ field }, value) {
     if(field === 'namePromotion'){
         value = removeAscent(value)
