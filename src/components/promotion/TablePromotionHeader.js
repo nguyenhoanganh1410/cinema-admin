@@ -119,17 +119,6 @@ const TablePromotionHeader = ({ setTab, valueStatusPick, searchText }) => {
       ),
     },
     {
-      title: "Mô tả",
-      dataIndex: "desc",
-      render: (text) => {
-        if (text?.length > 50) {
-          return text?.substring(0, 50) + "...";
-        } else {
-          return text;
-        }
-      },
-    },
-    {
       title: "Ngày bắt đầu",
       dataIndex: "startDate",
     },

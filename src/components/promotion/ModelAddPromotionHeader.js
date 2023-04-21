@@ -19,12 +19,12 @@ import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import moment from "moment";
 import useModelAddPromotionHeaderHook from "./useModelAddPromotionHeaderHook";
 
-
+const { RangePicker } = DatePicker;
 const ModelAddPromotionHeader = ({
   showModalAddCustomer,
   setShowModalAddCustomer,
 }) => {
-  const { 
+  const {
     normFile,
     dummyRequest,
     tagRender,
@@ -34,13 +34,15 @@ const ModelAddPromotionHeader = ({
     startDate,
     endDate,
     onSearch,
-    onChangeEndDate,
     onChangeDate,
     handleChangeRank,
     handleSubmit,
     yupSync,
-    onClose
-    } = useModelAddPromotionHeaderHook(showModalAddCustomer, setShowModalAddCustomer )
+    onClose,
+  } = useModelAddPromotionHeaderHook(
+    showModalAddCustomer,
+    setShowModalAddCustomer
+  );
 
   return (
     <>
@@ -79,8 +81,9 @@ const ModelAddPromotionHeader = ({
                 label="Mã CT Khuyến mãi"
                 rules={[yupSync]}
               >
-                <InputNumber placeholder="Hãy nhập mã CT khuyến mãi..." 
-                  addonBefore="PRO"  
+                <InputNumber
+                  placeholder="Hãy nhập mã CT khuyến mãi..."
+                  addonBefore="PRO"
                   min={1}
                   style={{ width: "100%" }}
                 />
@@ -98,7 +101,7 @@ const ModelAddPromotionHeader = ({
                       if (!value) {
                         return Promise.reject("Hãy nhập ngày bắt đầu.");
                       }
-                      if ( value < new Date()) {
+                      if (value < new Date()) {
                         return Promise.reject(
                           "Ngày bắt đầu nhỏ hơn ngày kết thúc!"
                         );
@@ -113,54 +116,19 @@ const ModelAddPromotionHeader = ({
                   }),
                 ]}
               >
-                <DatePicker
-                  disabledDate={(current) =>
-                    current && current < moment().endOf(startDate)
-                  }
+                <RangePicker
+                  placeholder={['Ngày bắt đầu', 'Ngày kết thúc']}
                   onChange={onChangeDate}
-                  style={{ width: "100%" }}
-                  placeholder="Chọn ngày bắt đầu"
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="endDate"
-                label="Ngày kết thúc"
-                rules={[
-                  ({ getFieldValue }) => ({
-                    validator(rule, value) {
-                      if (!value) {
-                        return Promise.reject("Hãy nhập ngày kết thúc.");
-                      }
-                      if (value < moment(startDate)) {
-                        return Promise.reject(
-                          "Ngày kết thúc phải lớn hơn hoặc ngày bắt đầu."
-                        );
-                      }
-                      return Promise.resolve();
-                    },
-                  }),
-                ]}
-              >
-                <DatePicker
-                  disabledDate={(current) =>
-                    current && current < moment().endOf(endDate)
+                  disabledDate={
+                    (current) => {
+                      return current && current < moment().endOf('day');
+                    }
                   }
-                  onChange={onChangeEndDate}
-                  style={{ width: "100%" }}
-                  placeholder="Chọn ngày kết thúc."
                 />
               </Form.Item>
             </Col>
-          </Row>
-          <Row gutter={16}>
             <Col span={12}>
-              <Form.Item
-                name="rankCustomer"
-                label="Nhóm khách hàng"
-              
-              >
+              <Form.Item name="rankCustomer" label="Nhóm khách hàng">
                 <Select
                   placeholder="Chọn nhóm khách hàng"
                   style={{
@@ -174,6 +142,8 @@ const ModelAddPromotionHeader = ({
                 />
               </Form.Item>
             </Col>
+          </Row>
+          <Row gutter={16}>
             <Col span={12}>
               <Form.Item
                 name="image"
@@ -197,10 +167,7 @@ const ModelAddPromotionHeader = ({
           </Row>
           <Row>
             <Col span={24}>
-              <Form.Item
-                name="desc"
-                label="Mô tả"
-              >
+              <Form.Item name="desc" label="Mô tả">
                 <Input.TextArea rows={4} placeholder="Nhập mô tả..." />
               </Form.Item>
             </Col>

@@ -166,14 +166,9 @@ const useModelAddPromotionHeaderHook = (showModalAddCustomer, setShowModalAddCus
   
     //choise date start worling
     const onChangeDate = (date, dateString) => {
-      setStartDate(dateString);
+      setStartDate(dateString[0]);
+      setEndDate(dateString[1]);
     };
-  
-    //choise date start worling
-    const onChangeEndDate = (date, dateString) => {
-      setEndDate(dateString);
-    };
-  
     useEffect(() => {
       form.setFieldsValue({
         namePromotion: "",
@@ -190,11 +185,10 @@ const useModelAddPromotionHeaderHook = (showModalAddCustomer, setShowModalAddCus
         startDate,
         endDate,
         onSearch,
-        onChangeEndDate,
-        onChangeDate,
         handleChangeRank,
         handleSubmit,
         onClose,
+        onChangeDate,
         yupSync
     }
 }
