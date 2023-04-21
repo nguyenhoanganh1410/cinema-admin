@@ -37,11 +37,13 @@ import { VND } from "../../constant";
 import { yupSync } from "./useModelAddPromotionHeaderHook";
 
 const { TextArea } = Input;
+const { RangePicker } = DatePicker;
 
 const IndexLinePromotion = ({ setTab }) => {
   const [showModalAddCustomer, setShowModalAddCustomer] = useState(false);
   const [ranks, setRanks] = useState([]);
   const [rankPicked, setRankPicked] = useState([]);
+  const [newRankPicked, setNewRankPicked] = useState([]);
   const [listPromotionLine, setPromotionLine] = useState([]);
   const [promotionHeader, setPromotionHeader] = useState(null);
   const idHeaderPromotion = useSelector((state) => state.promotionHeaderId);
@@ -257,7 +259,7 @@ const IndexLinePromotion = ({ setTab }) => {
   };
 
   const handleChangeRank = (value) => {
-    setRankPicked(value)
+    setNewRankPicked(value);
   };
 
   const handleOpenModel = () => {
@@ -269,9 +271,9 @@ const IndexLinePromotion = ({ setTab }) => {
     console.log(`selected ${value}`);
   };
 
-  //choise date start worling
   const onChangeDate = (date, dateString) => {
-    console.log(date, dateString);
+    setStartDate(dateString[0]);
+    setEndDate(dateString[1]);
   };
 
   const handleSubmit = async (val) => {
@@ -281,15 +283,22 @@ const IndexLinePromotion = ({ setTab }) => {
     data.append("startDate", startDate);
     data.append("endDate", endDate);
     data.append("statusPromotion", val.statusPromotion);
-    rankPicked.forEach((rank) => {
-      data.append("rank", rank);
-    });
-    data.append("rank", rankPicked)
+    if (newRankPicked.length > 0) {
+      newRankPicked.forEach((rank) => {
+        data.append("rank", rank);
+      });
+    } else {
+      rankPicked.forEach((rank) => {
+        data.append("rank", rank?.value);
+      });
+    }
+
     if (val?.image[0]?.originFileObj) {
       data.append("image", val.image[0].originFileObj);
-    } else if(val.image.length === 0){
+    } else if (val.image.length === 0) {
       data.append("image", []);
     }
+
     try {
       const response = await promotionApi.updatePromotionHeader(
         data,
@@ -353,6 +362,7 @@ const IndexLinePromotion = ({ setTab }) => {
           setStatusDb(response.statusPromotion);
           setStartDate(response.startDate);
           setEndDate(response.endDate);
+
           form.setFieldsValue({
             id: response.id,
             promotionCode: response.promotionCode,
@@ -361,6 +371,10 @@ const IndexLinePromotion = ({ setTab }) => {
             startDate: dayjs(response.startDate, newDateFormat),
             endDate: dayjs(response.endDate, newDateFormat),
             statusPromotion: response.statusPromotion ? "1" : "0",
+            date: [
+              dayjs(response.startDate, newDateFormat),
+              dayjs(response.endDate, newDateFormat),
+            ],
             image: [
               {
                 uid: "-1",
@@ -463,80 +477,15 @@ const IndexLinePromotion = ({ setTab }) => {
               />
             </Form.Item>
           </Col>
-          <Col span={6}>
-            <Form.Item
-              label="Ngày bắt đầu"
-              name="startDate"
-              rules={[
-                ({ getFieldValue }) => ({
-                  validator(rule, value) {
-                    if (!value) {
-                      return Promise.reject("Hãy nhập ngày bắt đầu.");
-                    }
-                    if ( value < new Date()) {
-                      return Promise.reject(
-                        "Ngày bắt đầu nhỏ hơn ngày kết thúc!"
-                      );
-                    }
-                    if (value > moment(endDate)) {
-                      return Promise.reject(
-                        "Ngày bắt đầu phải nhỏ hơn ngày kết thúc."
-                      );
-                    }
-                    return Promise.resolve();
-                  },
-                }),
-              ]}
-            >
-              <DatePicker
-                disabledDate={(current) =>
-                  current && current < moment().endOf(startDate)
-                }
-                disabled={
-                  currentDate > startDate || statusDb === true ? true : false
-                }
+          <Col span={12}>
+            <Form.Item label="Ngày bắt đầu" name="date">
+              <RangePicker
+                disabled={statusDb ? true : false}
+                placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
                 onChange={onChangeDate}
-                style={{ width: "100%" }}
-                placeholder="Chọn ngày bắt đầu"
-                defaultValue={dayjs(startDate, newDateFormat)}
-                format={newDateFormat}
-              />
-            </Form.Item>
-          </Col>
-          <Col span={6}>
-            <Form.Item
-              name="endDate"
-              label="Ngày kết thúc"
-              rules={[
-                ({ getFieldValue }) => ({
-                  validator(rule, value) {
-                    if (!value) {
-                      return Promise.reject("Hãy nhập ngày kết thúc.");
-                    }
-                    if (value < moment(startDate)) {
-                      return Promise.reject(
-                        "Ngày kết thúc phải lớn hơn hoặc ngày bắt đầu."
-                      );
-                    }
-                    return Promise.resolve();
-                  },
-                }),
-              ]}
-            >
-              <DatePicker
                 disabledDate={(current) => {
-                  if (currentDate > startDateDb) {
-                    return current && current < moment(currentDate);
-                  } else {
-                    return current && current < moment().endOf(startDate);
-                  }
+                  return current && current < moment().endOf("day");
                 }}
-                disabled={statusDb === true ? true : false}
-                onChange={onChangeDate}
-                style={{ width: "100%" }}
-                placeholder="Chọn ngày kết thúc"
-                defaultValue={dayjs(endDate, newDateFormat)}
-                format={newDateFormat}
               />
             </Form.Item>
           </Col>
@@ -626,10 +575,7 @@ const IndexLinePromotion = ({ setTab }) => {
         </Row>
         <Row gutter={16}>
           <Col span={24}>
-            <Form.Item
-              name="desc"
-              label="Mô tả CTKM"
-            >
+            <Form.Item name="desc" label="Mô tả CTKM">
               <TextArea
                 disabled={statusDb === true ? true : false}
                 rows={4}
