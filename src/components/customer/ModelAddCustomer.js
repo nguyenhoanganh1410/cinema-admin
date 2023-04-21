@@ -16,7 +16,13 @@ import {
 import openAddressApi from "../../api/openApi";
 import customerApi from "../../api/customerApi";
 import { useDispatch, useSelector } from "react-redux";
+import moment from "moment";
 const { Option } = Select;
+import dayjs from "dayjs";
+import { notifyError,
+  notifySucess
+ } from "../../utils/Notifi";
+ import { setReload } from "../../redux/actions";
 
 const ModelAddCustomer = ({
   showModalAddCustomer,
@@ -32,7 +38,11 @@ const ModelAddCustomer = ({
   const [districtPicked, setDistrictPicked] = useState(0);
   const [wardPicked, setWardPicked] = useState(0);
   const [isExistPhone, setIsExistPhone] = useState(true);
+  const [isExistEmail, setIsExistEmail] = useState(true);
   const [form] = Form.useForm();
+  const [dob, setDob] = useState(null);
+
+  const currentDate = moment().format("YYYY-MM-DD");
 
   const normFile = (e) => {
     console.log("Upload event:", e);
@@ -65,56 +75,50 @@ const ModelAddCustomer = ({
   };
 
   const onChangePhone = async (e) => {
-    console.log("phone:", e.target.value);
     const phone = e.target.value;
     if (phone.length === 10) {
       const rs = await customerApi.getCustomerByPhone(phone);
       console.log(rs);
       if (rs.data !== null) {
         setIsExistPhone(false);
-        console.log("exist");
-        message.error("Số điện thoại đã tồn tại!");
       } else {
         setIsExistPhone(true);
-        console.log("not exist");
       }
     }
+  };
+
+  const onChangeDob = (date, dateString) => {
+    setDob(dateString);
   };
 
   //handle submit form create new customer...
   const handleSubmit = async (val) => {
     console.log("values:", val);
-    // const { firstname, lastname, phone, email, address, dob, note, image } =
-    //   val;
-    // const date = new Date(dob?.$d).toISOString();
-    // const data = new FormData();
-    // data.append("firstName", firstname);
-    // data.append("lastName", lastname);
-    // data.append("phone", phone);
-    // data.append("email", email);
-    // data.append("address", address);
-    // data.append("dob", date);
-    // data.append("city_id", provincePicked);
-    // data.append("district_id", districtPicked);
-    // data.append("ward_id", wardPicked);
-    // data.append("street", address);
-    // data.append("note", note);
-
-    // if (image) {
-    //   data.append("image", image[0].originFileObj);
-    // }
-
-    // console.log(data);
-    // const rs = await customerApi.createCustomer(data);
-
-    // if (rs) {
-    //   setShowModalAddCustomer(false);
-    //   depatch(setReload(!reload));
-    //   form.resetFields();
-    //   setTimeout(() => {
-    //     message.success("Thêm nhân viên thành công!");
-    //   }, 500);
-    // }
+    const { firstname, lastname, phone, email, address, dob, note, image } =
+      val;
+    const data = new FormData();
+    data.append("firstName", firstname);
+    data.append("lastName", lastname);
+    data.append("phone", phone);
+    data.append("email", email);
+    data.append("dob", dob);
+    data.append("city_id", provincePicked);
+    data.append("district_id", districtPicked);
+    data.append("ward_id", wardPicked);
+    if (image) {
+      data.append("image", image[0].originFileObj);
+    }
+    try {
+      const rs = await customerApi.createCustomer(data);
+      if (rs) {
+        setShowModalAddCustomer(false);
+        depatch(setReload(!reload));
+        form.resetFields();
+        notifySucess("Thêm khách hàng thành công");
+      }
+    } catch (error) {
+      notifyError("Thêm khách hàng thất bại",error);
+    }
   };
 
   useEffect(() => {
@@ -203,6 +207,14 @@ const ModelAddCustomer = ({
     form.validateFields(["phone"]);
   }, [isExistPhone]);
 
+  useEffect(() => {
+    form.validateFields(["email"]);
+  }, [isExistEmail]);
+
+  useEffect(() => {
+    form.validateFields(["dob"]);
+  }, [dob]);
+
   const validateEmail = (value) => {
     if (value) {
       const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
@@ -212,6 +224,19 @@ const ModelAddCustomer = ({
     }
     return Promise.resolve();
   };
+
+  const onChangeEmail = async (e) => {
+    const email = e.target.value;
+    if (email) {
+      const rs = await customerApi.getCustomerByEmail(email);
+      console.log(rs);
+      if (rs.data !== null) {
+        setIsExistEmail(false);
+      } else {
+        setIsExistEmail(true);
+      }
+    }
+  }
 
   return (
     <>
@@ -225,9 +250,9 @@ const ModelAddCustomer = ({
         }}
         extra={
           <Space>
-            <Button onClick={onClose}>Cancel</Button>
+            <Button onClick={onClose}>Hủy</Button>
             <Button form="myForm" htmlType="submit" type="primary">
-              Submit
+              Lưu
             </Button>
           </Space>
         }
@@ -241,6 +266,7 @@ const ModelAddCustomer = ({
                 rules={[
                   {
                     required: true,
+                    message: "Hãy nhập tên khách hàng...",
                   },
                 ]}
               >
@@ -270,6 +296,10 @@ const ModelAddCustomer = ({
                 label="Hãy nhập số điện thoại"
                 hasFeedback
                 rules={[
+                  {
+                    required: true,
+                    message: "Hãy nhập số điện thoại...",
+                  },
                   ({ getFieldValue }) => ({
                     validator(rule, value) {
                       if (value !== undefined && value.length < 10) {
@@ -285,6 +315,13 @@ const ModelAddCustomer = ({
                 <Input
                   onChange={onChangePhone}
                   placeholder="Hãy nhập số điện thoại..."
+                  onKeyPress={(event) => {
+                    if (!/[0-9]/.test(event.key)) {
+                      event.preventDefault();
+                    }
+                  }}
+                  maxLength={10}
+                  showCount
                 />
               </Form.Item>
             </Col>
@@ -297,17 +334,26 @@ const ModelAddCustomer = ({
                     validator(rule, value) {
                       if (value !== undefined && value.length < 1) {
                         return Promise.reject("Email không hợp lệ");
+                      } else if (isExistEmail === false) {
+                        return Promise.reject("Email đã tồn tại");
+                      } else if (value !== undefined && value.length > 0) {
+                        const emailRegex =
+                          /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
+                        if (!emailRegex.test(value)) {
+                          return Promise.reject("Email không hợp lệ");
+                        }
                       }
                       return Promise.resolve();
                     },
                   }),
                 ]}
               >
-                <Input placeholder="Hãy nhập email..." />
+                <Input placeholder="Hãy nhập email..."
+                  onChange={onChangeEmail}
+                 />
               </Form.Item>
             </Col>
           </Row>
-
           <Row gutter={16}>
             <Col span={12}>
               <Select
@@ -360,22 +406,27 @@ const ModelAddCustomer = ({
               />
             </Col>
             <Col span={12}>
-              <Form.Item name="address">
-                <Input
-                  style={{
-                    width: "100%",
-                  }}
-                  placeholder="Nhập địa chỉ khách hàng..."
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="dob" label="Ngày sinh">
+              <Form.Item name="dob"
+                rules={[
+                  ({ getFieldValue }) => ({
+                    validator(rule, value) {
+                     if (value !== undefined && dob) {
+                       if (moment(currentDate).diff(dob, 'years') < 18) {
+                         return Promise.reject("Khách hàng phải trên 18 tuổi");
+                       }
+                     }
+                      return Promise.resolve();
+                    },
+                  }),
+                ]}
+              >
                 <DatePicker
                   style={{
                     width: "100%",
                   }}
                   format="YYYY-MM-DD"
+                  placeholder="Chọn ngày sinh"
+                  onChange={onChangeDob}
                 />
               </Form.Item>
             </Col>
@@ -400,14 +451,6 @@ const ModelAddCustomer = ({
               </Form.Item>
             </Col>
             <Col span={12}></Col>
-          </Row>
-
-          <Row style={{ marginTop: "16px" }} gutter={16}>
-            <Col span={24}>
-              <Form.Item name="note" label="Ghi chú">
-                <Input.TextArea rows={4} placeholder="Nhập ghi chú..." />
-              </Form.Item>
-            </Col>
           </Row>
         </Form>
       </Drawer>

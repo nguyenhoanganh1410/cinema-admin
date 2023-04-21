@@ -67,17 +67,17 @@ const TableCustomer = () => {
       dataIndex: "rank",
       key: "rank",
       render: (rank) => {
-        let color = "green";
-        if (rank === "Start") {
+        let color = "";
+        if (rank === "START") {
           color = "green";
         }
-        if (rank === "Gold") {
+        if (rank === "GOLD") {
           color = "gold";
         }
-        if (rank === "Silver") {
+        if (rank === "SILVER") {
           color = "silver";
         }
-        if (rank === "Diamond") {
+        if (rank === "DIAMOND") {
           color = "blue";
         }
         return (
@@ -86,11 +86,41 @@ const TableCustomer = () => {
           </Tag>
         );
       },
+      filters: [
+        {
+          text: "START",
+          value: "START",
+        },
+        {
+          text: "GOLD",
+          value: "GOLD",
+        },
+        {
+          text: "SILVER",
+          value: "SILVER",
+        },
+        {
+          text: "DIAMOND",
+          value: "DIAMOND",
+        },
+      ],
+      onFilter: (value, record) => record.rank.indexOf(value) === 0,
     },
     {
-      title: "Hình ảnh",
-      dataIndex: "image",
-      render: (image) => <Image width={50} src={image} />,
+      render: (val,record) => {
+        return (
+          <Button
+            disabled={record.active === "Hoạt động" ? true : false}
+            icon={<DeleteOutlined />}
+            onClick={() => {
+              setSelectedId(record.id);
+              handleDelete();
+            }}
+            danger
+          >
+          </Button>
+        );
+      },
     },
   ];
 
@@ -142,15 +172,6 @@ const TableCustomer = () => {
     fetchListCustomer();
   }, [reload]);
 
-  const onSelectChange = (selectedId) => {
-    setSelectedRowKeys(selectedId);
-  };
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: onSelectChange,
-  };
-  const hasSelected = selectedRowKeys.length > 0;
-  const selectedOne = selectedRowKeys.length === 1;
 
   //handle delete customer in here...
   const handleDelete = () => {
@@ -213,13 +234,6 @@ const TableCustomer = () => {
   return (
     <div>
       <Table
-        rowSelection={{
-          selectedRowKeys,
-          onChange: onSelectChange,
-          onSelect: (record) => {
-            setSelectedId(record.id);
-          },
-        }}
         columns={columns}
         dataSource={listCustomer}
       />

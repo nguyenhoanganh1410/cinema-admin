@@ -32,6 +32,10 @@ const customerApi = {
         return axiosApi.get(`/customer/phone/${phone}`);
     },
 
+    getCustomerByEmail: (email) => {
+        return axiosApi.get(`/customer/email/${email}`);
+    },
+
     createInCinema: (data) => {
         return axiosApi.post(`/customer/cinema`,data);
     }
