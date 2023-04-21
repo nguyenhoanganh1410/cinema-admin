@@ -119,7 +119,7 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
         depatch(setReload(!reload));
       }
     } catch (error) {
-      notifyError("Chọn sai định dạng ảnh.")
+      notifyError("Mã phim đã tồn tại!")
     }
    
   };
