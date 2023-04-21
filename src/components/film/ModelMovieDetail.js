@@ -122,7 +122,7 @@ const ModelDetailMovie = ({ showModalDetailMovie, setShowModalDetailMovie,select
         category: response.idCategoryMovie,
         time: response.duration,
         releaseDate: moment(response.releaseDate),
-        desc: response.desc,
+        desc: response?.desc,
         classify: response.classify,
         endDate: moment(response.endDate),
         status: response.isActived,
@@ -164,6 +164,7 @@ const ModelDetailMovie = ({ showModalDetailMovie, setShowModalDetailMovie,select
     data.append("classify", classify);
     data.append("endDate", new Date(endDatePicker));
     data.append("isActived", status);
+    
     if (imagePicker) {
       if (imagePicker.length === 0){
         console.log("image no");
