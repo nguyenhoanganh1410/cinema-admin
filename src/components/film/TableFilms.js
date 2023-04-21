@@ -113,16 +113,6 @@ const TableFilms = ({keyword,startDatePicker,endDatePicker}) => {
       onFilter: (value, record) => record.status === value,
     },
     {
-      title: "Hình ảnh",
-      dataIndex: "image",
-      render: (image) => (
-        <Image
-          width={50}
-          src={image}
-        />
-      ),
-    },
-    {
       title: "Trạng thái",
       dataIndex: "active",
       render: (active) => {
