@@ -51,6 +51,8 @@ import IndexTicket from "../components/tickets/IndexFilm";
 import { notifyWarn } from "../utils/Notifi";
 import { MESSAGE_NOT_ACCEPT } from "../constant";
 import RevenueComponent from "../components/statistic/RevenueComponent";
+import CustomerStatitisComponent from "../components/statistic/customer/CustomerStatitisComponent";
+import FilmStatisticComponent from "../components/statistic/film/FilmStatisticComponent";
 const { Header, Content, Footer, Sider } = Layout;
 
 const { Text } = Typography;
@@ -183,8 +185,12 @@ const HomePage = () => {
       return <IndexTicket />;
     } else if (itemClicked === 10) {
       return <IndexTicketRefund />;
-    } else if( itemClicked === 1000){
-      return <RevenueComponent />
+    } else if (itemClicked === 1000) {
+      return <RevenueComponent />;
+    } else if (itemClicked === 1003) {
+      return <CustomerStatitisComponent />;
+    } else if(itemClicked === 1002){
+      return <FilmStatisticComponent />
     }
     return <IndexDashboard />;
   };
