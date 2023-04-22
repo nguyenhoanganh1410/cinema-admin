@@ -13,9 +13,13 @@ import {
 import RevenueTable from "./table/RevenueTable";
 import dayjs from "dayjs";
 import moment from "moment";
+import useRevenueComponentHook from "./useRevenueComponentHook";
 const { RangePicker } = DatePicker;
 const dateFormat = "YYYY/MM/DD";
 const RevenueComponent = () => {
+  const { revenues, onChangeDate, handleChangeEmployee, idStaff, staffs } =
+    useRevenueComponentHook();
+    
   return (
     <div className="site-card-wrapper">
       <Breadcrumb style={{ marginBottom: "1rem", marginTop: "1rem" }}>
@@ -37,6 +41,7 @@ const RevenueComponent = () => {
           <RangePicker
             placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
             style={{ minWidth: "50%" }}
+            onChange={onChangeDate}
             defaultValue={[
               dayjs(moment().startOf("month").format(dateFormat), dateFormat),
               dayjs(moment().format(dateFormat), dateFormat),
@@ -51,21 +56,8 @@ const RevenueComponent = () => {
               width: "200px",
               margin: "0 1rem",
             }}
-            //   onChange={handleChangePosition}
-            options={[
-              {
-                value: "allFill",
-                label: "Tất cả nhân viên",
-              },
-              {
-                value: "emp-01",
-                label: "Nhân viên 1",
-              },
-              {
-                value: "emp-02",
-                label: "Nhân viên 2",
-              },
-            ]}
+            onChange={handleChangeEmployee}
+            options={staffs}
           />
         </Col>
         <Col span={4} style={{ position: "absolute", right: "2.5%" }}>
@@ -85,7 +77,7 @@ const RevenueComponent = () => {
         }}
       >
         <Col span={24}>
-          <RevenueTable />
+          <RevenueTable idStaff={idStaff} revenues={revenues} />
         </Col>
       </Row>
     </div>

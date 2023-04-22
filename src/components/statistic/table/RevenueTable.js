@@ -1,4 +1,5 @@
 import { Table } from "antd";
+import useRevenueComponentHook from "../useRevenueComponentHook";
 const columns = [
   {
     title: "STT",
@@ -6,124 +7,61 @@ const columns = [
   },
   {
     title: "Ngày",
-    dataIndex: "date",
-    sorter: (a, b) => a.age - b.age,
+    dataIndex: "createdAt",
+    defaultSortOrder: 'descend',
+    sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt )
   },
   {
     title: "Chiết khấu",
     dataIndex: "discount",
-    sorter: (a, b) => a.age - b.age,
   },
   {
     title: "Doanh số trước chiết khấu",
     dataIndex: "total",
-
-    sorter: (a, b) => a.age - b.age,
   },
   {
     title: "Doanh số sau chiết khấu",
-    dataIndex: "actual",
-    sorter: (a, b) => a.age - b.age,
+    dataIndex: "totalDiscount",
   },
 ];
-const data = [
-  {
-    key: Math.random().toString(),
-    date: "22/04/2022",
-    discount: 10000,
-    total: 900000,
-    actual: 890000,
-  },
-  {
-    key: Math.random().toString(),
-    date: "22/04/2022",
-    discount: 10000,
-    total: 900000,
-    actual: 890000,
-  },
-  {
-    key: Math.random().toString(),
-    date: "22/04/2022",
-    discount: 10000,
-    total: 900000,
-    actual: 890000,
-  },
-  {
-    key: Math.random().toString(),
-    date: "22/04/2022",
-    discount: 10000,
-    total: 900000,
-    actual: 890000,
-  },
-  {
-    key: Math.random().toString(),
-    date: "22/04/2022",
-    discount: 10000,
-    total: 900000,
-    actual: 890000,
-  },
-  {
-    key: Math.random().toString(),
-    date: "22/04/2022",
-    discount: 10000,
-    total: 900000,
-    actual: 890000,
-  },
 
+const columnsWithEmployee = [
   {
-    key: Math.random().toString(),
-    date: "22/04/2022",
-    discount: 10000,
-    total: 900000,
-    actual: 890000,
+    title: "Mã nhân viên",
+    dataIndex: "idEmployee",
   },
   {
-    key: Math.random().toString(),
-    date: "22/04/2022",
-    discount: 10000,
-    total: 900000,
-    actual: 890000,
+    title: "Tên nhân viên",
+    dataIndex: "name",
   },
   {
-    key: Math.random().toString(),
-    date: "22/04/2022",
-    discount: 10000,
-    total: 900000,
-    actual: 890000,
+    title: "Ngày",
+    dataIndex: "createdAt",
+    defaultSortOrder: 'descend',
+    sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt )
   },
   {
-    key: Math.random().toString(),
-    date: "22/04/2022",
-    discount: 10000,
-    total: 900000,
-    actual: 890000,
+    title: "Chiết khấu",
+    dataIndex: "discount",
   },
   {
-    key: Math.random().toString(),
-    date: "22/04/2022",
-    discount: 10000,
-    total: 900000,
-    actual: 890000,
+    title: "Doanh số trước chiết khấu",
+    dataIndex: "total",
   },
   {
-    key: Math.random().toString(),
-    date: "22/04/2022",
-    discount: 10000,
-    total: 900000,
-    actual: 890000,
-  },
-  {
-    key: Math.random().toString(),
-    date: "22/04/2022",
-    discount: 10000,
-    total: 900000,
-    actual: 890000,
+    title: "Doanh số sau chiết khấu",
+    dataIndex: "totalDiscount",
   },
 ];
+
 const onChange = (pagination, filters, sorter, extra) => {
   console.log("params", pagination, filters, sorter, extra);
 };
-const RevenueTable = () => (
-  <Table columns={columns} dataSource={data} onChange={onChange} />
-);
+
+const RevenueTable = ({revenues, idStaff}) =>{
+  console.log(idStaff);
+  return (
+    <Table columns={idStaff ? columnsWithEmployee : columns} dataSource={revenues} onChange={onChange} />
+  );
+}
 export default RevenueTable;

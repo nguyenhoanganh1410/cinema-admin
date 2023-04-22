@@ -25,7 +25,9 @@ const staffApi = {
     return axiosApi.delete(`/staff/${id}`);
   },
 
-
+  getStaffsByIdCinema: (id) => {
+    return axiosApi.get(`/staff/cinema/${id}`);
+  },
 };
 
 
