@@ -619,7 +619,7 @@ const IndexLinePromotion = ({ setTab }) => {
               Dòng khuyến mãi
             </span>
           </Space>
-          {currentDate < startDate && statusDb === false ? (
+          {/* {currentDate < startDate && statusDb === false ? ( */}
             <Button
               type="primary"
               onClick={() => handleOpenModel()}
@@ -631,7 +631,7 @@ const IndexLinePromotion = ({ setTab }) => {
             >
               Thêm
             </Button>
-          ) : null}
+         {/* // ) : null} */}
         </div>
         <Table columns={columns} dataSource={listPromotionLine} />
       </div>

@@ -50,6 +50,7 @@ import { ToastContainer, toast } from "react-toastify";
 import IndexTicket from "../components/tickets/IndexFilm";
 import { notifyWarn } from "../utils/Notifi";
 import { MESSAGE_NOT_ACCEPT } from "../constant";
+import RevenueComponent from "../components/statistic/RevenueComponent";
 const { Header, Content, Footer, Sider } = Layout;
 
 const { Text } = Typography;
@@ -88,7 +89,12 @@ const items = [
   getItem("Hệ thống", "sub100", <ProjectOutlined />, [
     getItem("Nhân viên", "15"),
   ]),
-  getItem("Thống kê", "18", <PieChartOutlined />),
+  getItem("Thống kê", "18", <PieChartOutlined />, [
+    getItem("Thống kê doanh thu", "1000"),
+    getItem("Thống kê khuyến mãi", "1001"),
+    getItem("Thống kê theo phim", "1002"),
+    getItem("Thống kê khách hàng", "1003"),
+  ]),
 ];
 const HomePage = () => {
   const navigator = useNavigate();
@@ -177,6 +183,8 @@ const HomePage = () => {
       return <IndexTicket />;
     } else if (itemClicked === 10) {
       return <IndexTicketRefund />;
+    } else if( itemClicked === 1000){
+      return <RevenueComponent />
     }
     return <IndexDashboard />;
   };
