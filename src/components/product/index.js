@@ -55,12 +55,6 @@ const IndexProduct = () => {
             Thêm
           </Button>
         </Col>
-        {/* <Col style={{ margin: "0 1rem" }}>
-          {" "}
-          <Button type="primary" size="large" icon={<ToolOutlined />}>
-            Cập nhật
-          </Button>
-        </Col> */}
       </Row>
 
       <Row

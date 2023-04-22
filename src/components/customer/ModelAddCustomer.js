@@ -17,13 +17,13 @@ import openAddressApi from "../../api/openApi";
 import customerApi from "../../api/customerApi";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
-const { Option } = Select;
 import dayjs from "dayjs";
 import { notifyError,
   notifySucess
- } from "../../utils/Notifi";
- import { setReload } from "../../redux/actions";
+} from "../../utils/Notifi";
+import { setReload } from "../../redux/actions";
 
+const { Option } = Select;
 const ModelAddCustomer = ({
   showModalAddCustomer,
   setShowModalAddCustomer,

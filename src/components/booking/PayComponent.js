@@ -64,7 +64,6 @@ const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
   const cinema = useSelector((state) => state.cinema);
   const user = useSelector((state) => state.user);
   const [totalPrice, setTotalPrice] = useState(0);
-
   const [pickProducts, setPickProducts] = useState([]);
   const [seatPicked, setSeatPicked] = useState([]);
   const [pay, setPay] = useState([]);
@@ -75,22 +74,19 @@ const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
   const [promotionApplicalbe, setPromotionApplicalbe] = useState([]);
   const [totalDiscount, setTotalDiscount] = useState(0);
   const [typeCustomer, setTypeCustomer] = useState("KH000");
-
   const [producs, setProducts] = useState([]);
-
   const [promotion, setPromotion] = useState([]);
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newCustomer, setNewCustomer] = useState({});
-
-
+  const [textSearch, setTextSearch] = useState('')
   const [form] = Form.useForm();
 
   const reload = useSelector((state) => state.reload);
 
   const isBooking = useSelector((state) => state.isBooking);
-  console.log(isBooking);
+
   useEffect(() => {
     setSeatPicked(booking?.seats);
     setPickProducts(booking?.products);
@@ -127,6 +123,7 @@ const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
   }, [seatPicked, pickProducts]);
 
   const handleSearchCustomer = async (e) => {
+    setTextSearch(e.target.value)
     const data = await customerApi.getCustomerByPhone(e.target.value);
     if (data.id) {
       setCustomerSearched(data);
@@ -139,6 +136,7 @@ const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
     setOptions([]);
   };
   const handleClickCustomer = () => {
+    setTextSearch("")
     if (customerSearched) {
       setPay([...pay, { customer: customerSearched }]);
 
@@ -148,12 +146,9 @@ const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
         totalMoney: totalPrice,
         products: producs,
       };
-      console.log("load", dataPayload);
 
       getPromotion(dataPayload)
         .then((result) => {
-          //insert data into options
-
           const promotionWarning = result.filter((val) => {
             return val?.warning === true;
           });
@@ -161,11 +156,8 @@ const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
             return val?.warning === false || val?.warning === undefined;
           });
           const totalDiscount = promotionApplicalbe.reduce((acc, val) => {
-            console.log("dis", val?.discount);
-            console.log("acc", acc);
             const dis = val?.discount ? val?.discount : 0;
             return acc + dis;
-            return acc + 0;
           }, 0);
           setTotalDiscount(totalDiscount);
           setPromotionApplicalbe(promotionApplicalbe);
@@ -176,14 +168,11 @@ const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
           });
           const discount = result.reduce((acc, val) => {
             if (val?.type === "1" || val?.type === "3") {
-              console.log("dis", val?.discount);
-              console.log("acc", acc);
               const dis = val?.discount ? val?.discount : 0;
               return acc + dis;
             }
             return acc + 0;
           }, 0);
-          console.log(result);
           setDiscountMoney(discount);
           setOptions(dataOptions);
           setPromotion(result);
@@ -451,7 +440,8 @@ const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
               <Input
                 placeholder="Nhập số điện thoại khách..."
                 onChange={handleSearchCustomer}
-                value={pay[0]?.customer ? pay[0]?.customer?.phone : ""}
+               // value={pay[0]?.customer ? pay[0]?.customer?.phone : ""}
+               value={textSearch ? textSearch : pay[0]?.customer ? pay[0]?.customer?.phone : ""}
               />
               {customerSearched ? (
                 <ul className="search_results">

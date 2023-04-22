@@ -21,10 +21,36 @@ import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 
-const MoneyPromotion = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
+const MoneyPromotion = ({
+  showModalAddCustomer,
+  disabled,
+  setShowModalAddCustomer,
+  listProductSeat,
+  promtionDetails,
+}) => {
+  const [form] = Form.useForm();
+  const handleSubmit = (values) => {
+    console.log("values", values);
+  };
+  useEffect(() => {
+    if (promtionDetails) {
+      form.setFieldsValue({
+        id: promtionDetails.id,
+        category: promtionDetails?.IdProduct_buy || 0,
+        totalDiscount: promtionDetails?.money_received || 0,
+        qtyBuy: promtionDetails?.qty_buy || 0,
+      });
+    }
+  }, [promtionDetails]);
+
   return (
     <>
-      <Form layout="vertical">
+      <Form
+        form={form}
+        id="myFormAddLinePro"
+        onFinish={handleSubmit}
+        layout="vertical"
+      >
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
@@ -38,27 +64,19 @@ const MoneyPromotion = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
               ]}
             >
               <Select
+                disabled={disabled}
                 placeholder="Chọn sản phẩm mua"
                 style={{
                   width: "100%",
                 }}
                 // onChange={handleChangePosition}
-                options={[
-                  {
-                    value: "1",
-                    label: "Ghế Thường",
-                  },
-                  {
-                    value: "2",
-                    label: "Ghế Đôi",
-                  },
-                ]}
+                options={listProductSeat}
               />
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item
-              name=""
+              name="qtyBuy"
               label="Số lượng mua"
               style={{ width: "100%" }}
               rules={[
@@ -69,6 +87,7 @@ const MoneyPromotion = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
               ]}
             >
               <InputNumber
+                disabled={disabled}
                 style={{ width: "100%" }}
                 min={1}
                 max={10}
@@ -82,7 +101,7 @@ const MoneyPromotion = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              name=""
+              name="totalDiscount"
               label="Số tiền KM"
               rules={[
                 {
@@ -92,6 +111,7 @@ const MoneyPromotion = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
               ]}
             >
               <InputNumber
+                disabled={disabled}
                 style={{ width: "100%" }}
                 formatter={(value) =>
                   `VNĐ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")

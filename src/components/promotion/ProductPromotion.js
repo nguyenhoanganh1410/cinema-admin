@@ -21,20 +21,31 @@ import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 
-const ProductPromotion = (
-  handleSubmit,
-) => {
+const ProductPromotion = ({handleSubmit, disabled,listProduct,listProductSeat, promtionDetails}) => {
   const [form] = Form.useForm();
+  console.log(listProduct);
   handleSubmit = (values) => {
     console.log("values", values);
   };
+  useEffect(() => {
+    if (promtionDetails) {
+      form.setFieldsValue({
+        id: promtionDetails.id,
+        productBuy: promtionDetails?.IdProduct_buy || 0,
+        productReceive: promtionDetails?.IdProduct_receive || 0,
+        qtyReceive: promtionDetails?.qty_receive || 0,
+        qtyBuy: promtionDetails?.qty_buy || 0
+      });
+    }
+  }, [promtionDetails]);
   return (
     <>
-      <Form 
+      <Form
         form={form}
         id="myFormAddLinePro"
         onFinish={handleSubmit}
-      layout="vertical">
+        layout="vertical"
+      >
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
@@ -52,17 +63,9 @@ const ProductPromotion = (
                 style={{
                   width: "100%",
                 }}
+                disabled={disabled}
                 // onChange={handleChangePosition}
-                options={[
-                  {
-                    value: "1",
-                    label: "Ghế Thường",
-                  },
-                  {
-                    value: "2",
-                    label: "Ghế Đôi",
-                  },
-                ]}
+                options={listProductSeat}
               />
             </Form.Item>
           </Col>
@@ -78,29 +81,13 @@ const ProductPromotion = (
               ]}
             >
               <Select
+                disabled={disabled}
                 placeholder="Chọn sản phẩm nhận"
                 style={{
                   width: "100%",
                 }}
                 // onChange={handleChangePosition}
-                options={[
-                  {
-                    value: "1",
-                    label: "Ghế Thường",
-                  },
-                  {
-                    value: "2",
-                    label: "Ghế Đôi",
-                  },
-                  {
-                    value: "1",
-                    label: "Bắp rang bơ ",
-                  },
-                  {
-                    value: "2",
-                    label: "Pepsi vị chanh lớn",
-                  },
-                ]}
+                options={listProduct}
               />
             </Form.Item>
           </Col>
@@ -119,6 +106,7 @@ const ProductPromotion = (
               ]}
             >
               <InputNumber
+                disabled={disabled}
                 min={1}
                 max={10}
                 style={{ width: "100%" }}
@@ -139,6 +127,7 @@ const ProductPromotion = (
               ]}
             >
               <InputNumber
+                disabled={disabled}
                 min={1}
                 style={{ width: "100%" }}
                 max={10}

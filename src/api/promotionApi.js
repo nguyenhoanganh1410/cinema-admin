@@ -24,6 +24,9 @@ const promotionApi = {
   getPromotionLineByHeader: (_id) => {
     return axiosApi.get(`/promotionLine/promotionHeader/${_id}`);
   },
+  getPromotionLineById: (_id) => {
+    return axiosApi.get(`/promotionLine/${_id}`);
+  },
 
   createPromotionLine: (data) => {
     return axiosApi.post("/promotionLine", data);
@@ -34,6 +37,10 @@ const promotionApi = {
 
   checkPromotion: (data) => {
     return axiosApi.post(`/promotionHeader/check/promotion`, data);
+  },
+
+  getPromotionDetailsByLineId: (_id) => {
+    return axiosApi.get(`/promotionDetail/promotionLine/${_id}`);
   },
 };
 

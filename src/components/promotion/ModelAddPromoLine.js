@@ -17,38 +17,23 @@ import {
   Upload,
   message,
 } from "antd";
-
-import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
-import ProductPromotion from "./ProductPromotion";
-import MoneyPromotion from "./MoneyPromotion";
-import PercentPromotion from "./PercentPromotion";
 import promotionApi from "../../api/promotionApi";
 import moment from "moment";
-
 import { useDispatch, useSelector } from "react-redux";
 import { setReload } from "../../redux/actions";
-
 import dayjs from "dayjs";
 import productApi from "../../api/productApi";
+import { yupSync } from "./useModelPromotionLine";
+import { TYPE_FOOD_PRODUCT, TYPE_SEAT_PRODUCT } from "../../constant";
 
-const { Option } = Select;
-
-const newDateFormat = 'YYYY-MM-DD'
-
-const getBase64 = (file) =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = (error) => reject(error);
-  });
-
+const newDateFormat = "YYYY-MM-DD";
+const { RangePicker } = DatePicker;
 const ModelAddPromoLine = ({
   showModalAddCustomer,
   setShowModalAddCustomer,
   startDateDb,
   endDateDb,
-  idHeaderPromotion
+  idHeaderPromotion,
 }) => {
   const [form] = Form.useForm();
 
@@ -57,17 +42,13 @@ const ModelAddPromoLine = ({
 
   const [type, setType] = useState(0);
 
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   const [listProductSeat, setListProductSeat] = useState([]);
   const [listProduct, setListProduct] = useState([]);
 
   const [idPromotionLine, setIdPromotionLine] = useState(0);
-
-  const onSearch = (value) => {
-    console.log("search:", value);
-  };
 
   const onClose = () => {
     setShowModalAddCustomer(false);
@@ -75,7 +56,6 @@ const ModelAddPromoLine = ({
 
   //handle submit form create new customer...
   const handleSubmit = (val) => {
-    console.log("val", val);
 
     const payloadLine = {
       promotionCode: val.promotionCode.toUpperCase(),
@@ -87,7 +67,7 @@ const ModelAddPromoLine = ({
       max_qty_per_customer_per_day: val.maxUsePerCustomer,
       budget: val.budget,
       promotionHeaderId: idHeaderPromotion,
-    }
+    };
 
     const payloadDetail = {
       IdProduct_buy: val.productBuy,
@@ -97,20 +77,17 @@ const ModelAddPromoLine = ({
       qty_receive: val.qtyReceive,
       total_purchase_amount: val.moneyBought,
       percent_reduction: val.percent,
+      max_money_reduction: val.maxMoneyPercent
     };
 
     try {
       const createLine = async () => {
         const response = await promotionApi.createPromotionLine(payloadLine);
         setIdPromotionLine(response.id);
-        console.log("response", response);
         if (response) {
           const createDetail = async () => {
-            console.log("idPromotionLine", idPromotionLine);
-            payloadDetail.idPromotionLine = response.id ;
-            console.log("payloadDetail", payloadDetail);
+            payloadDetail.idPromotionLine = response.id;
             const res = await promotionApi.createPromotionDetail(payloadDetail);
-            console.log("res", res);
             if (res) {
               message.success("Thêm thành công");
               depatch(setReload(!reload));
@@ -122,32 +99,24 @@ const ModelAddPromoLine = ({
       };
 
       createLine();
-    }
-    catch (error) {
+    } catch (error) {
       console.log("error", error);
     }
   };
 
-  //change position
   const handleChangeTypePro = (value) => {
     setType(value);
   };
 
-  //choise date start worling
-  const onChangeStartDate = (date, dateString) => {
-    setStartDate(dateString);
-  };
-
-  //choise date end worling
-  const onChangeEndDate = (date, dateString) => {
-    setEndDate(dateString);
+  const onChangeDate = (date, dateString) => {
+    setStartDate(dateString[0]);
+    setEndDate(dateString[1]);
   };
 
   useEffect(() => {
     const fetchProductSeats = async () => {
       try {
-        const response = await productApi.getListProductByType("Ghe");
-        console.log("response", response);
+        const response = await productApi.getListProductByType(TYPE_SEAT_PRODUCT);
         const options = response.map((item) => ({
           value: item.id,
           label: item.productName,
@@ -159,8 +128,7 @@ const ModelAddPromoLine = ({
     };
     const fetchAllProduct = async () => {
       try {
-        const response = await productApi.getProducts();
-        console.log("response", response);
+        const response = await productApi.getListProductByType(TYPE_FOOD_PRODUCT);
         const options = response.map((item) => ({
           value: item.id,
           label: item.productName,
@@ -175,7 +143,6 @@ const ModelAddPromoLine = ({
     fetchProductSeats();
   }, []);
 
-  console.log("startDate", endDateDb);
   return (
     <>
       <Drawer
@@ -206,12 +173,7 @@ const ModelAddPromoLine = ({
               <Form.Item
                 name="promotionCode"
                 label="Mã áp dụng"
-                rules={[
-                  {
-                    required: true,
-                    message: "Hãy nhập mã áp dụng...",
-                  },
-                ]}
+                rules={[yupSync]}
               >
                 <Input
                   style={{ textTransform: "uppercase" }}
@@ -254,11 +216,11 @@ const ModelAddPromoLine = ({
                   onChange={handleChangeTypePro}
                   options={[
                     {
-                      value: 1,
+                      value: 2,
                       label: "Khuyến mãi giảm tiền",
                     },
                     {
-                      value: 2,
+                      value: 1,
                       label: "Khuyễn mãi tặng sản phẩm",
                     },
                     {
@@ -324,7 +286,7 @@ const ModelAddPromoLine = ({
             <Col span={12}>
               <Form.Item
                 name="startDate"
-                label="Ngày bắt đầu"
+                label="Ngày bắt đầu - Ngày kết thúc"
                 rules={[
                   {
                     required: true,
@@ -332,7 +294,7 @@ const ModelAddPromoLine = ({
                   },
                 ]}
               >
-                <DatePicker
+                {/* <DatePicker
                   disabledDate={(current) =>
                     current && current < moment(startDateDb) || current > moment(endDateDb).add(1, 'days')
                   }
@@ -340,10 +302,17 @@ const ModelAddPromoLine = ({
                   style={{ width: "100%" }}
                   placeholder="Chọn ngày bắt đầu"
                   format={newDateFormat}
+                /> */}
+                <RangePicker
+                  placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
+                  onChange={onChangeDate}
+                  disabledDate={(current) => {
+                    return current && current < moment().endOf('day');
+                  }}
                 />
               </Form.Item>
             </Col>
-            <Col span={12} style={{}}>
+            {/* <Col span={12} style={{}}>
               <Form.Item
                 name="endDate"
                 label="Ngày kết thúc"
@@ -364,7 +333,7 @@ const ModelAddPromoLine = ({
                   format={newDateFormat}
                 />
               </Form.Item>
-            </Col>
+            </Col> */}
           </Row>
           <Space
             direction="vertical"
@@ -382,7 +351,7 @@ const ModelAddPromoLine = ({
               Chi tiết loại khuyến mãi
             </span>
           </Space>
-          {type === 1 ? (
+          {type === 2 ? (
             <>
               <Row gutter={16}>
                 <Col span={12}>
@@ -452,7 +421,7 @@ const ModelAddPromoLine = ({
                 </Col>
               </Row>
             </>
-          ) : type === 2 ? (
+          ) : type === 1 ? (
             <>
               <Row gutter={16}>
                 <Col span={12}>
@@ -493,7 +462,7 @@ const ModelAddPromoLine = ({
                         width: "100%",
                       }}
                       // onChange={handleChangePosition}
-                      options={listProductSeat}
+                      options={listProduct}
                     />
                   </Form.Item>
                 </Col>
@@ -582,6 +551,30 @@ const ModelAddPromoLine = ({
                       max={100}
                       placeholder="Nhập số phần trăm giảm.."
                       formatter={(value) => `% ${value}`}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    name="maxMoneyPercent"
+                    label="Số tiền KM tối đa"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Nhập số tiền...",
+                      },
+                    ]}
+                  >
+                    <InputNumber
+                      style={{ width: "100%" }}
+                      formatter={(value) =>
+                        `VNĐ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                      }
+                      parser={(value) => value.replace(/\VNĐ\s?|(,*)/g, "")}
+                      // onChange={onChange}
+                      placeholder="Nhập số tiền..."
                     />
                   </Form.Item>
                 </Col>

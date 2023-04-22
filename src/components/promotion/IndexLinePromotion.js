@@ -35,6 +35,7 @@ import dayjs from "dayjs";
 import promotionRsApi from "../../api/promotionRs";
 import { VND } from "../../constant";
 import { yupSync } from "./useModelAddPromotionHeaderHook";
+import ModelPromtionLineDetail from "./ModelPromtionLineDetail";
 
 const { TextArea } = Input;
 const { RangePicker } = DatePicker;
@@ -65,15 +66,28 @@ const IndexLinePromotion = ({ setTab }) => {
   const depatch = useDispatch();
   const reload = useSelector((state) => state.reload);
 
+  const [isShowModelDetail, setIsShowModelDetail] = useState(false);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [totalMoneyProUsed, setTotalMoneyProUsed] = useState(0);
-
+  const [idPromotionLine, setIdPromotionLine] = useState(null);
+  const handleOnclik = (id) => {
+    setIdPromotionLine(id);
+    setIsShowModelDetail(true);
+  };
   const columns = [
     {
       title: "Mã Code",
       dataIndex: "promotionCode",
       key: "promotionCode",
-      render: (text) => <a>{text}</a>,
+      render: (text, record) => (
+        <a
+          style={{ textTransform: "capitalize" }}
+          onClick={() => handleOnclik(record.id)}
+        >
+          {text.toLowerCase()}
+        </a>
+      ),
     },
     {
       title: "Miêu tả",
@@ -480,7 +494,7 @@ const IndexLinePromotion = ({ setTab }) => {
           <Col span={12}>
             <Form.Item label="Ngày bắt đầu" name="date">
               <RangePicker
-                disabled={statusDb ? true : false}
+                disabled={[moment().diff( moment(startDate), "seconds" ) > 0 ? true : false, false]}
                 placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
                 onChange={onChangeDate}
                 disabledDate={(current) => {
@@ -716,6 +730,14 @@ const IndexLinePromotion = ({ setTab }) => {
           startDateDb={startDateDb}
           endDateDb={endDateDb}
           idHeaderPromotion={idHeaderPromotion}
+        />
+      ) : null}
+      {isShowModelDetail ? (
+        <ModelPromtionLineDetail
+          idPromotionLine={idPromotionLine}
+          setIdPromotionLine={setIdPromotionLine}
+          isShowModelDetail={isShowModelDetail}
+          setIsShowModelDetail={setIsShowModelDetail}
         />
       ) : null}
     </div>

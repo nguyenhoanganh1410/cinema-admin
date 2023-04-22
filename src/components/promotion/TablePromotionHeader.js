@@ -19,13 +19,6 @@ const TablePromotionHeader = ({ setTab, valueStatusPick, searchText }) => {
   const handleDelete = () => {
     showModal();
   };
-
-  // //handle show details of promotion header
-  // const handeShowDetailsPromotion = () => {
-  //   dispatch(setPromotionHeader());
-  //   setTab(1);
-  // };
-
   //model
   const [isModalOpen, setIsModalOpen] = useState(false);
   const showModal = () => {
