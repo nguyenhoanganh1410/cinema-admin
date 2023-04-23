@@ -17,7 +17,7 @@ const PickFilmComponent = ({next}) => {
  }
  useEffect(()=>{
     const getFilms = async (_id) =>{
-        const data = await movieApi.getMovieByIdCinema(_id);
+        const data = await movieApi.getMovieByType(1);
         if(data) setFilms(data);
     }
     getFilms(1)
