@@ -45,6 +45,8 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
   const [status, setStatus] = useState("");
   const [endDatePicked, setEndDatePicked] = useState("");
 
+  const { RangePicker } = DatePicker;
+
 
   const [form] = Form.useForm();
 
@@ -69,6 +71,8 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
       idMovie: values.movie,
       idCinema: values.cinema,
     };
+
+    console.log("payload", payload);
     
     try {
       const res = await showApi.createShow(payload);
@@ -100,11 +104,12 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
 
   //choise date start worling
   const onChangeDate = (date, dateString) => {
-    setStartDatePicked(dateString);
+    setStartDatePicked(dateString[0]);
+    setEndDatePicked(dateString[1]);
+
   };
 
   const onChangeDateEnd = (date, dateString) => {
-    setEndDatePicked(dateString);
   };
 
   const onChangeMovie = async (value) => {
@@ -143,7 +148,7 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
     //load movies
     const getMovies = async () => {
       try {
-        const response = await movieApi.getMovies();
+        const response = await movieApi.getMovieByType(1)
         if (response) {
           const arrMovie = response.map((item) => {
             return {
@@ -263,186 +268,6 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
     </div>
   );
 
-  // return (
-  //   <>
-  //     <Drawer
-  //       title="Thêm suất chiếu"
-  //       width={720}
-  //       onClose={onClose}
-  //       open={showModalAddCustomer}
-  //       bodyStyle={{
-  //         paddingBottom: 80,
-  //       }}
-  //       extra={
-  //         <Space>
-  //           <Button onClick={onClose}>Thoát</Button>
-  //           <Button form="myFormShow" htmlType="submit" type="primary">
-  //             Submit
-  //           </Button>
-  //         </Space>
-  //       }
-  //     >
-  //       <Form
-  //         form={form}
-  //         onFinish={handleSubmit}
-  //         id="myFormShow"
-  //         layout="vertical"
-  //       >
-  //         <Row gutter={16}>
-  //           <Col span={12}>
-  //             <Form.Item
-  //               name="movie"
-  //               label="Chọn phim"
-  //               rules={[
-  //                 {
-  //                   required: true,
-  //                   message: "Hãy chọn bộ phim...",
-  //                 },
-  //               ]}
-  //             >
-  //               <Select
-  //                 placeholder="Chọn phim"
-  //                 style={{
-  //                   width: "100%",
-  //                 }}
-  //                 onChange={onChangeMovie}
-  //                 options={listMovie}
-  //               />
-  //             </Form.Item>
-  //           </Col>
-  //           <Col span={12}>
-  //             <Form.Item
-  //               name="cinema"
-  //               label="Chọn chi nhánh"
-  //               rules={[
-  //                 {
-  //                   required: true,
-  //                   message: "Hãy chọn chi nhánh...",
-  //                 },
-  //               ]}
-  //             >
-  //               <Select
-  //                 placeholder="Chọn chi nhánh"
-  //                 style={{
-  //                   width: "100%",
-  //                 }}
-  //                 onChange={onChangeCinema}
-  //                 options={listCinema}
-  //               />
-  //             </Form.Item>
-  //           </Col>
-  //         </Row>
-  //         <Row gutter={16}>
-  //           <Col span={12}>
-  //             <Form.Item
-  //               name="hall"
-  //               label="Chọn phòng chiếu"
-  //               rules={[
-  //                 {
-  //                   required: true,
-  //                   message: "Hãy chọn phòng chiếu...",
-  //                 },
-  //               ]}
-  //             >
-  //               <Select
-  //                 placeholder="Chọn phòng chiếu"
-  //                 style={{
-  //                   width: "100%",
-  //                 }}
-  //                 onChange={onChangeHall}
-  //                 options={listHall}
-  //               />
-  //             </Form.Item>
-  //           </Col>
-  //         </Row>
-  //         <Row gutter={16}>
-  //           <Col span={12}>
-  //             <Form.Item
-  //               name="startDate"
-  //               label="Ngày bắt đầu"
-  //               rules={[
-  //                 ({ getFieldValue }) => ({
-  //                   validator(rule, value) {
-  //                     if (value < new Date()) {
-  //                       return Promise.reject(
-  //                         "Ngày bắt đầu phải lớn hơn ngày hiện tại!"
-  //                       );
-  //                     }
-  //                   },
-  //                 }),
-  //               ]}
-  //             >
-  //               <DatePicker
-  //                 onChange={onChangeDate}
-  //                 style={{ width: "100%" }}
-  //                 placeholder="Chọn ngày chiếu"
-  //               />
-  //             </Form.Item>
-  //           </Col>
-  //           <Col span={12}>
-  //             <Form.Item
-  //               name="endDate"
-  //               label="Ngày kết thúc"
-  //               rules={[
-  //                 ({ getFieldValue }) => ({
-  //                   validator(rule, value) {
-  //                     if (value < new Date(startDatePicked)) {
-  //                       return Promise.reject(
-  //                         "Ngày kết thúc phải lớn hơn hoặc ngày bắt đầu!"
-  //                       );
-  //                     }
-  //                   },
-  //                 }),
-  //               ]}
-  //             >
-  //               <DatePicker
-  //                 // onChange={onChangeDate}
-  //                 style={{ width: "100%" }}
-  //                 placeholder="Chọn ngày kết thúc"
-  //               />
-  //             </Form.Item>
-  //           </Col>
-  //         </Row>
-  //         <Row gutter={16}>
-  //           <Col span={24}>
-  //             <Form.Item
-  //               name="showTime"
-  //               label={
-  //                 <p>
-  //                   Chọn suất chiếu
-  //                   {durationString && (
-  //                     <Popover content={content} title="Chọn suất chiếu">
-  //                       <InfoCircleTwoTone />
-  //                     </Popover>
-  //                   )}
-  //                 </p>
-  //               }
-  //               rules={[
-  //                 {
-  //                   required: true,
-  //                   message: "Hãy chọn suất chiếu...",
-  //                 },
-  //               ]}
-  //             >
-  //               <Select
-  //                 mode="multiple"
-  //                 tokenSeparators={[","]}
-  //                 placeholder="Chọn suất chiếu"
-  //                 value={timePicked}
-  //                 style={{
-  //                   width: "100%",
-  //                 }}
-  //                 options={listTime}
-  //                 onChange={onChangeTime}
-  //                 status={status}
-  //               />
-  //             </Form.Item>
-  //           </Col>
-  //         </Row>
-  //       </Form>
-  //     </Drawer>
-  //   </>
-  // );
 
   return (
     <>
@@ -520,6 +345,7 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
                 ]}
               >
                 <Select
+                  mode="multiple"
                   placeholder="Chọn phòng chiếu"
                   style={{
                     width: "100%",
@@ -529,62 +355,26 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
                 />
               </Form.Item>
             </Col>
-          </Row>
-          <Row gutter={16}>
+          
             <Col span={12}>
               <Form.Item
-                name="startDate"
-                label="Ngày bắt đầu"
+                name="date"
+                label="Thời gian chiếu"
                 rules={[
                   {
                     required: true,
-                    message: "Hãy chọn ngày bắt đầu...",
+                    message: "Hãy chọn thời gian chiếu...",
                   },
-                  ({ getFieldValue }) => ({
-                    validator(rule, value) {
-                      if (value < new Date()) {
-                        return Promise.reject(
-                          "Ngày bắt đầu phải lớn hơn ngày hiện tại!"
-                        );
-                      }
-                      return Promise.resolve();
-                    },
-                  }),
                 ]}
               >
-                <DatePicker
+                <RangePicker 
+                  placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
                   onChange={onChangeDate}
-                  style={{ width: "100%" }}
-                  placeholder="Chọn ngày chiếu"
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="endDate"
-                label="Ngày kết thúc"
-                rules={[
-                  {
-                    required: true,
-                    message: "Hãy chọn ngày kết thúc...",
-                  },
-                  ({ getFieldValue }) => ({
-                    validator(rule, value) {
-                      if (value < new Date(startDatePicked)) {
-                        return Promise.reject(
-                          "Ngày kết thúc phải lớn hơn hoặc ngày bắt đầu!"
-                        );
-                      }
-                      return Promise.resolve();
-                    },
-                  }),
-                ]}
-              >
-                <DatePicker
-                  // onChange={onChangeDate}
-                  onChange={onChangeDateEnd}
-                  style={{ width: "100%" }}
-                  placeholder="Chọn ngày kết thúc"
+                  disabledDate={
+                    (current) => {
+                      return current && current < moment().endOf('day');
+                    }
+                  }
                 />
               </Form.Item>
             </Col>

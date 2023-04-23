@@ -4,6 +4,11 @@ const movieApi = {
   getMovies: (query) => {
     return axiosApi.get(`/movie?keyword=${query?.keyword}&startDate=${query?.startDate}&endDate=${query?.endDate}`);
   },
+
+  getMovieByType: (type) => {
+    return axiosApi.get(`/movie/status/${type}`);
+  },
+
   searchMovies: (nameMovie) => {
     return axiosApi.get(`/movie/name/search/${nameMovie}`);
   },

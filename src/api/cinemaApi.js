@@ -10,6 +10,9 @@ const cinameApi = {
   getHallByCinema: (id) => {
     return axiosApi.get(`cinemaHall/cinema/${id}`);
   },
+  getCinemaActive: () => {
+    return axiosApi.get("/cinema/status/active");
+  }
 
 
 };
