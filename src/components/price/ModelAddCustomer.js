@@ -12,12 +12,15 @@ import {
   Space,
   Upload,
   message,
+  
 } from "antd";
 
 import { useDispatch, useSelector } from "react-redux";
 import { setReload } from "../../redux/actions";
 import priceApi from "../../api/priceApi";
+import moment from "moment";
 const { Option } = Select;
+const { RangePicker } = DatePicker;
 
 const ModelAddCustomer = ({
   showModalAddCustomer,
@@ -30,18 +33,18 @@ const ModelAddCustomer = ({
   const [endDatePicked, setEndDatePicked] = useState("");
   const [form] = Form.useForm();
 
-  const onSearch = (value) => {
-    console.log("search:", value);
-  };
-
   const onClose = () => {
     setShowModalAddCustomer(false);
   };
 
-
   const onChangeDate = (date, dateString) => {
-    setStartDatePicked(dateString);
+    setStartDatePicked(dateString[0]);
+    setEndDatePicked(dateString[1]);
   };
+
+  // const onChangeDate = (date, dateString) => {
+  //   setStartDatePicked(dateString);
+  // };
 
   const onChangeDateEnd = (date, dateString) => {
     setEndDatePicked(dateString);
@@ -68,24 +71,6 @@ const ModelAddCustomer = ({
     }
   };
  
-
-  
-
-
-  // useEffect(() => {
-  //   form.validateFields(["phone"]);
-  // }, [isExistPhone]);
-
-  // const validateEmail = (value) => {
-  //   if (value) {
-  //     const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
-  //     if (!emailRegex.test(value)) {
-  //       return Promise.reject("Email không hợp lệ!");
-  //     }
-  //   }
-  //   return Promise.resolve();
-  // };
-
   return (
     <>
       <Drawer
@@ -128,57 +113,25 @@ const ModelAddCustomer = ({
             </Col>
           </Row>
           <Row gutter={16}>
-          <Col span={12}>
+          <Col span={24}>
               <Form.Item
                 name="startDate"
                 label="Ngày bắt đầu"
-                rules={[
-                  ({getFieldValue})=>({
-                    validator(rule,value){
-                      if(!value){
-                        return Promise.reject("Hãy nhập ngày bắt đầu!");
-                      }
-                      if(value < new Date()){
-                        return Promise.reject("Ngày bắt đầu phải lớn hơn ngày hiện tại!");
-                      }
-                      return Promise.resolve();
-                    }
-                  })
-                ]}
+               
               >
-                <DatePicker
+                 <RangePicker
+                  placeholder={['Ngày bắt đầu', 'Ngày kết thúc']}
                   onChange={onChangeDate}
-                  style={{ width: "100%" }}
-                  placeholder="Chọn ngày chiếu"
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="endDate"
-                label="Ngày kết thúc"
-                rules={[
-                  ({getFieldValue})=>({
-                    validator(rule,value){
-    
-                      if(!value){
-                        return Promise.reject("Hãy nhập ngày kết thúc!");
-                      }
-                      if(value < new Date(startDatePicked)){
-                        return Promise.reject("Ngày kết thúc phải lớn hơn hoặc ngày bắt đầu!");
-                      }
-                      return Promise.resolve();
+                  style={{width: "250px"}}
+                  disabledDate={
+                    (current) => {
+                      return current && current < moment().endOf('day');
                     }
-                  })
-                ]}
-              >
-                <DatePicker
-                  onChange={onChangeDateEnd}
-                  style={{ width: "100%" }}
-                  placeholder="Chọn ngày kết thúc"
+                  }
                 />
               </Form.Item>
             </Col>
+         
           </Row>
           <Row style={{ marginTop: "16px" }} gutter={16}>
             <Col span={24}>
