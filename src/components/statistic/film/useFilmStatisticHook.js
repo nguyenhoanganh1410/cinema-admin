@@ -5,13 +5,14 @@ import { useSelector } from "react-redux";
 import { fetchRevenueByCustomer, fetchRevenueByMovie } from "../../../services/StatitisFetch";
 import { SDT_VANG_LAI, VND } from "../../../constant";
 import { getCinemas } from "../../../services/CinemaFetch";
+import { getFilmByCinemaId } from "../../../services/FilmService";
 const dateFormat = "YYYY/MM/DD";
 
 const useFilmStatisticHook = () => {
   const [revenues, setRevenues] = useState([]);
   const user = useSelector((state) => state.user);
   const cinema = useSelector((state) => state.cinema);
- 
+  const [listMovie, setListMovie] = useState([])
 
   const [params, setParams] = useState({
     end_date: moment().format(dateFormat),
@@ -25,6 +26,13 @@ const useFilmStatisticHook = () => {
       end_date: dateString[1],
     });
   };
+
+  const handleOnChangeMovie = (value) =>{
+    setParams({
+      ...params,
+      movie_id: value
+    });
+  }
 
   useEffect(() => {
     fetchRevenueByMovie(params)
@@ -52,12 +60,26 @@ const useFilmStatisticHook = () => {
         console.log("fetch revunues failed!!");
       });
   }, [params]);
+
+  useEffect(() => {
+    getFilmByCinemaId(cinema?.id || 1).then(data =>{
+      const newDate = data.map(val =>{
+        return {
+          value: val?.id,
+          label: val?.nameMovie
+        }
+      })
+      setListMovie(newDate)
+    })
+  }, [])
  
 
   return {
     revenues,
     cinema,
-    onChangeDate
+    onChangeDate,
+    listMovie,
+    handleOnChangeMovie
   };
 };
 

@@ -1,4 +1,4 @@
-import { Table } from "antd";
+import { Table, Tag } from "antd";
 import useRevenueComponentHook from "../useRevenueComponentHook";
 const columns = [
   {
@@ -17,11 +17,11 @@ const columns = [
   },
   {
     title: "Doanh số trước chiết khấu",
-    dataIndex: "total",
+    dataIndex: "totalDiscount",
   },
   {
     title: "Doanh số sau chiết khấu",
-    dataIndex: "totalDiscount",
+    dataIndex: "total",
   },
 ];
 
@@ -46,31 +46,57 @@ const columnsWithEmployee = [
   },
   {
     title: "Doanh số trước chiết khấu",
-    dataIndex: "total",
+    dataIndex: "totalDiscount",
   },
   {
     title: "Doanh số sau chiết khấu",
-    dataIndex: "totalDiscount",
+    dataIndex: "total",
   },
 ];
 
 const columnsCustomerStattits = [
   {
-    title: "Mã khách hàng",
+    title: "Mã KH",
     dataIndex: "idCustomer",
   },
   {
-    title: "Tên khách hàng",
+    title: "Tên KH",
     dataIndex: "name",
   },
   {
-    title: "SĐT khách hàng",
-    dataIndex: "phone",
+    title: "Rank",
+    dataIndex: "rank",
+    render: (rank) => {
+      let color = "";
+      if (rank === "START") {
+        color = "green";
+      }
+      if (rank === "GOLD") {
+        color = "gold";
+      }
+      if (rank === "SILVER") {
+        color = "silver";
+      }
+      if (rank === "DIAMOND") {
+        color = "blue";
+      }
+      return (
+        <Tag color={color} key={rank}>
+          {rank?.toUpperCase()}
+        </Tag>
+      );
+    },
+  },
+  {
+    title: "Ngày",
+    dataIndex: "createdAt",
+
+    sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt )
   },
   {
     title: "Số vé",
     dataIndex: "tickets",
-    defaultSortOrder: 'descend',
+   
     sorter: (a, b) => a.totalOrder - b.totalOrder
   },
   {
@@ -78,14 +104,26 @@ const columnsCustomerStattits = [
     dataIndex: "discount",
   },
   {
-    title: "Doanh số trước chiết khấu",
-    dataIndex: "total",
+    title: "DS trước CK",
+    dataIndex: "totalDiscount",
   },
   {
-    title: "Doanh số sau chiết khấu",
-    dataIndex: "totalDiscount",
+    title: "DS sau CK",
+    dataIndex: "total",
     // defaultSortOrder: 'descend',
     // sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt )
+  },
+  {
+    title: "Xã",
+    dataIndex: "ward",
+  },
+  {
+    title: "Phường",
+    dataIndex: "district",
+  },
+  {
+    title: "Tỉnh",
+    dataIndex: "city",
   },
 ];
 
@@ -115,11 +153,11 @@ const columnsFilmStattits = [
   },
   {
     title: "Doanh số trước chiết khấu",
-    dataIndex: "total",
+    dataIndex: "totalDiscount",
   },
   {
     title: "Doanh số sau chiết khấu",
-    dataIndex: "totalDiscount",
+    dataIndex: "total",
   },
 ];
 const onChange = (pagination, filters, sorter, extra) => {
@@ -134,11 +172,14 @@ const RevenueTable = ({revenues, idStaff, tableType}) =>{
   }
   if(tableType === 1){
     return (
-      <Table columns={columnsCustomerStattits} dataSource={revenues} onChange={onChange} />
+      <Table   scroll={{
+        x: 1024,
+        
+      }} columns={columnsCustomerStattits} dataSource={revenues} onChange={onChange} />
     );
   }
   return (
-    <Table columns={idStaff ? columnsWithEmployee : columns} dataSource={revenues} onChange={onChange} />
+    <Table columns={idStaff ? columnsWithEmployee : columnsWithEmployee} dataSource={revenues} onChange={onChange} />
   );
 }
 export default RevenueTable;

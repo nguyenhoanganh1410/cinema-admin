@@ -7,12 +7,15 @@ import React, { useState } from "react";
 import tokenService from "./service/token.service";
 import { setCinema, setUser } from "./redux/actions";
 import cinameApi from "./api/cinemaApi";
+import ForgotPassword from "./components/form/ForgotPassword";
+import ResetPassword from "./components/form/ResetPassword";
 
 function App() {
   const navigator = useNavigate();
   const depatch = useDispatch();
   const user = useSelector((state) => state.user);
-
+  const pathname = window.location.pathname
+  console.log(pathname);
   React.useEffect(() => {
     const userInLocalStorage = tokenService.getUser();
     if (userInLocalStorage) {
@@ -23,7 +26,7 @@ function App() {
         depatch(setCinema(data))
       } 
       getCinemaId(userInLocalStorage?.staff?.cinema_id)
-    } else {
+    } else if(!userInLocalStorage && pathname === "/") {
       navigator("/login");
     }
   }, []);
@@ -31,6 +34,8 @@ function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginForm />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/auth/reset-password" element={<ResetPassword />} />
       <Route path="/" element={<HomePage />} />
       <Route
         path="*"

@@ -18,7 +18,7 @@ import useFilmStatisticHook from "./useFilmStatisticHook";
 const { RangePicker } = DatePicker;
 const dateFormat = "YYYY/MM/DD";
 const FilmStatisticComponent = () => {
-  const { revenues, cinema, onChangeDate } = useFilmStatisticHook();
+  const { revenues, cinema,listMovie,handleOnChangeMovie, onChangeDate } = useFilmStatisticHook();
 
   return (
     <div className="site-card-wrapper">
@@ -49,19 +49,17 @@ const FilmStatisticComponent = () => {
             format={dateFormat}
           />
         </Col>
-        {/* <Col span={12}>
+        <Col span={12}>
           <Select
-            disabled
-            defaultValue={cinema?.id}
-            placeholder="Chọn rạp"
+            placeholder="Chọn phim"
             style={{
               width: "200px",
               margin: "0 1rem",
             }}
-            options={listCinema}
-           // onChange={handleChangeEmployee}
+            options={listMovie}
+            onChange={handleOnChangeMovie}
           />
-        </Col> */}
+        </Col>
         <Col span={4} style={{ position: "absolute", right: "2.5%" }}>
           <Button type="primary" title="Xuất file">
             Xuất báo cáo

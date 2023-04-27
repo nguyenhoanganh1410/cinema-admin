@@ -13,57 +13,49 @@ import {
 import "./LoginForm.scss";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import userApi from "../../api/userApi";
-import { useDispatch } from "react-redux";
-import { setUser } from "../../redux/actions";
 import { useNavigate } from "react-router-dom";
-import tokenService from "../../service/token.service";
-import { notifyError } from "../../utils/Notifi";
 import { ToastContainer } from "react-toastify";
-
-const { Title, Text } = Typography;
-const LoginForm = () => {
+import SuccesFormPage from "./SuccesFormPage";
+import { MdEmail, MdOutlineMailOutline } from "react-icons/md";
+import { sendEmailGetPassword } from "../../services/AuthService";
+function validateEmail(mail) {
+  if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mail)) {
+    return true;
+  }
+  return false;
+}
+export default function ForgotPassword() {
   const navigate = useNavigate();
   const [userName, setUserName] = React.useState("");
-  const [password, setPassword] = React.useState("");
   const [loadingStatus, setLoadingStatus] = useState(false);
-
-  const dispatch = useDispatch();
-
+  const [messErro, setMessErro] = useState("");
+  const [isSuccess, setIsSucess] = useState(false)
   const setOnChangeUserName = (e) => {
     setUserName(e.target.value);
-  };
-  const setOnChangePass = (e) => {
-    setPassword(e.target.value);
+    setMessErro('')
   };
 
   //handle submit to login user
   const handleSubmitForm = () => {
-    setLoadingStatus(true);
-    //call api for login
-    const loginUser = async (username, pass) => {
-      try {
-        const response = await userApi.login(username, pass);
-
-        setLoadingStatus(false);
-        //console.log(response);
-        //set user info
-        if (response) {
-          //redirct home page
-          navigate("/");
-          dispatch(setUser(response.data.staff));
-
-          //luu thông tin acessTonken vào localstorage
-          tokenService.setUser(response.data);
-        }
-      } catch (error) {
-        console.log("Failed to login ", error);
-        notifyError('Tên tài khoản hoặc mật khẩu không chính xác.')
-        setLoadingStatus(false)
-      }
-    };
-    loginUser(userName, password);
+    if (!userName) {
+      setMessErro("Email không được để trống.");
+      return;
+    } else if (!validateEmail(userName)) {
+      setMessErro("Email không đúng định dạng.");
+      return;
+    }
+    sendEmailGetPassword(userName).then(() => {
+      setMessErro("");
+      setIsSucess(true)
+    }).catch(error => {
+      alert(error.message)
+      console.log(error);
+    })
   };
 
+  if(isSuccess){
+    return <SuccesFormPage text="Đã gửi link đổi mật khẩu vào email."/>
+  }
   return (
     <Row style={{ height: "100vh" }} className="login">
       <Col span={8}></Col>
@@ -86,59 +78,78 @@ const LoginForm = () => {
                 fontWeight: "500",
                 textAlign: "center",
                 color: "#9f9f9f",
-               
+                textTransform: "capitalize",
               }}
             >
-            SPECIAL ACCESS REQUIRED
+              Gửi yêu cầu để lấy lại mật khẩu
             </p>
           </div>
           <form
             onSubmit={() => handleSubmitForm()}
             style={{
-              //backgroundColor: "white",
               borderRadius: "",
               padding: "2rem 2rem",
             }}
           >
-            
-           
+            {messErro ? (
+              <span
+                style={{
+                  color: "red",
+                  fontSize: "14px",
+                  fontWeight: "400",
+                  marginBottom: "12px",
+                }}
+              >
+                Email không đúng định dạng.
+              </span>
+            ) : null}
             <Input
               size="large"
-              placeholder="Nhập tên tài khoản"
+              placeholder="Nhập email để lấy lại mật khẩu."
               onChange={(e) => setOnChangeUserName(e)}
-              prefix={<UserOutlined />}
-              style={{fontSize:"14px", padding:"10px"}}
+              prefix={<MdOutlineMailOutline />}
+              style={{
+                fontSize: "14px",
+                marginBottom: "24px",
+                marginTop: "12px",
+                padding: "10px",
+              }}
             />
-           
-            <Input.Password
-              size="large"
-              placeholder="Nhập mật khẩu"
-              onChange={(e) => setOnChangePass(e)}
-              prefix={<LockOutlined />}
-              style={{ marginTop: "1.5rem", marginBottom: "1.5rem", fontSize:"14px", padding:"10px" }}
-            />
-            {userName && password ? (
+
+            {userName ? (
               <Button
                 onClick={() => handleSubmitForm()}
                 type="primary"
-                style={{ width: "100%",color:"white", borderColor:"#058dd9",backgroundColor:"#058dd9", height: "40px", marginBottom: "1rem" }}
+                style={{
+                  width: "100%",
+                  color: "white",
+                  borderColor: "#058dd9",
+                  backgroundColor: "#058dd9",
+                  height: "40px",
+                  marginBottom: "1rem",
+                }}
                 loading={loadingStatus}
               >
-                Đăng Nhập
+                Gửi Yêu Cầu
               </Button>
             ) : (
               <Button
                 onClick={() => handleSubmitForm()}
                 disabled
                 type="primary"
-                style={{ width: "100%", color:"white", borderColor:"#058dd9", backgroundColor:"#058dd9", height: "40px", marginBottom: "1rem" }}
+                style={{
+                  width: "100%",
+                  color: "white",
+                  borderColor: "#058dd9",
+                  backgroundColor: "#058dd9",
+                  height: "40px",
+                  marginBottom: "1rem",
+                }}
               >
-                Đăng Nhập
+                Gửi Yêu Cầu
               </Button>
             )}
-            <p className="forgetPassword" onClick={() => navigate("/forgot-password")}>
-              Quên mật khẩu?
-            </p>
+            <p onClick={() => navigate("/login")} className="forgetPassword">Đăng nhập ngay</p>
           </form>
         </div>
       </Col>
@@ -154,8 +165,7 @@ const LoginForm = () => {
         draggable
         pauseOnHover
         theme="colored"
-        />
+      />
     </Row>
   );
-};
-export default LoginForm;
+}

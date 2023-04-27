@@ -68,6 +68,8 @@ const useRevenueComponentHook = () => {
                 discount: VND.format(val?.discount.toString()),
                 totalDiscount: VND.format(val?.totalDiscount.toString()),
                 total: VND.format(val?.total.toString()),
+                idEmployee: "#" + val?.Staff?.id,
+                name: val?.Staff?.firstName + " " + val?.Staff?.lastName
               };
             });
             setRevenues(newDate);

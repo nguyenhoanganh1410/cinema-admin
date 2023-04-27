@@ -219,6 +219,7 @@ const HomePage = () => {
         collapsible
         collapsed={collapsed}
         onCollapse={(value) => setCollapsed(value)}
+        className="scroll-bar"
       >
         <div
           style={{
