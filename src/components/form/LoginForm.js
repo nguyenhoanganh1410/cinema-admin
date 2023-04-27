@@ -26,17 +26,18 @@ const LoginForm = () => {
   const [userName, setUserName] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [loadingStatus, setLoadingStatus] = useState(false);
-
+  const [error, setError] = useState("")
   const dispatch = useDispatch();
 
   const setOnChangeUserName = (e) => {
     setUserName(e.target.value);
+    setError("")
   };
   const setOnChangePass = (e) => {
     setPassword(e.target.value);
+    setError("")
   };
 
-  //handle submit to login user
   const handleSubmitForm = () => {
     setLoadingStatus(true);
     //call api for login
@@ -57,7 +58,7 @@ const LoginForm = () => {
         }
       } catch (error) {
         console.log("Failed to login ", error);
-        notifyError('Tên tài khoản hoặc mật khẩu không chính xác.')
+        setError(error?.response?.data?.message)
         setLoadingStatus(false)
       }
     };
@@ -100,14 +101,17 @@ const LoginForm = () => {
               padding: "2rem 2rem",
             }}
           >
-            
-           
+            {
+              error ? 
+              <span style={{color:"red", fontSize:"14px", lineHeight:"23px", textTransform:"capitalize"}}>{error}</span>
+              : null
+            }
             <Input
               size="large"
               placeholder="Nhập tên tài khoản"
               onChange={(e) => setOnChangeUserName(e)}
               prefix={<UserOutlined />}
-              style={{fontSize:"14px", padding:"10px"}}
+              style={{fontSize:"14px", padding:"10px", marginTop:"10px"}}
             />
            
             <Input.Password
