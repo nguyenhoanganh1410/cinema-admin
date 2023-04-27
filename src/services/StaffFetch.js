@@ -13,3 +13,14 @@ export const featchStaffByIdCinema = async (data) =>{
     }
    
 }
+
+export const createStaff = async (data) =>{
+    try {
+        const dataResult = await staffApi.createStaff(data)
+        return dataResult
+    } catch (error) {
+        console.log("fetch failed!!", error);
+        throw error;
+    }
+   
+}

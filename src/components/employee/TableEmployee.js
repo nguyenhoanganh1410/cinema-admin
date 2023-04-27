@@ -55,15 +55,6 @@ const TableEmployee = () => {
       dataIndex: "phone",
     },
     {
-      title: "Giới tính",
-      dataIndex:"gender",
-      width: 30,
-    },
-    {
-      title: "Ngày sinh",
-      dataIndex: "dob",
-    },
-    {
       title: "Địa chỉ",
       dataIndex: "address",
     },
@@ -222,8 +213,7 @@ const TableEmployee = () => {
   const handleCancel = () => {
     setIsModalOpen(false);
   };
-  /////
-
+  
   return (
     <div>
       <div
