@@ -137,6 +137,7 @@ const useModelAddPromotionHeaderHook = (showModalAddCustomer, setShowModalAddCus
       rankPicked.forEach((rank) => {
         data.append("rank", rank)
       })
+      
       if(val.image){
         data.append("image", val.image[0].originFileObj)
       }

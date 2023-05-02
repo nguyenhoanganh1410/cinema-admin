@@ -38,7 +38,7 @@ import IndexRouter from "../components/show/IndexRouter";
 import { useSelector } from "react-redux";
 import UserInfo from "../components/user/UserIndex";
 import tokenService from "../service/token.service";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import IndexRoutePro from "../components/promotion/IndexRoutePro";
 import IndexProduct from "../components/product";
 import IndexRouteHall from "../components/cinemahall/IndexRoute";
@@ -111,7 +111,6 @@ const HomePage = () => {
   const handleOk = () => {
     setIsModalOpen(false);
     handleLogout();
-    //handle code for log out in here
   };
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -189,8 +188,8 @@ const HomePage = () => {
       return <RevenueComponent />;
     } else if (itemClicked === 1003) {
       return <CustomerStatitisComponent />;
-    } else if(itemClicked === 1002){
-      return <FilmStatisticComponent />
+    } else if (itemClicked === 1002) {
+      return <FilmStatisticComponent />;
     }
     return <IndexDashboard />;
   };
@@ -209,6 +208,15 @@ const HomePage = () => {
     tokenService.removeUser();
   };
 
+  useEffect(() => {
+    const pathname = window.location.pathname;
+    console.log(pathname);
+    if (pathname === "/account-setting") {
+      setItemClicked(100);
+    }
+  }, []);
+
+  console.log(user?.image);
   return (
     <Layout
       style={{
@@ -325,18 +333,34 @@ const HomePage = () => {
                     <Menu onClick={onClickMenuUser}>
                       <Menu.Item key="0">
                         <div style={{ width: "20rem", display: "flex" }}>
-                          <Avatar
-                            style={{
-                              color: "#f56a00",
-                              backgroundColor: "#fde3cf",
+                          {user?.image ? (
+                            <Avatar
+                              src={<img src={user?.image} />}
+                              style={{
+                                color: "#f56a00",
+                                backgroundColor: "#fde3cf",
 
-                              width: "35px",
-                              height: "35px",
-                              marginRight: "12px",
-                            }}
-                          >
-                            {/* {user?.lastName[0]} */}L
-                          </Avatar>
+                                width: "35px",
+                                height: "35px",
+                                marginRight: "12px",
+                              }}
+                            >
+                              {user?.lastName}
+                            </Avatar>
+                          ) : (
+                            <Avatar
+                              style={{
+                                color: "#f56a00",
+                                backgroundColor: "#fde3cf",
+
+                                width: "35px",
+                                height: "35px",
+                                marginRight: "12px",
+                              }}
+                            >
+                              {user?.lastName?.substring(0,1)}
+                            </Avatar>
+                          )}
                           <div
                             style={{ display: "flex", flexDirection: "column" }}
                           >
@@ -398,18 +422,34 @@ const HomePage = () => {
                     justifyContent: "space-between",
                   }}
                 >
-                  <Avatar
-                    style={{
-                      color: "#f56a00",
-                      backgroundColor: "#fde3cf",
+                  {user?.image ? (
+                    <Avatar
+                      src={<img src={user?.image} />}
+                      style={{
+                        color: "#f56a00",
+                        backgroundColor: "#fde3cf",
 
-                      width: "35px",
-                      height: "35px",
-                      marginRight: "6px",
-                    }}
-                  >
-                    {/* {user?.lastName[0]} */}L
-                  </Avatar>
+                        width: "35px",
+                        height: "35px",
+                        marginRight: "12px",
+                      }}
+                    >
+                      {user?.lastName}
+                    </Avatar>
+                  ) : (
+                    <Avatar
+                      style={{
+                        color: "#f56a00",
+                        backgroundColor: "#fde3cf",
+
+                        width: "35px",
+                        height: "35px",
+                        marginRight: "12px",
+                      }}
+                    >
+                      {user?.lastName?.substring(0,1)}
+                    </Avatar>
+                  )}
                   <Text style={{ fontWeight: "500", color: "#333" }}>
                     {user?.firstName + " " + user?.lastName}
                   </Text>

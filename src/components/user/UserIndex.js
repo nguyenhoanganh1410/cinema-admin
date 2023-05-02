@@ -9,66 +9,50 @@ import {
   Breadcrumb,
   Upload,
   Button,
+  Form,
+  Modal,
 } from "antd";
-
-import { PlusOutlined, LoadingOutlined } from "@ant-design/icons";
-import TokenService from "../../service/token.service";
-
-const { Title, Text } = Typography;
-const getBase64 = (img, callback) => {
-  const reader = new FileReader();
-  reader.addEventListener("load", () => callback(reader.result));
-  reader.readAsDataURL(img);
-};
-
-const beforeUpload = (file) => {
-  const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
-  if (!isJpgOrPng) {
-    message.error("You can only upload JPG/PNG file!");
-  }
-  const isLt2M = file.size / 1024 / 1024 < 2;
-  if (!isLt2M) {
-    message.error("Image must smaller than 2MB!");
-  }
-  return isJpgOrPng && isLt2M;
-};
+import useUserHook, { yupSync } from "./useUserHook";
+import { PlusOutlined } from "@ant-design/icons";
 
 const UserInfo = () => {
-  const [loading, setLoading] = useState(false);
-  const [imageUrl, setImageUrl] = useState();
-  const [user, setUser] = useState(null);
-  console.log(user);
-  const handleChange = (info) => {
-    if (info.file.status === "uploading") {
-      setLoading(true);
-      return;
-    }
-    if (info.file.status === "done") {
-      // Get this url from response in real world.
-      getBase64(info.file.originFileObj, (url) => {
-        setLoading(false);
-        setImageUrl(url);
-      });
-    }
-  };
-
-  const uploadButton = (
-    <div>
-      {loading ? <LoadingOutlined /> : <PlusOutlined />}
-      <div
-        style={{
-          marginTop: 8,
-        }}
-      >
-        Upload
-      </div>
-    </div>
-  );
-
+  const {
+    form,
+    uploadButton,
+    user,
+    imageUrl,
+    loading,
+    handleChange,
+    beforeUpload,
+    getBase64,
+    handleUpdateProfile,
+    loadingProfile,
+    setImageUrl,
+    previewImage,
+    previewOpen,
+    previewTitle,
+    fileList,
+    handleCancel,
+    setFileList,
+    handlePreview,
+  } = useUserHook();
   useEffect(() => {
-    //get info user in local storage
-    setUser(TokenService.getUser().staff);
-  }, []);
+    form.setFieldsValue({
+      first_name: user?.firstName,
+      last_name: user?.lastName,
+    });
+    if (user?.image) {
+      setFileList([
+        {
+          uid: "-1",
+          name: "image.png",
+          status: "done",
+          url: user?.image,
+        },
+      ]);
+    }
+  }, [user]);
+
   return (
     <div className="site-card-wrapper">
       <Breadcrumb style={{ marginBottom: "1rem", marginTop: "1rem" }}>
@@ -89,31 +73,40 @@ const UserInfo = () => {
         }}
       >
         <Col span={24}>
-          <form>
+          <Form
+            layout="vertical"
+            id="myFormAddLinePro"
+            form={form}
+            onFinish={handleUpdateProfile}
+          >
             <Row>
               <Col span={10}></Col>
               <Col span={14}>
-                <Upload
-                  name="avatar"
-                  listType="picture-card"
-                  className="avatar-uploader"
-                  showUploadList={false}
-                  action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                  beforeUpload={beforeUpload}
-                  onChange={handleChange}
-                >
-                  {imageUrl ? (
+                <>
+                  <Upload
+                    action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                    listType="picture-card"
+                    fileList={fileList}
+                    onPreview={handlePreview}
+                    onChange={handleChange}
+                  >
+                    {fileList.length >= 1 ? null : uploadButton}
+                  </Upload>
+                  <Modal
+                    open={previewOpen}
+                    title={previewTitle}
+                    footer={null}
+                    onCancel={handleCancel}
+                  >
                     <img
-                      src={imageUrl}
-                      alt="avatar"
+                      alt="example"
                       style={{
                         width: "100%",
                       }}
+                      src={previewImage}
                     />
-                  ) : (
-                    uploadButton
-                  )}
-                </Upload>
+                  </Modal>
+                </>
               </Col>
             </Row>
             <Row style={{ marginTop: "1rem" }} gutter={16}>
@@ -133,11 +126,12 @@ const UserInfo = () => {
                 </p>
               </Col>
               <Col span={14}>
-                <Input
-                  style={{ width: "50%" }}
-                  placeholder="Enter first name"
-                  value={user?.firstName}
-                />
+                <Form.Item rules={[yupSync]} name="first_name">
+                  <Input
+                    style={{ width: "50%" }}
+                    placeholder="Enter first name"
+                  />
+                </Form.Item>
               </Col>
             </Row>
             <Row style={{ marginTop: "0.5rem" }} gutter={16}>
@@ -157,11 +151,12 @@ const UserInfo = () => {
                 </p>
               </Col>
               <Col span={14}>
-                <Input
-                  style={{ width: "50%" }}
-                  placeholder="Enter last name"
-                  value={user?.lastName}
-                />
+                <Form.Item rules={[yupSync]} name="last_name">
+                  <Input
+                    style={{ width: "50%" }}
+                    placeholder="Enter last name"
+                  />
+                </Form.Item>
               </Col>
             </Row>
             <Row style={{ marginTop: "0.5rem" }} gutter={16}>
@@ -196,12 +191,19 @@ const UserInfo = () => {
                 className="gutter-row"
               ></Col>
               <Col span={14}>
-                <Button type="primary">Save</Button>
+                <Button
+                  form="myFormAddLinePro"
+                  htmlType="submit"
+                  type="primary"
+                  loading={loadingProfile}
+                >
+                  Save
+                </Button>
               </Col>
             </Row>
-          </form>
+          </Form>
 
-          <form style={{ marginTop: "2rem" }}>
+          <Form style={{ marginTop: "2rem" }}>
             <Row style={{ marginTop: "0.5rem" }} gutter={16}>
               <Col
                 span={10}
@@ -219,10 +221,12 @@ const UserInfo = () => {
                 </p>
               </Col>
               <Col span={14}>
-                <Input.Password
-                  style={{ width: "50%" }}
-                  placeholder="Enter last name"
-                />
+                <Form.Item rules={[yupSync]} name="current_password">
+                  <Input.Password
+                    style={{ width: "50%" }}
+                    placeholder="Enter password"
+                  />
+                </Form.Item>
               </Col>
             </Row>
             <Row style={{ marginTop: "0.5rem" }} gutter={16}>
@@ -242,10 +246,12 @@ const UserInfo = () => {
                 </p>
               </Col>
               <Col span={14}>
-                <Input.Password
-                  style={{ width: "50%" }}
-                  placeholder="Enter last name"
-                />
+                <Form.Item rules={[yupSync]} name="new_password">
+                  <Input.Password
+                    style={{ width: "50%" }}
+                    placeholder="Enter password"
+                  />
+                </Form.Item>
               </Col>
             </Row>
             <Row style={{ marginTop: "0.5rem" }} gutter={16}>
@@ -265,10 +271,12 @@ const UserInfo = () => {
                 </p>
               </Col>
               <Col span={14}>
-                <Input.Password
-                  style={{ width: "50%" }}
-                  placeholder="Enter email"
-                />
+                <Form.Item rules={[yupSync]} name="confirm_password">
+                  <Input.Password
+                    style={{ width: "50%" }}
+                    placeholder="Enter password"
+                  />
+                </Form.Item>
               </Col>
             </Row>
             <Row style={{ marginTop: "0.5rem" }} gutter={16}>
@@ -281,7 +289,7 @@ const UserInfo = () => {
                 <Button type="primary">Save</Button>
               </Col>
             </Row>
-          </form>
+          </Form>
         </Col>
       </Row>
     </div>

@@ -17,10 +17,11 @@ const onClick=(e)=>{
 }
 
 
-const TableEmployee = () => {
+const TableEmployee = ({searchText}) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [listStaff, setListStaff] = useState([]);
+  const [staffsTemplate, setStaffsTemplate] = useState([])
   const depatch = useDispatch();
   const reload = useSelector((state) => state.reload);
   const [selectedId, setSelectedId] = useState([]);
@@ -29,6 +30,17 @@ const TableEmployee = () => {
     //setShowModalDetailCustomer(true);
     setSelectedId(e);
   };
+
+  useEffect(() => {
+    if(!searchText){
+      setListStaff(staffsTemplate);
+      return;
+    }
+    const newArr = listStaff.filter((val) => {
+      return val?.name.toLowerCase().search(searchText.toLowerCase()) !== -1
+    });
+    setListStaff(newArr);
+  }, [searchText]);
 
   const columns = [
     {
@@ -117,8 +129,6 @@ const TableEmployee = () => {
     const fetchListStaff = async () => {
       try {
         const response = await staffApi.getStaffs();
-        console.log(response);
-
         const data = await Promise.all(
           response.map(async(item, index) => {
             const ward = await openAddressApi.getWardByCode(item.ward_id);
@@ -144,13 +154,13 @@ const TableEmployee = () => {
               email: item.email,
               position: item.position,
               status: item.status,
-              // maneger: `${item.Staffs[0]?.firstName} ${item.Staffs[0]?.lastName}`,
               maneger: item.Staffs[0]?.firstName + item.Staffs[0]?.lastName,
               image: item.image,
             };
           })
         );
         setListStaff(data);
+        setStaffsTemplate(data)
       } catch (error) {
         console.log("Failed to fetch product list: ", error);
       }
@@ -182,9 +192,6 @@ const TableEmployee = () => {
       setLoading(false);
     }, 1000);
   };
-
-  ///
-  //model
   const [isModalOpen, setIsModalOpen] = useState(false);
   const showModal = () => {
     setIsModalOpen(true);

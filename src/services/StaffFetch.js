@@ -5,13 +5,21 @@ import statitisApi from "../api/statitisApi";
 export const featchStaffByIdCinema = async (data) =>{
     try {
         const dataResult = await staffApi.getStaffsByIdCinema(data)
-        console.log(dataResult);
         return dataResult
     } catch (error) {
         console.log("fetch failed!!", error);
         throw error;
     }
-   
+}
+
+export const getStaffById = async (id) =>{
+    try {
+        const dataResult = await staffApi.getStaff(id)
+        return dataResult
+    } catch (error) {
+        console.log("fetch failed!!", error);
+        throw error;
+    }
 }
 
 export const createStaff = async (data) =>{
@@ -22,5 +30,14 @@ export const createStaff = async (data) =>{
         console.log("fetch failed!!", error);
         throw error;
     }
-   
+}
+
+export const updateStaff = async (id, data) =>{
+    try {
+        const dataResult = await staffApi.updateStaff(id, data)
+        return dataResult
+    } catch (error) {
+        console.log("fetch failed!!", error);
+        throw error;
+    }
 }

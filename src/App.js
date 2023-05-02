@@ -15,18 +15,17 @@ function App() {
   const depatch = useDispatch();
   const user = useSelector((state) => state.user);
   const pathname = window.location.pathname
-  console.log(pathname);
   React.useEffect(() => {
     const userInLocalStorage = tokenService.getUser();
     if (userInLocalStorage) {
       depatch(setUser(userInLocalStorage.staff));
-      navigator("/");
+      //navigator("/");
       const getCinemaId = async (id) =>{
         const data = await cinameApi.getCinemaById(id);
         depatch(setCinema(data))
       } 
       getCinemaId(userInLocalStorage?.staff?.cinema_id)
-    } else if(!userInLocalStorage && pathname === "/") {
+    } else if(!userInLocalStorage) {
       navigator("/login");
     }
   }, []);
@@ -36,6 +35,7 @@ function App() {
       <Route path="/login" element={<LoginForm />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/auth/reset-password" element={<ResetPassword />} />
+      <Route path="/account-setting" element={<HomePage />} />
       <Route path="/" element={<HomePage />} />
       <Route
         path="*"

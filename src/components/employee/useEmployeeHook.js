@@ -38,7 +38,7 @@ let schema = yup.object().shape({
   first_name: yup.string().trim().required(MESSAGE_REQUIRE_NAME("Họ")),
   last_name: yup.string().required(NOT_EMPTY),
   email: yup.string().trim().required(NOT_EMPTY).email("Email không hợp lệ."),
-  phone: yup.string().trim().required(NOT_EMPTY),
+  phone: yup.string().trim().required(NOT_EMPTY).matches(/^\d{9,11}$/, "Sô điện thoại không hợp lệ."),
   position: yup.string().trim().required("Không được để trống."),
   tinh: yup.string().trim().required("Không được để trống."),
   quan: yup.string().trim().required("Không được để trống."),

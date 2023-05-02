@@ -17,23 +17,7 @@ import ModelAddEmployee from "./ModelAddEmployee";
 const { Title, Text } = Typography;
 const IndexEmployee = () => {
   const [showModalAddCustomer, setShowModalAddCustomer] = useState(false);
-  
-  // //model
-  // const [isModalOpen, setIsModalOpen] = useState(false);
-  // const showModal = () => {
-  //   setIsModalOpen(true);
-  // };
-  // const handleOk = () => {
-  //   setIsModalOpen(false);
-
-  //   //handle code for log out in here
-
-  //   ////////
-  // };
-  // const handleCancel = () => {
-  //   setIsModalOpen(false);
-  // };
-  // /////
+  const [searchText, setSearchText] = useState("")
 
   const showModal = () => {
     setShowModalAddCustomer(true);
@@ -54,8 +38,9 @@ const IndexEmployee = () => {
       >
         <Col span={12}>
           <Input
-            placeholder="Nhập tên, số điện thoại hoặc email..."
+            placeholder="Nhập tên..."
             prefix={<SearchOutlined />}
+            onChange={(e) => setSearchText(e.target.value)}
           />
         </Col>
         <Col span={9}>
@@ -64,12 +49,6 @@ const IndexEmployee = () => {
             Thêm
           </Button>
         </Col>
-        {/* <Col style={{ margin: "0 1rem" }}>
-          {" "}
-          <Button type="primary" size="large" icon={<ToolOutlined />}>
-            Cập nhật
-          </Button>
-        </Col> */}
         <Col span={1}>
           <Button type="primary" icon={<DownloadOutlined />}>
             Xuất file
@@ -87,7 +66,7 @@ const IndexEmployee = () => {
         }}
       >
         <Col span={24}>
-          <TableEmployee />
+          <TableEmployee searchText={searchText}/>
         </Col>
       </Row>
       {showModalAddCustomer ? (
