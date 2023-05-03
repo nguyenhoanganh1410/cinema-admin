@@ -11,7 +11,6 @@ import {
   Row,
   Select,
   Space,
-  
   Upload,
   message,
   InputNumber,

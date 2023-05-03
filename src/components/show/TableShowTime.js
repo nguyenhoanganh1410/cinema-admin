@@ -107,11 +107,11 @@ const TableShowTime = ({ record }) => {
                 alignItems: "center",
               }}
             >
-              <Button
+              {/* <Button
                 title="Xem chi tiết"
                 icon={<EyeOutlined />}
                 onClick={() => showModalDetail()}
-              ></Button>
+              ></Button> */}
               <Button
                 style={{
                   marginLeft: "10px",

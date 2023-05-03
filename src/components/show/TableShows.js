@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Table, Modal, Select, Badge,Tag } from "antd";
+import { Button, Table, Modal, Select, Badge, Tag, DatePicker,message } from "antd";
 import {
   SearchOutlined,
   PlusSquareFilled,
@@ -8,6 +8,7 @@ import {
   DeleteOutlined,
   MinusSquareOutlined,
   PlusSquareOutlined,
+  ScheduleOutlined,
 } from "@ant-design/icons";
 import showApi from "../../api/showApi";
 import showTimeApi from "../../api/showTimeApi";
@@ -16,6 +17,8 @@ import TableShowTime from "./TableShowTime";
 
 import { useDispatch, useSelector } from "react-redux";
 import { setReload } from "../../redux/actions";
+import cinameApi from "../../api/cinemaApi";
+import movieApi from "../../api/movieApi";
 
 const TableShows = ({ setShowModalAddCustomer, setTab }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -23,9 +26,47 @@ const TableShows = ({ setShowModalAddCustomer, setTab }) => {
   const [listShow, setListShow] = useState([]);
   const [selectedId, setSelectedId] = useState(0);
   const [listShowTime, setListShowTime] = useState([]);
+  const { RangePicker } = DatePicker;
+  const [cinemaPicker, setCinemaPicker] = useState([]);
+  const [moviePicker, setMoviePicker] = useState([]);
+  const [startDatePicker, setStartDatePicker] = useState("");
+  const [endDatePicker, setEndDatePicker] = useState("");
+  const [listCinema, setListCinema] = useState([]);
+  const [listMovie, setListMovie] = useState([]);
 
   const depatch = useDispatch();
   const reload = useSelector((state) => state.reload);
+
+  const [listTimeDuplicate, setListTimeDuplicate] = useState([]);
+  const [isModalOpenShow, setIsModalOpenShow] = useState(false);
+
+  const columns_show = [
+    {
+      title: "Mã lịch chiếu",
+      dataIndex: "idShow",
+    },
+    {
+      title: "Mã phim",
+      dataIndex: "codeMovie",
+    },
+    {
+      title: "Tên phim",
+      dataIndex: "nameMovie",
+    },
+    {
+      title: "Ngày chiếu",
+      dataIndex: "showDate",
+    },
+    {
+      title: "Từ giờ",
+      dataIndex: "startTime",
+    },
+    {
+      title: "Đến giờ",
+      dataIndex: "endTime",
+    },
+  ];
+
 
   const columns = [
     {
@@ -55,16 +96,39 @@ const TableShows = ({ setShowModalAddCustomer, setTab }) => {
     {
       title: "Trạng thái",
       dataIndex: "status",
-      render: (val) => {
+      render: (val,record) => {
         let color = "";
-        if (val === "Đang chiếu") {
+        let text = "";
+        if (val === 1) {
+          text = "Hoạt động";
           color = "green";
-        } else if (val === "Sắp chiếu") {
-          color = "blue";
-        } else if (val === "Đã kết thúc") {
+        } else if (val === 0) {
+          text = "Ngừng hoạt động";
           color = "red";
         }
-        return <Badge color={color} text={val} />;
+        return (
+          <>
+            <Badge
+              color={color}
+            />
+            <Select
+              value={val}
+              style={{
+                width: 170,
+              }}
+              bordered={false}
+              // value={val}
+
+              onChange={(value) => {
+                handleChangeStatus(value, record);
+                }
+              }
+            >
+              <Option value={1}>Hoạt động</Option>
+              <Option value={0}>Ngừng hoạt động</Option>
+            </Select>
+          </>
+        );
       },
     },
   ];
@@ -88,40 +152,92 @@ const TableShows = ({ setShowModalAddCustomer, setTab }) => {
       }
       setListShowTime(data);
     };
-    
-    if(selectedId !== 0){
+
+    if (selectedId !== 0) {
       fetchShowTimeByShowId();
     }
-
   }, [selectedId]);
-
-  
-
-
 
   const onSelectChange = (selectedId) => {
     setSelectedRowKeys(selectedId);
   };
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: onSelectChange,
-  };
-  const hasSelected = selectedRowKeys.length > 0;
-  const selectedOne = selectedRowKeys.length === 1;
 
   //handle delete customer in here...
   const handleDelete = () => {
     showModal();
   };
 
-  //handle update customer in here ....
-  const handleUpdate = () => {
-    setLoading(true);
-    // ajax request after empty completing
-    setTimeout(() => {
-      setSelectedRowKeys([]);
-      setLoading(false);
-    }, 1000);
+  const onChangeDate = (date, dateString) => {
+    setStartDatePicker(dateString[0]);
+    setEndDatePicker(dateString[1]);
+  };
+
+  const onChangeCinema = (value) => {
+    if (value === undefined) {
+      setCinemaPicker([]);
+    } else {
+      setCinemaPicker(value);
+    }
+  };
+
+  const onChangeMovie = (value) => {
+    if (value === undefined) {
+      setMoviePicker([]);
+    } else {
+      setMoviePicker(value);
+    }
+  };
+
+  const handleChangeStatus = async (value, record) => {
+    console.log(value);
+    const check = async () => {
+      const timeUnique = await showTimeApi.getlistTimeUnique(record.id);
+      const payload = {
+        startDate: record.startDate,
+        endDate: record.endDate,
+        showTime: timeUnique,
+        idCinemaHall: record.idHall,
+        idMovie: record.idMovie,
+        idCinema: record.idCinema,
+      }
+      try {
+        const response = await showApi.checkShowIsExist(payload);
+        if (response.length === 0) {
+          const response = await showApi.updateShow(record.id, { status: value});
+          if (response) {
+            message.success("Cập nhật thành công");
+            depatch(setReload(!reload));
+          }
+        }
+      } catch (error) {
+        const { data } = error.response;
+        if (data) {
+          console.log(data);
+          setIsModalOpenShow(true);
+          const list = data.data.map((item) => {
+            return {
+              idShow: item.idShow,
+              codeMovie: item.Show.Movie.codeMovie,
+              nameMovie: item.Show.Movie.nameMovie,
+              showDate: item.showDate,
+              startTime: item.ShowTime.showTime,
+              endTime: item.endTime,
+            };
+          });
+          setListTimeDuplicate(list);
+        }
+      }
+    }
+    if (value === 1) {
+      check();
+    } else {
+      const response = await showApi.updateShow(record.id, { status: value});
+      if (response) {
+        message.success("Cập nhật thành công");
+        depatch(setReload(!reload));
+      }
+    }
+
   };
 
   ///
@@ -154,30 +270,33 @@ const TableShows = ({ setShowModalAddCustomer, setTab }) => {
   useEffect(() => {
     //load movies
     const getListShow = async () => {
+      console.log("cinema", cinemaPicker);
+      console.log("movie", moviePicker);
       try {
-        const response = await showApi.getShow();
+        const response = await showApi.getShow(
+          {
+            cinemaId: cinemaPicker,
+            movieId: moviePicker,
+            startDate: startDatePicker,
+            endDate: endDatePicker,
+          }
+        );
         console.log(response);
         //set user info
         if (response) {
           const data = response.map((item, index) => {
-            let statusName = "";
-            if (item.status === 1) {
-              statusName = "Đang chiếu";
-            } else if (item.status === 2) {
-              statusName = "Sắp chiếu";
-            } else if (item.status === 3) {
-              statusName = "Đã kết thúc";
-            }
             return {
               key: index,
               id: item.id,
               idMovie: item.Movie.id,
+              idCinema: item.Cinema.id,
+              idHall: item.CinemaHall.id,
               filmShow: item.Movie.nameMovie,
               startDate: item.startDate,
               endDate: item.endDate,
               locationShow: item.Cinema.name,
               roomShow: item.CinemaHall.name,
-              status: statusName,
+              status: item.status,
             };
           });
 
@@ -188,7 +307,37 @@ const TableShows = ({ setShowModalAddCustomer, setTab }) => {
       }
     };
     getListShow();
-  }, [reload]);
+  }, [reload, cinemaPicker, moviePicker, startDatePicker, endDatePicker]);
+
+  useEffect(() => {
+    const fetchCinema = async () => {
+      const res = await cinameApi.getCinemaActive();
+      if (res) {
+        const data = res.map((item, index) => {
+          return {
+            value: item.id,
+            label: item.name,
+          };
+        });
+        setListCinema(data);
+      }
+    };
+    const fetchMovie = async () => {
+      const res = await movieApi.getMovieByType(1);
+      if (res) {
+        const data = res.map((item, index) => {
+          return {
+            value: item.id,
+            label: item.nameMovie,
+          };
+        });
+        console.log(data);
+        setListMovie(data);
+      }
+    };
+    fetchMovie();
+    fetchCinema();
+  }, []);
 
   return (
     <div>
@@ -201,110 +350,57 @@ const TableShows = ({ setShowModalAddCustomer, setTab }) => {
         }}
       >
         <div>
+          <Select
+            placeholder="Lọc theo chi nhánh"
+            style={{
+              width: "200px",
+            }}
+            options={listCinema}
+            allowClear
+            onChange={onChangeCinema}
+          />
+          <Select
+            placeholder="Lọc theo phim"
+            style={{
+              width: "300px",
+              margin: "0 1rem",
+            }}
+            allowClear
+            options={listMovie}
+            onChange={onChangeMovie}
+          />
+          <RangePicker
+            placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
+            onCalendarChange={onChangeDate}
+          />
+        </div>
+        <div>
           <Button
             onClick={handleOpenAddShow}
             type="primary"
             icon={<UserAddOutlined />}
             title="Thêm mới suất chiếu"
+            style={{
+              margin: "0 1rem",
+            }}
           >
             Thêm
           </Button>
           <Button
             type="primary"
-            danger
-            onClick={handleDelete}
-            disabled={!hasSelected}
-            loading={loading}
-            icon={<DeleteOutlined />}
-            style={{ marginRight: "1rem", marginLeft: "1rem" }}
-          >
-            Xóa
-          </Button>
-          <Button
-            type="primary"
-            onClick={handleUpdate}
-            disabled={!selectedOne}
-            loading={loading}
-            icon={<ToolOutlined />}
-          >
-            Cập nhật
-          </Button>
-          <span
-            style={{
-              marginLeft: 8,
-            }}
-          >
-            {hasSelected ? `Selected ${selectedRowKeys.length} items` : ""}
-          </span>
-        </div>
-
-        <div>
-          <Button
-            type="primary"
-            icon={<ToolOutlined />}
+            icon={<ScheduleOutlined />}
             onClick={() => handleShowChart()}
           >
-            Xem biểu đồ
+            Xem lịch chiếu
           </Button>
-          <Select
-            placeholder="Hôm nay"
-            style={{
-              width: "150px",
-              margin: "0 1rem",
-            }}
-            //   onChange={handleChangePosition}
-            options={[
-              {
-                value: "allFill",
-                label: "Tất cả",
-              },
-              {
-                value: "todayFill",
-                label: "Hôm nay",
-              },
-              {
-                value: "todayFill",
-                label: "Ngày mai",
-              },
-              {
-                value: "sevenNextFill",
-                label: "7 ngày trước",
-              },
-              {
-                value: "sevenFill",
-                label: "7 ngày sau",
-              },
-            ]}
-          />
-          <Select
-            placeholder="Lọc theo phim"
-            style={{
-              width: "150px",
-            }}
-            //   onChange={handleChangePosition}
-            options={[
-              {
-                value: "filmAll",
-                label: "Tất cả phim",
-              },
-              {
-                value: "film01",
-                label: "Cánh diều âu",
-              },
-              {
-                value: "film02",
-                label: "Hoa vàng trên cỏ xanh",
-              },
-            ]}
-          />
         </div>
       </div>
       <Table
         columns={columns}
         expandable={{
-          expandedRowRender:(record) =>( <TableShowTime record={record} />),
+          expandedRowRender: (record) => <TableShowTime record={record} />,
           defaultExpandedRowKeys: [listShow.map((item) => item.id)],
-          expandRowByClick: true,
+          // expandRowByClick: true,
           onExpand: (expanded, record) => {
             setSelectedId(record.id);
           },
@@ -318,6 +414,28 @@ const TableShows = ({ setShowModalAddCustomer, setTab }) => {
         onCancel={handleCancel}
       >
         <p>Bạn muốn xóa bộ phim này không?</p>
+      </Modal>
+      <Modal
+        title="Danh sách lịch trùng"
+        onCancel={() => {
+          setIsModalOpenShow(false);
+          setListTimeDuplicate([]);
+        }}
+        open={isModalOpenShow}
+        width={1000}
+        footer={[
+          <Button
+            key="back"
+            onClick={() => {
+              setIsModalOpenShow(false);
+              setListTimeDuplicate([]);
+            }}
+          >
+            Đóng
+          </Button>,
+        ]}
+      >
+        <Table columns={columns_show} dataSource={listTimeDuplicate} />
       </Modal>
     </div>
   );
