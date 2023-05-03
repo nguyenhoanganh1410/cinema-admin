@@ -34,6 +34,16 @@ const statitisApi = {
       );
     }
   },
+
+  getRevenueByShow: (params) => {
+
+      return axiosApi.get(
+        `/statistics/revenuebyshowtime?date=${params.date}&idMovie=${params.idMovie}`
+      );
+    
+  },
+
+
 };
 
 export default statitisApi;

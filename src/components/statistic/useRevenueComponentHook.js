@@ -5,7 +5,7 @@ import moment from "moment";
 import { VND } from "../../constant";
 import { featchStaffByIdCinema } from "../../services/StaffFetch";
 import { useSelector } from "react-redux";
-const dateFormat = "YYYY/MM/DD";
+const dateFormat = "YYYY-MM-DD";
 
 const useRevenueComponentHook = () => {
   const [revenues, setRevenues] = useState([]);
@@ -23,8 +23,8 @@ const useRevenueComponentHook = () => {
   const onChangeDate = (date, dateString) => {
     setParams({
       ...params,
-      start_date: dateString[0],
-      end_date: dateString[1],
+      start_date: dateString[0].replaceAll('/', '-'),
+      end_date: dateString[1].replaceAll('/', '-'),
     });
   };
 

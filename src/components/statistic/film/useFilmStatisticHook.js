@@ -6,24 +6,29 @@ import { fetchRevenueByCustomer, fetchRevenueByMovie } from "../../../services/S
 import { SDT_VANG_LAI, VND } from "../../../constant";
 import { getCinemas } from "../../../services/CinemaFetch";
 import { getFilmByCinemaId } from "../../../services/FilmService";
-const dateFormat = "YYYY/MM/DD";
+const dateFormat = "YYYY-MM-DD";
 
 const useFilmStatisticHook = () => {
   const [revenues, setRevenues] = useState([]);
   const user = useSelector((state) => state.user);
   const cinema = useSelector((state) => state.cinema);
   const [listMovie, setListMovie] = useState([])
-
+  const [paramsShow, setParamShow] = useState({
+    date: "",
+    idMovie: ""
+  })
+  console.log(paramsShow);
   const [params, setParams] = useState({
     end_date: moment().format(dateFormat),
     start_date: moment().startOf("month").format(dateFormat),
     movie_id: null,
   });
   const onChangeDate = (date, dateString) => {
+    console.log(dateString);
     setParams({
       ...params,
-      start_date: dateString[0],
-      end_date: dateString[1],
+      start_date: dateString[0].replaceAll('/', '-'),
+      end_date: dateString[1].replaceAll('/', '-'),
     });
   };
 
@@ -34,10 +39,11 @@ const useFilmStatisticHook = () => {
     });
   }
 
+  console.log(revenues)
+
   useEffect(() => {
     fetchRevenueByMovie(params)
       .then((data) => {
-        console.log(data);
         if (data.length === 0) {
           setRevenues([]);
         } else {
@@ -79,6 +85,7 @@ const useFilmStatisticHook = () => {
     cinema,
     onChangeDate,
     listMovie,
+    setParamShow,
     handleOnChangeMovie
   };
 };

@@ -32,3 +32,14 @@ export const fetchRevenueByMovie = async (data) => {
     throw error;
   }
 };
+
+
+export const fetchRevenueByShow = async (data) => {
+  try {
+    const dataResult = await statitisApi.getRevenueByShow(data);
+    return dataResult;
+  } catch (error) {
+    console.log("fetch failed!!", error);
+    throw error;
+  }
+};

@@ -6,7 +6,7 @@ import { fetchRevenueByCustomer } from "../../../services/StatitisFetch";
 import { SDT_VANG_LAI, VND } from "../../../constant";
 import { getCinemas } from "../../../services/CinemaFetch";
 import { getCity } from "../../../services/AddressFetch";
-const dateFormat = "YYYY/MM/DD";
+const dateFormat = "YYYY-MM-DD";
 
 const useCustomerComponentHook = () => {
   const [revenues, setRevenues] = useState([]);
@@ -24,8 +24,8 @@ const useCustomerComponentHook = () => {
   const onChangeDate = (date, dateString) => {
     setParams({
       ...params,
-      start_date: dateString[0],
-      end_date: dateString[1],
+      start_date: dateString[0].replaceAll('/', '-'),
+      end_date: dateString[1].replaceAll('/', '-'),
     });
   };
 

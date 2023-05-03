@@ -53,6 +53,7 @@ import { MESSAGE_NOT_ACCEPT } from "../constant";
 import RevenueComponent from "../components/statistic/RevenueComponent";
 import CustomerStatitisComponent from "../components/statistic/customer/CustomerStatitisComponent";
 import FilmStatisticComponent from "../components/statistic/film/FilmStatisticComponent";
+import { IsManager } from "../utils/RoleUser";
 const { Header, Content, Footer, Sider } = Layout;
 
 const { Text } = Typography;
@@ -88,6 +89,39 @@ const items = [
     getItem("Sản phẩm", "20"),
     getItem("Bảng giá", "21"),
   ]),
+  // getItem("Hệ thống", "sub100", <ProjectOutlined />, [
+  //   getItem("Nhân viên", "15"),
+  // ]),
+  getItem("Thống kê", "18", <PieChartOutlined />, [
+    getItem("Thống kê doanh thu", "1000"),
+    getItem("Thống kê khuyến mãi", "1001"),
+    getItem("Thống kê theo phim", "1002"),
+    getItem("Thống kê khách hàng", "1003"),
+  ]),
+];
+
+const itemManager = [
+  getItem("Dashboard", "1", <DashboardTwoTone />),
+  getItem("Đặt vé", "sub00", <DesktopOutlined />, [
+    getItem("Đặt vé", "2"),
+    getItem("Vé đã đặt", "9"),
+    getItem("Hoá đơn trả", "10"),
+  ]),
+
+  getItem("Quản lý phim", "sub1", <UserOutlined />, [
+    getItem("Danh sách phim", "3"),
+    getItem("Quản lý suất chiếu", "4"),
+  ]),
+  getItem("Quản lý rạp", "sub4", <HomeOutlined />, [getItem("Rạp", "13")]),
+
+  getItem("Quản lý khuyến mãi", "19", <ThunderboltOutlined />),
+
+  getItem("Quản lý khách hàng", "11", <TeamOutlined />),
+
+  getItem("Sản phẩm", "12", <ProjectOutlined />, [
+    getItem("Sản phẩm", "20"),
+    getItem("Bảng giá", "21"),
+  ]),
   getItem("Hệ thống", "sub100", <ProjectOutlined />, [
     getItem("Nhân viên", "15"),
   ]),
@@ -98,11 +132,13 @@ const items = [
     getItem("Thống kê khách hàng", "1003"),
   ]),
 ];
+
 const HomePage = () => {
   const navigator = useNavigate();
   const user = useSelector((state) => state.user);
   const cinema = useSelector((state) => state.cinema);
   const isBooking = useSelector((state) => state.isBooking);
+
   //model
   const [isModalOpen, setIsModalOpen] = useState(false);
   const showModal = () => {
@@ -240,7 +276,7 @@ const HomePage = () => {
           theme="dark"
           defaultSelectedKeys={["1"]}
           mode="inline"
-          items={items}
+          items={user?.position === 3 ? itemManager : items}
           onClick={onClick}
         />
       </Sider>
@@ -374,7 +410,7 @@ const HomePage = () => {
                                 color: "#abb4bc",
                               }}
                             >
-                              {user?.nameRole}
+                             {user?.position === 3 ? "Quản Lý" : "Nhân Viên"}
                             </Text>
                           </div>
                         </div>

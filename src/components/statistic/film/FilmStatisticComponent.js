@@ -18,7 +18,7 @@ import useFilmStatisticHook from "./useFilmStatisticHook";
 const { RangePicker } = DatePicker;
 const dateFormat = "YYYY/MM/DD";
 const FilmStatisticComponent = () => {
-  const { revenues, cinema,listMovie,handleOnChangeMovie, onChangeDate } = useFilmStatisticHook();
+  const { revenues, cinema,listMovie,handleOnChangeMovie, onChangeDate, setParamShow } = useFilmStatisticHook();
 
   return (
     <div className="site-card-wrapper">
@@ -77,7 +77,7 @@ const FilmStatisticComponent = () => {
         }}
       >
         <Col span={24}>
-          <RevenueTable tableType={2} revenues={revenues} />
+          <RevenueTable setParamShow={setParamShow} tableType={2} revenues={revenues} />
         </Col>
       </Row>
     </div>
