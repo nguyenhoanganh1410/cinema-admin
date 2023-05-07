@@ -38,7 +38,7 @@ const getBase64 = (file) =>
 const { Option } = Select;
 
 const ModelAddCinema = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
-  const handleCancel = () => setPreviewOpen(false);
+ // const handleCancel = () => setPreviewOpen(false);
   const [form] = Form.useForm();
 
   const depatch = useDispatch();

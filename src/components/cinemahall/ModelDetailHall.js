@@ -32,7 +32,7 @@ const ModelDetailHall = ({
   selectedIdHall,
   selectedIdCinema,
 }) => {
-  const handleCancel = () => setPreviewOpen(false);
+ // const handleCancel = () => setPreviewOpen(false);
   const [form] = Form.useForm();
   const [cinemaInfo, setCinemaInfo] = useState({});
 
