@@ -19,7 +19,7 @@ import { useNavigate } from "react-router-dom";
 import tokenService from "../../service/token.service";
 import { notifyError } from "../../utils/Notifi";
 import { ToastContainer } from "react-toastify";
-
+import ReCAPTCHA from "react-google-recaptcha";
 const { Title, Text } = Typography;
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -64,6 +64,10 @@ const LoginForm = () => {
     };
     loginUser(userName, password);
   };
+
+  function onChange(value) {
+    console.log("Captcha value:", value);
+  }
 
   return (
     <Row style={{ height: "100vh" }} className="login">
@@ -121,11 +125,17 @@ const LoginForm = () => {
               prefix={<LockOutlined />}
               style={{ marginTop: "1.5rem", marginBottom: "1.5rem", fontSize:"14px", padding:"10px" }}
             />
+             {/* <ReCAPTCHA
+              sitekey="6LcsidglAAAAAFYnGRLQDCGqx8ZgKEf_b1GPOsjM"
+              onChange={onChange}
+              size="normal"
+              data-theme="dark"
+            /> */}
             {userName && password ? (
               <Button
                 onClick={() => handleSubmitForm()}
                 type="primary"
-                style={{ width: "100%",color:"white", borderColor:"#058dd9",backgroundColor:"#058dd9", height: "40px", marginBottom: "1rem" }}
+                style={{ width: "100%",color:"white", marginTop:"1rem", borderColor:"#058dd9",backgroundColor:"#058dd9", height: "40px", marginBottom: "1rem" }}
                 loading={loadingStatus}
               >
                 Đăng Nhập
@@ -135,7 +145,7 @@ const LoginForm = () => {
                 onClick={() => handleSubmitForm()}
                 disabled
                 type="primary"
-                style={{ width: "100%", color:"white", borderColor:"#058dd9", backgroundColor:"#058dd9", height: "40px", marginBottom: "1rem" }}
+                style={{ width: "100%", color:"white", marginTop:"1rem", borderColor:"#058dd9", backgroundColor:"#058dd9", height: "40px", marginBottom: "1rem" }}
               >
                 Đăng Nhập
               </Button>
