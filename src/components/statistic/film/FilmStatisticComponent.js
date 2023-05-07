@@ -14,20 +14,27 @@ import RevenueTable from "../table/RevenueTable";
 import dayjs from "dayjs";
 import moment from "moment";
 import useFilmStatisticHook from "./useFilmStatisticHook";
+import { exportExcel } from "../../export-excel/statistics/reveneu-movie";
+const { Title, Text } = Typography;
+
 
 const { RangePicker } = DatePicker;
 const dateFormat = "YYYY/MM/DD";
 const FilmStatisticComponent = () => {
-  const { revenues, cinema,listMovie,handleOnChangeMovie, onChangeDate, setParamShow } = useFilmStatisticHook();
+  const { revenues, cinema,listMovie,handleOnChangeMovie, onChangeDate, setParamShow,start_date, end_date } = useFilmStatisticHook();
+
+  const handleExportExcel =async () => {
+    console.log(revenues);
+    // console.log(dayjs(start_date).format('DD/MM/YYYY') , end_date)
+    await exportExcel(revenues, dayjs(start_date).format('DD/MM/YYYY'), dayjs(end_date).format('DD/MM/YYYY'));
+
+  };
 
   return (
     <div className="site-card-wrapper">
-      <Breadcrumb style={{ marginBottom: "1rem", marginTop: "1rem" }}>
-        <Breadcrumb.Item>Home</Breadcrumb.Item>
-        <Breadcrumb.Item>
-          <a href="">Thống kê theo phim</a>
-        </Breadcrumb.Item>
-      </Breadcrumb>
+      <Title level={5} style={{ marginBottom: "1rem" }}>
+        Thống kê doanh thu theo phim
+      </Title>
       <Row
         gutter={{
           xs: 8,
@@ -61,7 +68,9 @@ const FilmStatisticComponent = () => {
           />
         </Col>
         <Col span={4} style={{ position: "absolute", right: "2.5%" }}>
-          <Button type="primary" title="Xuất file">
+          <Button type="primary" title="Xuất file"
+            onClick={handleExportExcel}
+          >
             Xuất báo cáo
           </Button>
         </Col>

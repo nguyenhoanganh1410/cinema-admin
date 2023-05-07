@@ -34,7 +34,7 @@ const IndexProduct = () => {
           lg: 16,
         }}
       >
-        <Col span={12}>
+        <Col span={21}>
           <Input
             placeholder="Nhập tên, mã sản phẩm"
             prefix={<SearchOutlined />}
@@ -43,13 +43,14 @@ const IndexProduct = () => {
                 setKeyword(e.target.value);
               }
             }}
+            style={{ width: "50%" }}
           />
         </Col>
 
         {/* <Col span={9}>
         </Col> */}
 
-        <Col span={1}>
+        <Col span={3}>
           {" "}
           <Button type="primary" icon={<UserAddOutlined />} onClick={showModal}>
             Thêm

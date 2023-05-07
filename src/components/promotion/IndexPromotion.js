@@ -29,6 +29,10 @@ const IndexPromotion = ({ setTab }) => {
   const [showModalAddCustomer, setShowModalAddCustomer] = useState(false);
   const [valueStatusPick, setValueStatusPick] = useState(1)
   const [searchText, setSearchText] = useState('')
+  const [startDatePicker, setStartDatePicker] = useState("");
+  const [endDatePicker, setEndDatePicker] = useState("");
+  const { RangePicker } = DatePicker;
+
   const showModal = () => {
     setShowModalAddCustomer(true);
   };
@@ -40,6 +44,10 @@ const IndexPromotion = ({ setTab }) => {
   const handleChangeSearch = (e) =>{
     setSearchText(e.target.value)
   }
+  const onChangeDate = (date, dateString) => {
+    setStartDatePicker(dateString[0]);
+    setEndDatePicker(dateString[1]);
+  };
 
   return (
     <div className="site-card-wrapper">
@@ -54,25 +62,22 @@ const IndexPromotion = ({ setTab }) => {
           lg: 16,
         }}
       >
-        <Col span={10}>
+        <Col span={7}>
           <Input
             onChange={(e) => handleChangeSearch(e)}
             placeholder="Nhập tên khuyễn mãi..."
             prefix={<SearchOutlined />}
           />
         </Col>
-        <Col span={8}>
+        <Col span={9}>
           {" "}
-          <Button
-            type="primary"
-            icon={<UserAddOutlined />}
-            onClick={showModal}
-            title="Thêm mới bộ phim"
-          >
-            Thêm
-          </Button>
+          <RangePicker 
+            placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
+            onCalendarChange={onChangeDate}
+          />
         </Col>
-        <Col span={4}>
+    
+        <Col span={5}>
           <Form.Item>
             <Select
               defaultValue={1}
@@ -96,6 +101,16 @@ const IndexPromotion = ({ setTab }) => {
               ]}
             />
           </Form.Item>
+        </Col>
+        <Col span={2}>
+          {" "}
+          <Button
+            type="primary"
+            icon={<UserAddOutlined />}
+            onClick={showModal}
+          >
+            Thêm
+          </Button>
         </Col>
       </Row>
 

@@ -15,6 +15,8 @@ import dayjs from "dayjs";
 import moment from "moment";
 import useRevenueComponentHook from "../useRevenueComponentHook";
 import useCustomerComponentHook from "./useCustomerComponentHook";
+const { Title, Text } = Typography;
+
 const { RangePicker } = DatePicker;
 const dateFormat = "YYYY/MM/DD";
 const CustomerStatitisComponent = () => {
@@ -23,12 +25,9 @@ const CustomerStatitisComponent = () => {
     
   return (
     <div className="site-card-wrapper">
-      <Breadcrumb style={{ marginBottom: "1rem", marginTop: "1rem" }}>
-        <Breadcrumb.Item>Home</Breadcrumb.Item>
-        <Breadcrumb.Item>
-          <a href="">Thống kê theo khách hàng</a>
-        </Breadcrumb.Item>
-      </Breadcrumb>
+      <Title level={5} style={{ marginBottom: "1rem" }}>
+        Thống kê khách hàng
+      </Title>
       <Row
         gutter={{
           xs: 8,

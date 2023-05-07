@@ -51,10 +51,10 @@ const useFilmStatisticHook = () => {
             return {
               ...val,
               createdAt: val?.createdAt.substring(0, 10),
-              discount: VND.format(val?.discount.toString()),
-              totalDiscount: VND.format(val?.totalDiscount.toString()),
-              total: VND.format(val?.total.toString()),
-              idMovie: "#" + val?.movie?.id,
+              discount: val?.discount,
+              totalDiscount: val?.totalDiscount,
+              total: val?.total,
+              idMovie: val?.movie?.id,
               name: val?.movie?.nameMovie,
               tickets: val?.count
             };
@@ -86,7 +86,9 @@ const useFilmStatisticHook = () => {
     onChangeDate,
     listMovie,
     setParamShow,
-    handleOnChangeMovie
+    handleOnChangeMovie,
+    start_date: params.start_date,
+    end_date: params.end_date,
   };
 };
 

@@ -2,58 +2,39 @@ import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { Column } from "@ant-design/plots";
 
-const ColumnChart = () => {
-  const data = [
-    {
-      type: "家具家电",
-      sales: 38,
-    },
-    {
-      type: "粮油副食",
-      sales: 52,
-    },
-    {
-      type: "生鲜水果",
-      sales: 61,
-    },
-    {
-      type: "美容洗护",
-      sales: 145,
-    },
-    {
-      type: "母婴用品",
-      sales: 48,
-    },
-    {
-      type: "进口食品",
-      sales: 38,
-    },
-    {
-      type: "食品饮料",
-      sales: 38,
-    },
-    {
-      type: "家庭清洁",
-      sales: 38,
-    },
-  ];
+const ColumnChart = ({data}) => {
   const config = {
     data,
-    xField: "type",
-    yField: "sales",
+    xField: "date",
+    yField: "revenue",
     xAxis: {
       label: {
         autoHide: true,
         autoRotate: false,
       },
     },
+    yAxis: {
+      label: {
+        formatter: function formatter(v) {
+          return "".concat(v).replace(/\d{1,3}(?=(\d{3})+$)/g, function (s) {
+            return "".concat(s, ",");
+          });
+        }
+      }
+    },
     meta: {
-      type: {
+      date: {
         alias: "类别",
       },
-      sales: {
-        alias: "销售额",
+      revenue: {
+        alias: "Doanh thu",
       },
+    },
+    tooltip: {
+      showMarkers: false,
+      formatter: (datum) => {
+        return { name: 'Doanh thu', value: datum.revenue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") };
+      }
     },
     minColumnWidth: 20,
     maxColumnWidth: 20,

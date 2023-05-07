@@ -27,7 +27,7 @@ import orderApi from "../../api/orderApi";
 import moment from "moment";
 import { MESSAGE_SYSTEM_ERRO, REASON_REFULT } from "../../constant";
 
-const TableFilms = () => {
+const TableFilms = ({ start_date, end_date }) => {
   // const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [listMovie, setListMovie] = useState([]);
@@ -106,19 +106,18 @@ const TableFilms = () => {
               title="Đổi trả hóa đơn"
               icon={<RetweetOutlined />}
               disabled={
-                record.status === 3
-                  ? true
-                  : false ||
                     currentDay > moment(record.showDate).format("YYYY-MM-DD")
                   ? true
                   : false ||
                     (currentDay ===
                       moment(record.showDate).format("YYYY-MM-DD") &&
-                      currentTimes > moment(record.showTime).format("HH:mm"))
+                      currentTimes > record.showTime)
                   ? true
                   : false
               }
-              onClick={() => showModal(record.id)}
+              onClick={() => {
+                showModal(record.id)
+              }}
             ></Button>
           </Space>
           <Space style={{ marginLeft: "10px" }}>
@@ -126,6 +125,11 @@ const TableFilms = () => {
               title="Xem chi tiết"
               icon={<EyeOutlined />}
               onClick={() => {
+                console.log('showt',record.showTime),
+                console.log('day',moment(record.showDate).format("YYYY-MM-DD")),
+                console.log('cr_day',currentDay),
+                console.log('cr_time',currentTimes),
+                console.log('time',moment(record.showTime).format("HH:mm")),
                 showModalDetail(record.id);
               }}
             ></Button>
@@ -261,15 +265,21 @@ const TableFilms = () => {
     const gettListOrder = async () => {
       try {
         //const response = await orderApi.getAll();
-        const response = await orderApi.getByType(1);
-        console.log(response);
+        const response = await orderApi.getByType(1,{start_date,end_date});
         //set user info
         if (response) {
           const newList = response.map((item) => {
+            let name_staff = "";
+            if (item.Staff) {
+              name_staff =
+                item?.Staff?.firstName + " " + item?.Staff?.lastName;
+            } else {
+              name_staff = "Online";
+            }
             return {
               id: item.id,
               customer: item.Customer.firstName + " " + item.Customer.lastName,
-              staff: item.Staff.firstName + " " + item.Staff.lastName,
+              staff: name_staff,
               showTime: item.ShowMovie.ShowTime.showTime,
               showDate: item.ShowMovie.showDate,
               createdAt: moment(item.createdAt).format("DD/MM/YYYY HH:mm"),
@@ -285,31 +295,10 @@ const TableFilms = () => {
       }
     };
     gettListOrder();
-  }, [reload]);
+  }, [reload,start_date,end_date]);
 
   return (
     <div>
-      <div
-        style={{
-          marginBottom: 16,
-        }}
-      >
-        <Button
-          type="primary"
-          onClick={handleRefresh}
-          loading={loading}
-          icon={<ReloadOutlined />}
-        >
-          Làm mới
-        </Button>
-        <span
-          style={{
-            marginLeft: 8,
-          }}
-        >
-          {/* {hasSelected ? `Selected ${selectedRowKeys.length} items` : ""} */}
-        </span>
-      </div>
       <Table columns={columns} dataSource={listMovie} />
       <Modal
         title="Tạo đơn trả hàng"

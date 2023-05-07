@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Input, Col, Row, Typography, Button, Modal,Table } from "antd";
+import { Input, Col, Row, Typography, Button, Modal,Table,DatePicker } from "antd";
 
 import {
   SearchOutlined,
@@ -25,8 +25,17 @@ const IndexCustomer = ({ setTab ,setSelectedIdHeader}) => {
   const depatch = useDispatch();
   const reload = useSelector((state) => state.reload);
 
+  const { RangePicker } = DatePicker;
+  const [startDatePicker, setStartDatePicker] = useState("");
+  const [endDatePicker, setEndDatePicker] = useState("");
+
   const showModal = () => {
     setShowModalAddCustomer(true);
+  };
+
+  const onChangeDate = (date, dateString) => {
+    setStartDatePicker(dateString[0]);
+    setEndDatePicker(dateString[1]);
   };
 
   const columns = [
@@ -79,22 +88,17 @@ const IndexCustomer = ({ setTab ,setSelectedIdHeader}) => {
           lg: 16,
         }}
       >
-        <Col span={12}>
-          <Input
-            placeholder="Nhập tên, số điện thoại hoặc email..."
-            prefix={<SearchOutlined />}
+        <Col span={19}>
+        <RangePicker 
+            placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
+            onCalendarChange={onChangeDate}
+            style={{ width: "50%" }}
           />
         </Col>
-        <Col span={1}>
-          {" "}
-          <Button type="primary" icon={<UserAddOutlined />} onClick={showModal}>
-            Thêm
-          </Button>
-        </Col>
+        
         <Col style={{
           marginLeft: "3rem"
         }} span={1}>
-          {" "}
           <Button type="primary" icon={<TableOutlined />} onClick={() => {
             setIsShowTable(!isShowTable)
           }} 
@@ -102,17 +106,11 @@ const IndexCustomer = ({ setTab ,setSelectedIdHeader}) => {
           > 
           </Button>
         </Col>
-        {/* <Col style={{ margin: "0 1rem" }}>
-          {" "}
-          <Button type="primary" size="large" icon={<ToolOutlined />}>
-            Cập nhật
+        <Col span={1}>
+          <Button type="primary" icon={<UserAddOutlined />} onClick={showModal}>
+            Thêm
           </Button>
-        </Col> */}
-        {/* <Col span={1}>
-          <Button type="primary" icon={<DownloadOutlined />}>
-            Xuất file
-          </Button>
-        </Col> */}
+        </Col>
       </Row>
 
       <Row

@@ -31,7 +31,7 @@ import moment from "moment";
 import { useDispatch, useSelector } from "react-redux";
 import { setReload } from "../../redux/actions";
 
-const TableFilms = () => {
+const TableFilms = ({ start_date, end_date }) => {
   // const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [listMovie, setListMovie] = useState([]);
@@ -231,15 +231,22 @@ const TableFilms = () => {
     //load movies
     const gettListOrder = async () => {
       try {
-        const response = await orderApi.getByType(3);
+        const response = await orderApi.getByType(3,{start_date,end_date});
 
         //set user info
         if (response) {
           const newList = response.map((item) => {
+            let name_staff = "";
+            if (item.Staff) {
+              name_staff =
+                item?.Staff?.firstName + " " + item?.Staff?.lastName;
+            } else {
+              name_staff = "Online";
+            }
             return {
               id: item.id,
               customer: item.Customer.firstName + " " + item.Customer.lastName,
-              staff: item.Staff.firstName + " " + item.Staff.lastName,
+              staff: name_staff,
               showTime: item.ShowMovie.ShowTime.showTime,
               refundDate: moment(item.refundDate).format("DD/MM/YYYY HH:mm"),
               totalPrice: item.totalPrice,
@@ -254,31 +261,10 @@ const TableFilms = () => {
       }
     };
     gettListOrder();
-  }, [reload]);
+  }, [reload,start_date,end_date]);
 
   return (
     <div>
-      <div
-        style={{
-          marginBottom: 16,
-        }}
-      >
-        <Button
-          type="primary"
-          onClick={handleRefresh}
-          loading={loading}
-          icon={<ReloadOutlined />}
-        >
-          Làm mới
-        </Button>
-        <span
-          style={{
-            marginLeft: 8,
-          }}
-        >
-          {/* {hasSelected ? `Selected ${selectedRowKeys.length} items` : ""} */}
-        </span>
-      </div>
       <Table columns={columns} dataSource={listMovie} />
       <Modal
         title="Tạo đơn trả hàng"

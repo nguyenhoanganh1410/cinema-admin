@@ -187,10 +187,8 @@ const ModelDetailMovie = ({
           res.showDate = moment(res.ShowMovie.showDate).format("DD/MM/YYYY");
           const name = res.Customer?.firstName + res.Customer?.lastName;
           // res.totalPrice = res.totalPrice.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-          const totalPrice = res.totalPrice
-            .toString()
-            .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-          res.totalPrice = totalPrice;
+          const totatBefore = res.totalPrice + res.totalDiscount;
+          res.totatBefore = totatBefore;
           if (name === "NN") {
             res.customerName = "Khách vãng lai";
           }
@@ -699,8 +697,41 @@ const ModelDetailMovie = ({
             </Col>
             <Col span={8}>
               <span>
-                Tổng tiền:
-                <span> {order?.totalPrice} </span>
+                Chiết khấu:
+                <span>
+                  {" "}
+                  {order?.totalDiscount
+                    ?.toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}{" "}
+                </span>
+              </span>
+            </Col>
+          </Row>
+          <Row gutter={16} style={{ marginBottom: "10px" }}>
+            <Col span={16}></Col>
+            <Col span={8}>
+              <span>
+                Tổng tiền trước ck:
+                <span>
+                  {" "}
+                  {order?.totatBefore
+                    ?.toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}{" "}
+                </span>
+              </span>
+            </Col>
+          </Row>
+          <Row gutter={16} style={{ marginBottom: "10px" }}>
+            <Col span={16}></Col>
+            <Col span={8}>
+              <span>
+                Tổng tiền sau ck:
+                <span>
+                  {" "}
+                  {order?.totalPrice
+                    ?.toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}{" "}
+                </span>
               </span>
             </Col>
           </Row>

@@ -14,20 +14,28 @@ import RevenueTable from "./table/RevenueTable";
 import dayjs from "dayjs";
 import moment from "moment";
 import useRevenueComponentHook from "./useRevenueComponentHook";
+import { exportExcel } from "../export-excel/statistics/reveneu-staff";
+const { Title, Text } = Typography;
+
+
 const { RangePicker } = DatePicker;
 const dateFormat = "YYYY/MM/DD";
 const RevenueComponent = () => {
-  const { revenues, onChangeDate, handleChangeEmployee, idStaff, staffs } =
+  const { revenues, onChangeDate, handleChangeEmployee, idStaff, staffs, start_date, end_date } =
     useRevenueComponentHook();
+
+  const handleExportExcel = () => {
+    console.log(revenues);
+    // console.log(dayjs(start_date).format('DD/MM/YYYY') , end_date)
+    exportExcel(revenues, dayjs(start_date).format('DD/MM/YYYY'), dayjs(end_date).format('DD/MM/YYYY'));
+
+  };
     
   return (
     <div className="site-card-wrapper">
-      <Breadcrumb style={{ marginBottom: "1rem", marginTop: "1rem" }}>
-        <Breadcrumb.Item>Home</Breadcrumb.Item>
-        <Breadcrumb.Item>
-          <a href="">Thống kê doanh thu</a>
-        </Breadcrumb.Item>
-      </Breadcrumb>
+     <Title level={5} style={{ marginBottom: "1rem" }}>
+        Thống kê doanh thu theo nhân viên
+      </Title>
       <Row
         gutter={{
           xs: 8,
@@ -39,6 +47,7 @@ const RevenueComponent = () => {
       >
         <Col span={6}>
           <RangePicker
+
             placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
             style={{ minWidth: "50%" }}
             onChange={onChangeDate}
@@ -61,7 +70,9 @@ const RevenueComponent = () => {
           />
         </Col>
         <Col span={4} style={{ position: "absolute", right: "2.5%" }}>
-          <Button type="primary" title="Xuất file">
+          <Button type="primary" title="Xuất file"
+            onClick={handleExportExcel}
+          >
             Xuất báo cáo
           </Button>
         </Col>
