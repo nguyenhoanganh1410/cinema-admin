@@ -74,58 +74,61 @@ const TableFilms = ({keyword,startDatePicker,endDatePicker}) => {
       title: "Ngày kết thúc",
       dataIndex: "endDate",
     },
-    {
-      title: "Tình trạng",
-      dataIndex: "status",
-      render: (status) => {
-          let color = "green";
-          let text = "Đang chiếu";
-          if (status === 1) {
-            color = "success";
-            text = "Đang chiếu";
-          }
-          if (status === 0) {
-            color = "processing";
-            text = "Sắp chiếu";
-          }
-          if (status === 2) {
-            color = "error";
-            text = "Đã kết thúc";
-          }
-        return (
-          <Badge status={color} text={text} />
-        );
-      },
-      filters: [
-        {
-          text: "Đang chiếu",
-          value: 1,
-        },
-        {
-          text: "Sắp chiếu",
-          value: 0,
-        },
-        {
-          text: "Đã kết thúc",
-          value: 2,
-        },
-      ],
-      onFilter: (value, record) => record.status === value,
-    },
+    // {
+    //   title: "Tình trạng",
+    //   dataIndex: "status",
+    //   render: (status) => {
+    //       let color = "green";
+    //       let text = "Đang chiếu";
+    //       if (status === 1) {
+    //         color = "success";
+    //         text = "Đang chiếu";
+    //       }
+    //       if (status === 0) {
+    //         color = "processing";
+    //         text = "Sắp chiếu";
+    //       }
+    //       if (status === 2) {
+    //         color = "error";
+    //         text = "Đã kết thúc";
+    //       }
+    //     return (
+    //       <Badge status={color} text={text} />
+    //     );
+    //   },
+    //   filters: [
+    //     {
+    //       text: "Đang chiếu",
+    //       value: 1,
+    //     },
+    //     {
+    //       text: "Sắp chiếu",
+    //       value: 0,
+    //     },
+    //     {
+    //       text: "Đã kết thúc",
+    //       value: 2,
+    //     },
+    //   ],
+    //   onFilter: (value, record) => record.status === value,
+    // },
     {
       title: "Trạng thái",
-      dataIndex: "active",
-      render: (active) => {
+      dataIndex: "status",
+      render: (status) => {
         let color = "green";
-        if (active === "Hoạt động") {
+        let text = "Hoạt động";
+        if (status === 1) {
           color = "success";
+          text = "Hoạt động";
         }
-        if (active === "Ngừng hoạt động") {
+        if (status === 0) {
           color = "error";
+          text = "Ngừng hoạt động";
         }
         return (
-          <Tag color={color} key={active}>
-            {active.toUpperCase()}
+          <Tag color={color} key={text}>
+            {text.toUpperCase()}
           </Tag>
         );
       },
@@ -139,13 +142,13 @@ const TableFilms = ({keyword,startDatePicker,endDatePicker}) => {
           value: "Ngừng hoạt động",
         },
       ],
-      onFilter: (value, record) => record.active.indexOf(value) === 0,
+      onFilter: (value, record) => record.status.indexOf(value) === 0,
     },
     {
       render: (val,record) => {
         return (
           <Button
-            disabled={record.active === "Hoạt động" ? true : false}
+            disabled={record.status === 1 ? true : false}
             icon={<DeleteOutlined />}
             onClick={() => {
               setSelectedId(record.id);
@@ -160,19 +163,7 @@ const TableFilms = ({keyword,startDatePicker,endDatePicker}) => {
 
   ];
 
-  
 
-
-  // const onSelectChange = (newSelectedRowKeys) => {
-  //   console.log("selectedRowKeys changed: ", newSelectedRowKeys);
-  //   setSelectedRowKeys(newSelectedRowKeys);
-  // };
-  // const rowSelection = {
-  //   selectedRowKeys,
-  //   onChange: onSelectChange,
-  // };
-  // const hasSelected = selectedRowKeys.length > 0;
-  // const selectedOne = selectedRowKeys.length === 1;
 
   //handle delete Movie in here...
   const handleDelete = () => {
@@ -237,16 +228,6 @@ const TableFilms = ({keyword,startDatePicker,endDatePicker}) => {
             movie.endDate = movie?.endDate?.substring(0, 10);
             movie.status = movie?.status;
             movie.code = movie?.codeMovie;
-
-            const active = movie?.isActived;
-            console.log('ac',active);
-            let activeName = "";
-            if (active === true) {
-              activeName = "Hoạt động";
-            } else if (active === false) {
-              activeName = "Ngừng hoạt động";
-            }
-            movie.active = activeName;
 
             return movie;
           });

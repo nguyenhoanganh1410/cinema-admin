@@ -1,4 +1,4 @@
- import React, { useState } from "react";
+import React, { useState } from "react";
 import {
   Input,
   Col,
@@ -18,14 +18,15 @@ import {
   DeleteOutlined,
   DownloadOutlined,
 } from "@ant-design/icons";
-import TablePromotionHeader from "./TablePromotionHeader";
 import moment from "moment";
-import ModelAddPromotionHeader from "./ModelAddPromotionHeader";
+import ModelAddCinema from "./ModelAddCinema";
+import TableCinema from "./TableCinema";
 const { Title, Text } = Typography;
 const dateFormat = "YYYY/MM/DD";
-const IndexCinemaHall = ({ setTab, selectedIdCinema, statusDb }) => {
+const IndexCinema = ({ setTab, setSelectedIdCinema, setStatusDb }) => {
   const [showModalAddCustomer, setShowModalAddCustomer] = useState(false);
   const [keyword, setKeyword] = useState("");
+
 
   const showModal = () => {
     setShowModalAddCustomer(true);
@@ -37,12 +38,10 @@ const IndexCinemaHall = ({ setTab, selectedIdCinema, statusDb }) => {
 
   return (
     <div className="site-card-wrapper">
-      <Breadcrumb style={{ marginBottom: "1rem", marginTop: "1rem" }}>
-        <Breadcrumb.Item> <a onClick={()=>{handleRouter(0)}}> Rạp </a></Breadcrumb.Item>
-        <Breadcrumb.Item>
-          Phòng chiếu
-        </Breadcrumb.Item>
-      </Breadcrumb>
+      
+      <Title level={5} style={{ marginBottom: "1rem" }}>
+        Rạp
+      </Title>
       <Row
         gutter={{
           xs: 8,
@@ -53,7 +52,7 @@ const IndexCinemaHall = ({ setTab, selectedIdCinema, statusDb }) => {
       >
         <Col span={10}>
           <Input
-            placeholder="Nhập tên phòng chiếu hoặc loại phòng"
+            placeholder="Nhập tên rạp hoặc mã rạp"
             prefix={<SearchOutlined />}
             onKeyUp={(e) => {
               if (e.keyCode === 13) {
@@ -86,17 +85,16 @@ const IndexCinemaHall = ({ setTab, selectedIdCinema, statusDb }) => {
         }}
       >
         <Col span={24}>
-          <TablePromotionHeader keyword={keyword} setTab={setTab} selectedIdCinema={selectedIdCinema} statusDb={statusDb} />
+          <TableCinema keyword={keyword} setTab={setTab} setSelectedIdCinema={setSelectedIdCinema} setStatusDb={setStatusDb} />
         </Col>
       </Row>
       {showModalAddCustomer ? (
-        <ModelAddPromotionHeader
+        <ModelAddCinema
           showModalAddCustomer={showModalAddCustomer}
           setShowModalAddCustomer={setShowModalAddCustomer}
-          selectedIdCinema={selectedIdCinema}
         />
       ) : null}
     </div>
   );
 };
-export default IndexCinemaHall;
+export default IndexCinema;

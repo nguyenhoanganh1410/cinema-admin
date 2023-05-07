@@ -1,8 +1,8 @@
 import axiosApi from "./axisosApi";
 
 const showApi = {
-  getShow: () => {
-    return axiosApi.get("/show");
+  getShow: (query) => {
+    return axiosApi.get(`/show?cinemaId=${query?.cinemaId}&movieId=${query?.movieId}&startDate=${query?.startDate}&endDate=${query?.endDate}`);
   },
 
   getShowByMovieAndDate: (idMovie, date) => {
@@ -17,6 +17,16 @@ const showApi = {
   deleteShow: (id) => {
     return axiosApi.delete(`/show/${id}`);
   },
+  checkShowIsExist: (data) => {
+    return axiosApi.post("/show/checkExist", data);
+  },
+  getShowIsPass: ({startDate, endDate, idCinema, idCinemaHall, idMovie}) => {
+    return axiosApi.get(`/show/listShowTime/isPassed?startDateIn=${startDate}&endDateIn=${endDate}&idCinema=${idCinema}&idCinemaHall=${idCinemaHall}&idMovie=${idMovie}`
+    );
+  },
+  updateStatus: (id, status) => {
+    return axiosApi.put(`/show/status/${id}`, status);
+  }
 
 };
 

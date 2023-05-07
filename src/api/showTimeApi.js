@@ -21,7 +21,10 @@ const showTimeApi = {
     },
     getListTime(idCinema,showDate,idMovie) {
         return axiosApi.get(`/showTimesMovie/showTime/movie?idCinema=${idCinema}&showDate=${showDate}&idMovie=${idMovie}`);
-    }
+    },
+    getlistTimeUnique(idShow) {
+        return axiosApi.get(`/showTimesMovie/showTime/time/unique/${idShow}`);
+    },
 };
 
 export default showTimeApi;

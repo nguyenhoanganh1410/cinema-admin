@@ -26,9 +26,10 @@ import { notifyError,
 } from "../../utils/Notifi";
 import cinemaHallApi from "../../api/cinemaHallApi";
 
-const ModelAddPromotionHeader = ({
+const ModelDetailHall = ({
   showModalAddCustomer,
   setShowModalAddCustomer,
+  selectedIdHall,
   selectedIdCinema,
 }) => {
   const handleCancel = () => setPreviewOpen(false);
@@ -47,6 +48,7 @@ const ModelAddPromotionHeader = ({
     setShowModalAddCustomer(false);
   };
 
+
   useEffect(() => {
     const fetchCinemaInfo = async () => {
       try {
@@ -61,25 +63,37 @@ const ModelAddPromotionHeader = ({
         console.log("Failed to fetch product list: ", error);
       }
     };
+    const fetchCinemaHallInfo = async () => {
+      try {
+        const response = await cinemaHallApi.getById(selectedIdHall);
+        if (response) {
+          form.setFieldsValue({
+            name: response.name,
+            type: response.type,
+            totalSeats: response.totalSeats,
+          });
+        }
+      } catch (error) {
+        console.log("Failed to fetch product list: ", error);
+      }
+    };
+
+    fetchCinemaHallInfo();
     fetchCinemaInfo();
-  }, []);
+  }, [selectedIdHall, selectedIdCinema]);
 
   //handle submit form create new customer...
   const handleSubmit = async (val) => {
     delete val.nameCinema;
-    const payload = {
-      ...val,
-      cinema_id: selectedIdCinema,
-    };
     try {
-      const response = await cinemaHallApi.create(payload);
+      const response = await cinemaHallApi.update(selectedIdHall, val);
       if (response) {
-        notifySucess("Thêm thành công");
+        notifySucess("Cập nhật thành công!");
         depatch(setReload(!reload));
         onClose();
       }
     } catch (error) {
-      notifyError("Thêm thất bại");
+      notifyError("Cập nhật thất bại!");
       console.log("Failed to fetch product list: ", error);
     }
   };
@@ -108,7 +122,7 @@ const ModelAddPromotionHeader = ({
   return (
     <>
       <Drawer
-        title="Tạo phòng chiếu"
+        title="Chỉnh sửa phòng chiếu"
         width={720}
         onClose={onClose}
         open={showModalAddCustomer}
@@ -117,10 +131,10 @@ const ModelAddPromotionHeader = ({
         }}
         extra={
           <Space>
-            <Button onClick={onClose}>Cancel</Button>
+            <Button onClick={onClose}>Hủy</Button>
 
             <Button form="myForm" htmlType="submit" type="primary">
-              Submit
+              Lưu
             </Button>
           </Space>
         }
@@ -195,7 +209,6 @@ const ModelAddPromotionHeader = ({
                   style={{
                     width: "100%",
                   }}
-                  value={81}
                   // onChange={handleChangePosition}
                   options={[
                     {
@@ -212,4 +225,4 @@ const ModelAddPromotionHeader = ({
     </>
   );
 };
-export default ModelAddPromotionHeader;
+export default ModelDetailHall;
