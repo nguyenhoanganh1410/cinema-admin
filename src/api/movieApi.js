@@ -1,7 +1,7 @@
 import axiosApi from "./axisosApi";
 
 const movieApi = {
-  getMovies: (query) => {
+  getMovies: (query ) => {
     return axiosApi.get(`/movie?keyword=${query?.keyword}&startDate=${query?.startDate}&endDate=${query?.endDate}`);
   },
 

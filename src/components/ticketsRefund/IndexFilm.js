@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Input, Col, Row, Typography, Button, Modal, Breadcrumb } from "antd";
+import { Input, Col, Row, Typography, Button, Modal, Breadcrumb,DatePicker } from "antd";
 
 import {
   SearchOutlined,
@@ -17,9 +17,18 @@ import ModelAddFilm from "./ModelAddFilm";
 const { Title, Text } = Typography;
 const IndexTicketRefund = () => {
   const [showModalAddCustomer, setShowModalAddCustomer] = useState(false);
+  const { RangePicker } = DatePicker;
+  const [startDatePicker, setStartDatePicker] = useState("");
+  const [endDatePicker, setEndDatePicker] = useState("");
+  const [keyword, setKeyword] = useState("");
 
   const showModal = () => {
     setShowModalAddCustomer(true);
+  };
+
+  const onChangeDate = (date, dateString) => {
+    setStartDatePicker(dateString[0]);
+    setEndDatePicker(dateString[1]);
   };
 
   return (
@@ -37,19 +46,13 @@ const IndexTicketRefund = () => {
           lg: 16,
         }}
       >
-        <Col span={12}>
-          <Input
-            placeholder="Nhập mã hóa đơn / vé..."
-            prefix={<SearchOutlined />}
+        <Col span={19}>
+        <RangePicker 
+            placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
+            onCalendarChange={onChangeDate}
+            style={{ minWidth: "50%" }}
+            allowClear={true}
           />
-        </Col>
-        <Col span={9}>
-        
-        </Col>
-        <Col span={1}>
-          <Button type="primary" icon={<DownloadOutlined />}>
-            Xuất file
-          </Button>
         </Col>
       </Row>
 
@@ -63,7 +66,7 @@ const IndexTicketRefund = () => {
         }}
       >
         <Col span={24}>
-          <TableFilms />
+          <TableFilms start_date= {startDatePicker} end_date = {endDatePicker} />
         </Col>
       </Row>
       {showModalAddCustomer ? (

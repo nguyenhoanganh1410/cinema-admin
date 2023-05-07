@@ -52,7 +52,9 @@ import { notifyWarn } from "../utils/Notifi";
 import { MESSAGE_NOT_ACCEPT } from "../constant";
 import RevenueComponent from "../components/statistic/RevenueComponent";
 import CustomerStatitisComponent from "../components/statistic/customer/CustomerStatitisComponent";
+import PromotionStatitisComponent from "../components/statistic/promotion/PromotionStatitisComponent";
 import FilmStatisticComponent from "../components/statistic/film/FilmStatisticComponent";
+import RefundStatitisComponent from "../components/statistic/refund/RefundStatitisComponent";
 import { IsManager } from "../utils/RoleUser";
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -93,10 +95,12 @@ const items = [
   //   getItem("Nhân viên", "15"),
   // ]),
   getItem("Thống kê", "18", <PieChartOutlined />, [
-    getItem("Thống kê doanh thu", "1000"),
-    getItem("Thống kê khuyến mãi", "1001"),
-    getItem("Thống kê theo phim", "1002"),
-    getItem("Thống kê khách hàng", "1003"),
+    getItem("Doanh số bán hàng", "1000"),
+    getItem("Khuyến mãi", "1001"),
+    getItem("Phim", "1002"),
+    getItem("Khách hàng", "1003"),
+    getItem("Trả hàng", "1004"),
+
   ]),
 ];
 
@@ -226,6 +230,10 @@ const HomePage = () => {
       return <CustomerStatitisComponent />;
     } else if (itemClicked === 1002) {
       return <FilmStatisticComponent />;
+    } else if (itemClicked === 1001) {
+      return <PromotionStatitisComponent />;
+    } else if (itemClicked === 1004) {
+      return <RefundStatitisComponent />;
     }
     return <IndexDashboard />;
   };

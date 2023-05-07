@@ -2,42 +2,72 @@ import React from "react";
 import { Table, Divider } from "antd";
 const columns = [
   {
-    title: "Name",
+    title: "STT",
+    dataIndex: "key",
+  },
+  {
+    title: "Mã phim",
+    dataIndex: "codeMovie",
+  },
+  {
+    title: "Tên phim",
+    dataIndex: "nameMovie",
+  },
+  {
+    title: "Thể loại",
+    dataIndex: "category",
+  },
+  {
+    title: "Doanh thu",
+    dataIndex: "totalPrice",
+    render:(val) => {
+      return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    }
+  },
+];
+
+const columnsCus = [
+  {
+    title: "STT",
+    dataIndex: "key",
+    width: "10%",
+  },
+  {
+    title: "Mã KH",
+    dataIndex: "idCustomer",
+    width: "15%",
+  },
+  {
+    title: "Tên khách hàng",
     dataIndex: "name",
+    width: "35%",
   },
   {
-    title: "Age",
-    dataIndex: "age",
+    title: "Rank",
+    dataIndex: "rank",
+    width: "20%",
   },
   {
-    title: "Address",
-    dataIndex: "address",
-  },
+    title: "Tổng tiền",
+    dataIndex: "totalPrice",
+    width: "20%",
+    render:(val) => {
+      return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    }
+  }
 ];
-const data = [
-  {
-    key: "1",
-    name: "John Brown",
-    age: 32,
-    address: "New York No. 1 Lake Park",
-  },
-  {
-    key: "2",
-    name: "Jim Green",
-    age: 42,
-    address: "London No. 1 Lake Park",
-  },
-  {
-    key: "3",
-    name: "Joe Black",
-    age: 32,
-    address: "Sidney No. 1 Lake Park",
-  },
-];
-const TableTopMovie = ({ title }) => (
+
+const TableTopMovie = ({ title, data }) => (
   <>
     <Divider>{title}</Divider>
-    <Table columns={columns} dataSource={data} size="middle" />
+    <Table columns={columns} dataSource={data} size="middle" pagination={false} />
   </>
 );
-export default TableTopMovie;
+
+const TableTopCus = ({ title, data }) => (
+  <>
+    <Divider>{title}</Divider>
+    <Table columns={columnsCus} dataSource={data} size="middle" pagination={false}/>
+  </>
+);
+export { TableTopMovie, TableTopCus };

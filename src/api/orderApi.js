@@ -16,8 +16,8 @@ const orderApi = {
     refund: (id,data) => {
         return axiosApi.put(`order/refund/${id}`, data);
     },
-    getByType: (type) => {
-        return axiosApi.get(`order/type/${type}`);
+    getByType: (type,  { start_date, end_date } ) => {
+        return axiosApi.get(`order/type/${type}?start_date=${start_date}&end_date=${end_date}`);
     },
     
 };

@@ -26,13 +26,6 @@ import { notifyError,
   notifySucess
  } from "../../utils/Notifi";
 
-const getBase64 = (file) =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = (error) => reject(error);
-  });
 
 const ModelDetailMovie = ({ showModalDetailMovie, setShowModalDetailMovie,selectedId }) => {
   const [listCategory, setListCategory] = useState([]);
@@ -125,7 +118,7 @@ const ModelDetailMovie = ({ showModalDetailMovie, setShowModalDetailMovie,select
         desc: response?.desc,
         classify: response.classify,
         endDate: moment(response.endDate),
-        status: response.isActived,
+        status: response.status,
         cinema:response.idCinema,
         codeMovie:response.codeMovie,
         // date: [moment(response.releaseDate), moment(response.endDate)],
@@ -163,7 +156,7 @@ const ModelDetailMovie = ({ showModalDetailMovie, setShowModalDetailMovie,select
     data.append("desc", desc);
     data.append("classify", classify);
     data.append("endDate", new Date(endDatePicker));
-    data.append("isActived", status);
+    data.append("status", status);
     
     if (imagePicker) {
       if (imagePicker.length === 0){
@@ -501,11 +494,11 @@ const ModelDetailMovie = ({ showModalDetailMovie, setShowModalDetailMovie,select
                   onChange={onChangeStatus}
                   options={[
                     {
-                      value: true  ,
+                      value:  1,
                       label: "Hoạt động",
                     },
                     {
-                      value: false,
+                      value: 0,
                       label: "Ngừng hoạt động",
                     }
                   ]}

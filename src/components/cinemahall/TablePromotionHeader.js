@@ -4,31 +4,34 @@ import {
   SearchOutlined,
   PlusSquareFilled,
   UserAddOutlined,
-  ToolOutlined,
+  FormOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import movieApi from "../../api/movieApi";
 import promotionApi from "../../api/promotionApi";
 import { setCinemaHall, setPromotionHeader } from "../../redux/actions";
 import cinemaHallApi from "../../api/cinemaHallApi";
+import { MdOutlineChair } from "react-icons/md";
+import { setReload } from "../../redux/actions";
+import ModelDetailHall from "./ModelDetailHall";
+import { notifySucess, notifyError } from "../../utils/Notifi";
 
-const TablePromotionHeader = ({ setTab }) => {
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+const TablePromotionHeader = ({ setTab, selectedIdCinema, statusDb , keyword}) => {
   const [loading, setLoading] = useState(false);
   const [promotionHeaderList, setPromotionHeaderList] = useState([]);
   const dispatch = useDispatch();
-  const onSelectChange = (newSelectedRowKeys) => {
-    console.log("selectedRowKeys changed: ", newSelectedRowKeys);
-    setSelectedRowKeys(newSelectedRowKeys);
-  };
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: onSelectChange,
-  };
-  const hasSelected = selectedRowKeys.length > 0;
-  const selectedOne = selectedRowKeys.length === 1;
+  const reload = useSelector((state) => state.reload);
+  const [showModalAddCustomer, setShowModalAddCustomer] = useState(false);
+  const [selectedIdHall, setSelectedIdHall] = useState(0);
 
+
+
+  const showModalDetail = (e) => {
+    setShowModalAddCustomer(true);
+    setSelectedIdHall(e);
+  };
+  
   //handle delete customer in here...
   const handleDelete = () => {
     showModal();
@@ -45,10 +48,17 @@ const TablePromotionHeader = ({ setTab }) => {
   const showModal = () => {
     setIsModalOpen(true);
   };
-  const handleOk = () => {
+  const handleOk = async() => {
     setIsModalOpen(false);
-
-    //handle code for log out in here
+    try {
+      const response = await cinemaHallApi.delete(selectedIdHall);
+      if (response) {
+        notifySucess("Xóa thành công");
+        dispatch(setReload(!reload));
+      }
+    } catch (error) {
+      notifyError("Xóa thất bại");
+    }
   };
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -58,10 +68,10 @@ const TablePromotionHeader = ({ setTab }) => {
     //load
     const getListPromotionHeader = async () => {
       try {
-        const response = await cinemaHallApi.getCinemaHalls(1)
+        const response = await cinemaHallApi.getCinemaHalls(selectedIdCinema,keyword);
         if (response) {
           //handle data
-        
+
           setPromotionHeaderList(response);
         }
       } catch (error) {
@@ -69,22 +79,23 @@ const TablePromotionHeader = ({ setTab }) => {
       }
     };
     getListPromotionHeader();
-  }, []);
+  }, [reload, keyword]);
 
   const handleOnclik = (id) => {
     console.log(id);
     dispatch(setCinemaHall(id));
-    setTab(1);
+    setTab(2);
   };
 
   const columns = [
     {
+      title: "ID",
+      dataIndex: "id",
+    },
+    {
       title: "Tên rạp",
       dataIndex: "name",
       key: "name",
-      render: (text, record) => (
-        <a onClick={() => handleOnclik(record.id)}>{text}</a>
-      ),
     },
     {
       title: "Số ghế",
@@ -96,11 +107,37 @@ const TablePromotionHeader = ({ setTab }) => {
     },
 
     {
-      title: "Action",
       key: "action",
+      align: "center",
       render: (_, record) => (
         <Space size="middle">
-          <a>Delete</a>
+          <Button
+            title="Chỉnh sửa"
+            type="default"
+            icon={<FormOutlined />}
+            onClick={() => {
+              showModalDetail(record.id);
+            }}
+          ></Button>
+          <Button
+            title="Xem sơ đồ ghế"
+            type="default"
+            icon={
+              <MdOutlineChair
+                size={20}
+              />
+            }
+            onClick={()=> handleOnclik(record.id)}
+          ></Button>
+          <Button
+            disabled={statusDb === 1 ? true : false}
+            icon={<DeleteOutlined />}
+            onClick={() => {
+              setSelectedIdHall(record.id);
+              handleDelete();
+            }}
+            danger
+          ></Button>
         </Space>
       ),
     },
@@ -108,43 +145,29 @@ const TablePromotionHeader = ({ setTab }) => {
 
   return (
     <div>
-      <div
-        style={{
-          marginBottom: 16,
-        }}
-      >
-        <Button
-          type="primary"
-          danger
-          onClick={handleDelete}
-          disabled={!hasSelected}
-          loading={loading}
-          icon={<DeleteOutlined />}
-          style={{ marginRight: "1rem" }}
-        >
-          Xóa
-        </Button>
-        <span
-          style={{
-            marginLeft: 8,
-          }}
-        >
-          {hasSelected ? `Selected ${selectedRowKeys.length} items` : ""}
-        </span>
-      </div>
-      <Table
-        rowSelection={rowSelection}
-        columns={columns}
-        dataSource={promotionHeaderList}
-      />
+      <Table columns={columns} dataSource={promotionHeaderList} />
       <Modal
         title="Xóa rạp"
         open={isModalOpen}
-        onOk={handleOk}
-        onCancel={handleCancel}
+        footer={[
+          <Button key="back" onClick={handleCancel}>
+            Hủy
+          </Button>,
+          <Button key="submit" danger type="primary" onClick={handleOk}>
+            Xóa
+          </Button>,
+        ]}
       >
         <p>Bạn muốn xóa rạp này không?</p>
       </Modal>
+      {setShowModalAddCustomer ? (
+        <ModelDetailHall
+        showModalAddCustomer={showModalAddCustomer}
+          setShowModalAddCustomer={setShowModalAddCustomer}
+          selectedIdHall={selectedIdHall}
+          selectedIdCinema={selectedIdCinema}
+        />
+      ) : null}
     </div>
   );
 };

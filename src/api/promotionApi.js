@@ -42,6 +42,9 @@ const promotionApi = {
   getPromotionDetailsByLineId: (_id) => {
     return axiosApi.get(`/promotionDetail/promotionLine/${_id}`);
   },
+  getAllPromotionLine: () => {
+    return axiosApi.get("/promotionLine");
+  },
 };
 
 export default promotionApi;

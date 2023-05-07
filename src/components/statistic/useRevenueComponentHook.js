@@ -50,29 +50,34 @@ const useRevenueComponentHook = () => {
                 ...val,
                 stt: idx + 1,
                 createdAt: val?.createdAt.substring(0, 10),
-                discount: VND.format(val?.discount.toString()),
-                totalDiscount: VND.format(val?.totalDiscount.toString()),
-                total: VND.format(val?.total.toString()),
-                idEmployee: "#" + val?.Staff?.id,
+                discount: val?.discount.toString(),
+                totalDiscount: val?.totalDiscount.toString(),
+                total: val?.total.toString(),
+                idEmployee: val?.Staff?.id,
                 name: val?.Staff?.firstName + " " + val?.Staff?.lastName
               };
             });
 
             setRevenues(newDate);
           }else{
+            console.log(data)
+            // if staff_id is duplicate => same stt
+            
             const newDate = data.map((val, idx) => {
               return {
                 ...val,
-                stt: idx + 1,
+                stt: val?.Staff?.id === data[idx - 1]?.Staff?.id ? idx : idx + 1,
                 createdAt: val?.createdAt.substring(0, 10),
-                discount: VND.format(val?.discount.toString()),
-                totalDiscount: VND.format(val?.totalDiscount.toString()),
-                total: VND.format(val?.total.toString()),
-                idEmployee: "#" + val?.Staff?.id,
+                discount: val?.discount,
+                totalDiscount: val?.totalDiscount,
+                total: val?.total,
+                idEmployee: val?.Staff?.id,
                 name: val?.Staff?.firstName + " " + val?.Staff?.lastName
               };
             });
+
             setRevenues(newDate);
+
           }
         }
       })
@@ -106,7 +111,9 @@ const useRevenueComponentHook = () => {
     onChangeDate,
     staffs,
     handleChangeEmployee,
-    idStaff
+    idStaff,
+    start_date: params.start_date,
+    end_date: params.end_date,
   };
 };
 

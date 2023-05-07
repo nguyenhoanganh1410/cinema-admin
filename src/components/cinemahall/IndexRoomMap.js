@@ -64,6 +64,10 @@ const IndexCinemaMap = ({ setTab }) => {
     getSeatById(seat.id);
   };
 
+  const handleRouter = (value) => {
+    setTab(value);
+  };
+
   const handleLogic = () =>{
     setSeat(null);
     setOpen(false)
@@ -73,12 +77,12 @@ const IndexCinemaMap = ({ setTab }) => {
   return (
     <div className="site-card-wrapper">
       <Breadcrumb style={{ marginBottom: "1rem", marginTop: "1rem" }}>
-        <Breadcrumb.Item>Home</Breadcrumb.Item>
+        <Breadcrumb.Item> <a onClick={()=> handleRouter(0)}> Rạp</a> </Breadcrumb.Item>
         <Breadcrumb.Item>
-          <a href="">Quản lý rạp</a>
+          <a onClick={()=> handleRouter(1)} > Phòng chiếu </a>
         </Breadcrumb.Item>
         <Breadcrumb.Item>
-          <a href="">Sơ đồ rạp</a>
+          Sơ đồ phòng chiếu
         </Breadcrumb.Item>
       </Breadcrumb>
 
