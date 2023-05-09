@@ -38,8 +38,8 @@ const UserInfo = () => {
   } = useUserHook();
   useEffect(() => {
     form.setFieldsValue({
-      first_name: user?.firstName,
-      last_name: user?.lastName,
+      first_name: user?.firstName.toLowerCase(),
+      last_name: user?.lastName.toLowerCase(),
     });
     if (user?.image) {
       setFileList([
@@ -128,8 +128,9 @@ const UserInfo = () => {
               <Col span={14}>
                 <Form.Item rules={[yupSync]} name="first_name">
                   <Input
-                    style={{ width: "50%" }}
+                    style={{ width: "50%", textTransform:"capitalize" }}
                     placeholder="Enter first name"
+
                   />
                 </Form.Item>
               </Col>
@@ -153,7 +154,7 @@ const UserInfo = () => {
               <Col span={14}>
                 <Form.Item rules={[yupSync]} name="last_name">
                   <Input
-                    style={{ width: "50%" }}
+                     style={{ width: "50%", textTransform:"capitalize" }}
                     placeholder="Enter last name"
                   />
                 </Form.Item>

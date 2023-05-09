@@ -61,7 +61,7 @@ const IndexBooking = () => {
       type="editable-card"
       onChange={onChange}
       activeKey={activeKey}
-      onEdit={onEdit}
+     // onEdit={onEdit}
       items={items}
     />
   );

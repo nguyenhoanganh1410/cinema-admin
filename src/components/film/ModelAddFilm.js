@@ -338,6 +338,12 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
               <Form.Item
                 name="classify"
                 label="Độ tuổi thích hợp"
+                rules={[
+                  {
+                    required: true,
+                    message: "Hãy chọn  độ tuổi thích hợp...",
+                  },
+                ]}
               >
                 <Select
                   placeholder="Chọn độ tuổi thích hợp"
@@ -372,7 +378,12 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
               <Form.Item
                 name="daoDien"
                 label="Đạo diễn"
-               
+                rules={[
+                  {
+                    required: true,
+                    message: "Hãy nhập tên đạo diễn...",
+                  },
+                ]}
               >
                 <Input
                   placeholder="Hãy nhập tên đạo diễn..."
@@ -383,6 +394,12 @@ const ModelAddFilm = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
               <Form.Item
                 name="dienVien"
                 label="Diễn viên"
+                rules={[
+                  {
+                    required: true,
+                    message: "Hãy nhập tên diễn viên...",
+                  },
+                ]}
               >
                 <Input
                   placeholder="Hãy nhập tên diễn viên..."

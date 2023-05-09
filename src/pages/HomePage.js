@@ -260,7 +260,6 @@ const HomePage = () => {
     }
   }, []);
 
-  console.log(user?.image);
   return (
     <Layout
       style={{
@@ -310,10 +309,10 @@ const HomePage = () => {
               </p>
             </div>
             <div style={{ display: "flex", alignItems: "center" }}>
-              <p style={{ marginRight: "1rem", fontWeight: "500" }}>
-                Hi, {user?.firstName + " " + user?.lastName}
+              <p style={{ marginRight: "1rem", fontWeight: "500", textTransform:"capitalize" }}>
+                Hi, {user?.firstName?.toLowerCase() + " " + user?.lastName?.toLowerCase()}
               </p>
-              <Dropdown
+              {/* <Dropdown
                 overlay={
                   <>
                     <Menu>
@@ -370,7 +369,7 @@ const HomePage = () => {
                     className="notification_icon"
                   />
                 </div>
-              </Dropdown>
+              </Dropdown> */}
               <Dropdown
                 overlay={
                   <>
@@ -408,8 +407,8 @@ const HomePage = () => {
                           <div
                             style={{ display: "flex", flexDirection: "column" }}
                           >
-                            <Text style={{ fontWeight: "500", color: "#333" }}>
-                              {user?.firstName + " " + user?.lastName}
+                            <Text style={{ fontWeight: "500", color: "#333", textTransform:"capitalize" }}>
+                            {user?.firstName?.toLowerCase() + " " + user?.lastName?.toLowerCase()}
                             </Text>
                             <Text
                               style={{
@@ -494,8 +493,9 @@ const HomePage = () => {
                       {user?.lastName?.substring(0,1)}
                     </Avatar>
                   )}
-                  <Text style={{ fontWeight: "500", color: "#333" }}>
-                    {user?.firstName + " " + user?.lastName}
+                  <Text style={{ fontWeight: "500", color: "#333", textTransform:"capitalize" }}>
+                  {user?.firstName?.toLowerCase() + " " + user?.lastName?.toLowerCase()}
+                    
                   </Text>
                 </div>
               </Dropdown>

@@ -5,6 +5,10 @@ const cinemaHallApi = {
     return axiosApi.get(`/cinemaHall/cinema/${id}?keyword=${keyword}`);
   },
 
+  getCinemaHallById: (id) => {
+    return axiosApi.get(`/cinemaHall/${id}`);
+  },
+
   getCinemaHallSeatById: (id) => {
     return axiosApi.get(`/cinemaHallSeat/cinemaHall/${id}`);
   },

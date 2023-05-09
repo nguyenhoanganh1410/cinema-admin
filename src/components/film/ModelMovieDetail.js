@@ -106,12 +106,18 @@ const ModelDetailMovie = ({ showModalDetailMovie, setShowModalDetailMovie,select
       setEndDate(response.endDate);
       setStatus(response.isActived);
       setImage(response.image);
+     
+      let trailerTpm = " "
+      if(response.linkTrailer !== "undefined"){
+        trailerTpm = response.linkTrailer
+      }
+
       form.setFieldsValue({
         id: response.id,
         nameMovie: response.nameMovie,
         cast: response.cast,
         director: response.director,
-        linkTrailer: response.linkTrailer,
+        linkTrailer: trailerTpm,
         category: response.idCategoryMovie,
         time: response.duration,
         releaseDate: moment(response.releaseDate),

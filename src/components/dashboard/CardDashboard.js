@@ -21,7 +21,7 @@ const CardDashboard_Revenue = ({ total, ratio, rs }) => {
       <Text className="card_title">Doanh thu</Text>
       <div className="card_content">
         <Text className="card_content_text">
-          {total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+          {total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}đ
         </Text>
         <div className="card_content-div">
           <LineChartOutlined />
@@ -38,7 +38,7 @@ const CardDashboard_Revenue = ({ total, ratio, rs }) => {
           }}
         >
           {" "}
-          {rs?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}{" "}
+          {rs?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}đ
         </span>{" "}
         trong tháng này
       </Text>
@@ -52,7 +52,7 @@ const CardDashboard_NewCus = ({ total, ratio, rs }) => {
       <Text className="card_title">Khách hàng mới</Text>
       <div className="card_content">
         <Text className="card_content_text">
-          {total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+          {total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} KH
         </Text>
         <div className="card_content-div">
           <LineChartOutlined />
@@ -69,7 +69,7 @@ const CardDashboard_NewCus = ({ total, ratio, rs }) => {
           }}
         >
           {" "}
-          {rs?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}{" "}
+          {rs?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} KH
         </span>{" "}
         trong tháng này
       </Text>
@@ -83,7 +83,7 @@ const CardDashboard_Ticket = ({ total, ratio, rs }) => {
       <Text className="card_title">Tổng số vẽ bán ra</Text>
       <div className="card_content">
         <Text className="card_content_text">
-          {total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+          {total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} Vé
         </Text>
         <div className="card_content-div">
           <LineChartOutlined />
@@ -100,7 +100,7 @@ const CardDashboard_Ticket = ({ total, ratio, rs }) => {
           }}
         >
           {" "}
-          {rs?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}{" "}
+          {rs?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}{" "} Vé
         </span>{" "}
         trong tháng này
       </Text>
@@ -114,7 +114,7 @@ const CardDashboard_Refund = ({ total, ratio, rs }) => {
       <Text className="card_title">Tổng số vé trả</Text>
       <div className="card_content">
         <Text className="card_content_text">
-          {total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+          {total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} Vé
         </Text>
         <div className="card_content-div">
           <LineChartOutlined />
@@ -131,7 +131,7 @@ const CardDashboard_Refund = ({ total, ratio, rs }) => {
           }}
         >
           {" "}
-          {rs?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}{" "}
+          {rs?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} Vé
         </span>{" "}
         trong tháng này
       </Text>

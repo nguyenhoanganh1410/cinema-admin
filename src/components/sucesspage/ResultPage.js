@@ -15,8 +15,6 @@ import openAddressApi from "../../api/openApi";
 const ResultPage = ({ setCurrent, setIsSucess, idOrder }) => {
   const booking = useSelector((state) => state.booking);
   let componentRef = useRef();
-  console.log("b", idOrder);
-
   const [order, setOrder] = useState(null);
   const [orderDetail, setOrderDetail] = useState([]);
   const [detailSeatNomal, setDetailSeatNomal] = useState([]);
@@ -307,6 +305,7 @@ const ResultPage = ({ setCurrent, setIsSucess, idOrder }) => {
 
   const handleReset = () => {
     setCurrent(0);
+    setIsSucess(false)
   };
 
   const handlePrint = () => {};

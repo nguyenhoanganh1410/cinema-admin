@@ -79,7 +79,7 @@ const ModelDetailMovie = ({
   const [orderDetailProduct, setOrderDetailProduct] = useState([]);
   const [orderDetailPromotion, setOrderDetailPromotion] = useState([]);
   const [order, setOrder] = useState({});
-
+  console.log(order?.Customer?.firstName);
   const columnsSeat = [
     {
       title: "Vị trí",
@@ -93,7 +93,7 @@ const ModelDetailMovie = ({
       title: "Giá",
       dataIndex: "price",
       render: (val) => {
-        return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "đ";
       },
     },
     {
@@ -119,7 +119,7 @@ const ModelDetailMovie = ({
       title: "Giá",
       dataIndex: "priceProduct",
       render: (val) => {
-        return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "đ";
       },
     },
   ];
@@ -137,7 +137,7 @@ const ModelDetailMovie = ({
       title: "Tiền giảm",
       dataIndex: "discount",
       render: (val) => {
-        return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "đ";
       },
     },
   ];
@@ -365,7 +365,7 @@ const ModelDetailMovie = ({
                 fontWeight: "bold",
               }}
             >
-              HỆ THỐNG RẠP CHIẾU PHIM CINEMA-START
+              HỆ THỐNG RẠP CHIẾU PHIM CINEMA HUB
             </span>
             <span
               style={{
@@ -431,15 +431,17 @@ const ModelDetailMovie = ({
                   <span className="info">
                     Nhân viên:
                     <span>
-                      {" "}
-                      {order?.Staff?.firstName + order?.Staff?.lastName}{" "}
+                      {
+                        order?.Staff ? + " " + 
+                        order?.Staff?.firstName + order?.Staff?.lastName : " KH đặt Online"
+                      }
                     </span>
                   </span>
                 </Col>
                 <Col span={12}>
                   <span className="info">
                     Khách hàng:
-                    <span> {order?.customerName} </span>
+                    <span> {order?.customerName ? order?.customerName : order?.Customer?.firstName + " " + order?.Customer?.lastName}</span>
                   </span>
                 </Col>
               </Row>
@@ -595,7 +597,7 @@ const ModelDetailMovie = ({
   return (
     <>
       <Drawer
-        title="Thông tin chi tiết hoán đơn"
+        title="Thông tin chi tiết hoá đơn"
         width={720}
         onClose={onClose}
         open={showModalDetailMovie}
@@ -644,19 +646,26 @@ const ModelDetailMovie = ({
             </Col>
           </Row>
           <Row gutter={16} style={{ marginBottom: "10px" }}>
+          
             <Col span={16}>
-              <span>
-                Nhân viên:
-                <span>
-                  {" "}
-                  {order?.Staff?.firstName + order?.Staff?.lastName}{" "}
+              
+                <span style={{ textTransform: "capitalize" }}>
+                  Nhân viên:
+                  <span>
+                    {order?.Staff
+                      ? " " +
+                        order?.Staff?.firstName +
+                        " " +
+                        order?.Staff?.lastName
+                      : " Khách đặt online"}
+                  </span>
                 </span>
-              </span>
+              
             </Col>
             <Col span={8}>
               <span>
                 Khách hàng:
-                <span> {order?.customerName} </span>
+                <span> {order?.customerName ? order?.customerName : order?.Customer?.firstName + " " + order?.Customer?.lastName}</span>
               </span>
             </Col>
           </Row>
@@ -678,7 +687,7 @@ const ModelDetailMovie = ({
             <Col span={16}>
               <span>
                 Phim:
-                <span> {order?.ShowMovie?.Show?.Movie?.nameMovie} </span>
+                <span style={{textTransform:"capitalize"}}> {order?.ShowMovie?.Show?.Movie?.nameMovie.toLowerCase()} </span>
               </span>
             </Col>
             <Col span={8}>
@@ -696,13 +705,27 @@ const ModelDetailMovie = ({
               </span>
             </Col>
             <Col span={8}>
-              <span>
+            <span>
+                Tổng tiền trước CK:
+                <span>
+                {" "}{order?.totatBefore
+                    ?.toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "đ"}
+                </span>
+              </span>
+             
+            </Col>
+          </Row>
+          <Row gutter={16} style={{ marginBottom: "10px" }}>
+            <Col span={16}></Col>
+            <Col span={8}>
+            <span>
                 Chiết khấu:
                 <span>
                   {" "}
                   {order?.totalDiscount
                     ?.toString()
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}{" "}
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",") +"đ"}
                 </span>
               </span>
             </Col>
@@ -711,26 +734,12 @@ const ModelDetailMovie = ({
             <Col span={16}></Col>
             <Col span={8}>
               <span>
-                Tổng tiền trước ck:
-                <span>
-                  {" "}
-                  {order?.totatBefore
-                    ?.toString()
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}{" "}
-                </span>
-              </span>
-            </Col>
-          </Row>
-          <Row gutter={16} style={{ marginBottom: "10px" }}>
-            <Col span={16}></Col>
-            <Col span={8}>
-              <span>
-                Tổng tiền sau ck:
+                Tổng tiền sau CK:
                 <span>
                   {" "}
                   {order?.totalPrice
                     ?.toString()
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}{" "}
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "đ"}
                 </span>
               </span>
             </Col>

@@ -30,7 +30,7 @@ import { setCinema, setUser } from "../../redux/actions";
 
 let schema = yup.object().shape({
   first_name: yup.string().trim().required(NOT_EMPTY),
-  last_name: yup.string().required(NOT_EMPTY),
+  last_name: yup.string().trim().required(NOT_EMPTY),
 });
 
 export const yupSync = {
@@ -47,7 +47,10 @@ const getBase64 = (file) =>
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = () => resolve(reader.result);
-    reader.onerror = (error) => reject(error);
+    reader.onerror = (error) => {
+      console.log(error);
+      reject(error);
+    }
   });
 
 const useUserHook = (showModalAddCustomer, setShowModalAddCustomer) => {
@@ -69,6 +72,7 @@ const useUserHook = (showModalAddCustomer, setShowModalAddCustomer) => {
     if (!file.url && !file.preview) {
       file.preview = await getBase64(file.originFileObj);
     }
+    console.log(file.url);
     setPreviewImage(file.url || file.preview);
     setPreviewOpen(true);
     setPreviewTitle(file.name || file.url.substring(file.url.lastIndexOf('/') + 1));

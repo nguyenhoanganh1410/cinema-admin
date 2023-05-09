@@ -21,7 +21,7 @@ const columns = [
     title: "Doanh thu",
     dataIndex: "totalPrice",
     render:(val) => {
-      return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+      return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " đ"
     }
   },
 ];
@@ -52,7 +52,7 @@ const columnsCus = [
     dataIndex: "totalPrice",
     width: "20%",
     render:(val) => {
-      return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+      return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " đ"
     }
   }
 ];

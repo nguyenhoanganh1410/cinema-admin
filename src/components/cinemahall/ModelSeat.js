@@ -29,7 +29,7 @@ const ModelSeat = ({possition, seat, handleLogic }) => {
           id, data
         );
         if (response) {
-          console.log("update success");
+      //    console.log("update success");
           setStatusSeatState(null)
           setStatusState(null)
           handleLogic();

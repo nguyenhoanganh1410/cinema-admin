@@ -80,7 +80,7 @@ const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newCustomer, setNewCustomer] = useState({});
-  const [textSearch, setTextSearch] = useState('')
+  const [textSearch, setTextSearch] = useState("");
   const [form] = Form.useForm();
 
   const reload = useSelector((state) => state.reload);
@@ -123,7 +123,7 @@ const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
   }, [seatPicked, pickProducts]);
 
   const handleSearchCustomer = async (e) => {
-    setTextSearch(e.target.value)
+    setTextSearch(e.target.value);
     const data = await customerApi.getCustomerByPhone(e.target.value);
     if (data.id) {
       setCustomerSearched(data);
@@ -136,7 +136,7 @@ const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
     setOptions([]);
   };
   const handleClickCustomer = () => {
-    setTextSearch("")
+    setTextSearch("");
     if (customerSearched) {
       setPay([...pay, { customer: customerSearched }]);
 
@@ -295,14 +295,12 @@ const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
         depatch(setReload(!reload));
         form.resetFields();
         setIsModalOpen(false);
-
       }
     } catch (error) {
       console.log(error.response.data.message);
       // const {message} = error.response.data
       message.error(error.response.data.message);
     }
-
   };
 
   const content = (
@@ -362,6 +360,9 @@ const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
             >
               <p className="p-custom">
                 Rạp: <span>{cinema?.name}</span>
+              </p>
+              <p className="p-custom">
+                Phòng: <span>{booking?.hall?.name}</span>
               </p>
               <p>
                 Suất chiếu:{" "}
@@ -440,8 +441,14 @@ const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
               <Input
                 placeholder="Nhập số điện thoại khách..."
                 onChange={handleSearchCustomer}
-               // value={pay[0]?.customer ? pay[0]?.customer?.phone : ""}
-               value={textSearch ? textSearch : pay[0]?.customer ? pay[0]?.customer?.phone : ""}
+                // value={pay[0]?.customer ? pay[0]?.customer?.phone : ""}
+                value={
+                  textSearch
+                    ? textSearch
+                    : pay[0]?.customer
+                    ? pay[0]?.customer?.phone
+                    : ""
+                }
               />
               {customerSearched ? (
                 <ul className="search_results">

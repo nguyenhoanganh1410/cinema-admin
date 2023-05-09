@@ -60,7 +60,11 @@ const IndexDashboard = () => {
           item.key = index + 1;
           return item;
         });
-        setDataTopMovie(response);
+        const newData = response.sort((a, b) => {
+          return b.totalPrice - a.totalPrice;
+      });
+        console.log(newData);
+        setDataTopMovie(newData);
       } catch (error) {
         console.log("Failed to fetch top movie: ", error);
       }

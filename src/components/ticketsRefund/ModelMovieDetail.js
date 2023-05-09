@@ -386,7 +386,7 @@ const ModelDetailMovie = ({
                 Thông tin cơ bản
               </span>
             </Col>
-            <Col span={12}>
+            {/* <Col span={12}>
               <Button
                 style={{ float: "right" }}
                 onClick={handleExportExcel}
@@ -394,7 +394,7 @@ const ModelDetailMovie = ({
               >
                 Xuất excel
               </Button>
-            </Col>
+            </Col> */}
           </Row>
         </Space>
         <Form form={form} id="myForm" layout="vertical">

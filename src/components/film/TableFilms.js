@@ -53,9 +53,9 @@ const TableFilms = ({keyword,startDatePicker,endDatePicker}) => {
       dataIndex: "nameMovie",
       render: (text) => {
         if (text?.length > 30) {
-          return text?.substring(0, 30) + "...";
+          return <span style={{textTransform:"capitalize"}}>{text?.substring(0, 30).toLowerCase() + "..."}</span>
         } else {
-          return text;
+          return <span style={{textTransform:"capitalize"}}>{text.toLowerCase()}</span>
         }
       },
     },

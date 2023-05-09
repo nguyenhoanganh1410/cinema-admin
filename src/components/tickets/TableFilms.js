@@ -125,11 +125,11 @@ const TableFilms = ({ start_date, end_date }) => {
               title="Xem chi tiết"
               icon={<EyeOutlined />}
               onClick={() => {
-                console.log('showt',record.showTime),
-                console.log('day',moment(record.showDate).format("YYYY-MM-DD")),
-                console.log('cr_day',currentDay),
-                console.log('cr_time',currentTimes),
-                console.log('time',moment(record.showTime).format("HH:mm")),
+                // console.log('showt',record.showTime),
+                // console.log('day',moment(record.showDate).format("YYYY-MM-DD")),
+                // console.log('cr_day',currentDay),
+                // console.log('cr_time',currentTimes),
+                // console.log('time',moment(record.showTime).format("HH:mm")),
                 showModalDetail(record.id);
               }}
             ></Button>
@@ -224,10 +224,10 @@ const TableFilms = ({ start_date, end_date }) => {
     setIsModalOpen(true);
   };
   const handleOk = async () => {
+    form.submit()
     setIsModalOpen(false);
     const rs = form.getFieldValue("note");
     form.resetFields();
-    console.log(rs);
     const payload = {
       note: rs,
     }
@@ -321,7 +321,7 @@ const TableFilms = ({ start_date, end_date }) => {
                 ]}
               >
                 <Select
-                  placeholder="Hãy nhập lý do trả hàng"
+                  placeholder="Hãy chọn lý do trả hàng"
                   style={{
                     width: "100%",
                   }}
