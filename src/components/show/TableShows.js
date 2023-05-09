@@ -19,7 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setReload } from "../../redux/actions";
 import cinameApi from "../../api/cinemaApi";
 import movieApi from "../../api/movieApi";
-
+const { Option } = Select;
 const TableShows = ({ setShowModalAddCustomer, setTab }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);

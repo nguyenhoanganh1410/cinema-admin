@@ -31,7 +31,7 @@ const ModelAddPromotionHeader = ({
   setShowModalAddCustomer,
   selectedIdCinema,
 }) => {
-  const handleCancel = () => setPreviewOpen(false);
+ 
   const [form] = Form.useForm();
   const [cinemaInfo, setCinemaInfo] = useState({});
 
