@@ -227,9 +227,18 @@ const TableFilms = ({ start_date, end_date }) => {
     form.submit()
     setIsModalOpen(false);
     const rs = form.getFieldValue("note");
+    let text = ""
+    if(+rs === 1) {
+      text = "Khách muốn hủy vé"
+    }  else if (+rs === 2) {
+      text = "Khách đặt nhầm suất chiếu"
+    } else {
+      text = "Lý do khác"
+    }
+
     form.resetFields();
     const payload = {
-      note: rs,
+      note: text,
     }
     try {
       const res = await orderApi.refund(order?.id, payload);
@@ -325,6 +334,7 @@ const TableFilms = ({ start_date, end_date }) => {
                   style={{
                     width: "100%",
                   }}
+                  defaultValue="0"
                   // onChange={handleChangeCategory}
                   options={REASON_REFULT}
                 />

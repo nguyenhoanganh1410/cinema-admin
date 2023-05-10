@@ -14,6 +14,8 @@ import {
 } from "antd";
 import "./IndexRoomMap.scss";
 import cinemaHallApi from "../../api/cinemaHallApi";
+import { MESSAGE_UPDATE_SEAT_SUCCESS } from "../../constant";
+import { notifySucess } from "../../utils/Notifi";
 
 const ModelSeat = ({possition, seat, handleLogic }) => {
   const [form] = Form.useForm();
@@ -29,9 +31,9 @@ const ModelSeat = ({possition, seat, handleLogic }) => {
           id, data
         );
         if (response) {
-      //    console.log("update success");
           setStatusSeatState(null)
           setStatusState(null)
+          notifySucess(MESSAGE_UPDATE_SEAT_SUCCESS)
           handleLogic();
         }
       } catch (error) {
@@ -147,6 +149,7 @@ const ModelSeat = ({possition, seat, handleLogic }) => {
           {
             seat?.idProduct !== 1 ? 
             <Select
+            disabled
             placeholder="Loại ghế"
             onChange={handleChangeStatusSeat}
             name="statusSeat"
@@ -169,6 +172,7 @@ const ModelSeat = ({possition, seat, handleLogic }) => {
               ]}
             />  : 
             <Select
+            disabled
             placeholder="Loại ghế"
             onChange={handleChangeStatusSeat}
             name="statusSeatOk"

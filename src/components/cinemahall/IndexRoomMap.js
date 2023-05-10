@@ -72,7 +72,6 @@ const IndexCinemaMap = ({ setTab }) => {
     setSeat(null);
     setOpen(false)
     setChangeSeat(!changeSeat)
-    notifySucess(MESSAGE_UPDATE_SEAT_SUCCESS)
   }
   return (
     <div className="site-card-wrapper">

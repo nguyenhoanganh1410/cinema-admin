@@ -30,22 +30,6 @@ const IndexFilm = () => {
   const [startDatePicker, setStartDatePicker] = useState("");
   const [endDatePicker, setEndDatePicker] = useState("");
   const [keyword, setKeyword] = useState("");
-  // //model
-  // const [isModalOpen, setIsModalOpen] = useState(false);
-  // const showModal = () => {
-  //   setIsModalOpen(true);
-  // };
-  // const handleOk = () => {
-  //   setIsModalOpen(false);
-
-  //   //handle code for log out in here
-
-  //   ////////
-  // };
-  // const handleCancel = () => {
-  //   setIsModalOpen(false);
-  // };
-  // /////
 
   const showModal = () => {
     setShowModalAddCustomer(true);
@@ -78,11 +62,7 @@ const IndexFilm = () => {
           <Input
             placeholder="Nhập tên phim hoặc mã phim..."
             prefix={<SearchOutlined />}
-            onKeyUp={(e) => {
-              if (e.keyCode === 13) {
-                setKeyword(e.target.value);
-              }
-            }}
+            onChange={(e) => setKeyword(e.target.value)}
           />
         </Col>
         <Col span={9}>

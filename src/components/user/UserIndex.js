@@ -89,12 +89,13 @@ const UserInfo = () => {
                     fileList={fileList}
                     onPreview={handlePreview}
                     onChange={handleChange}
+                    accept=".jpg,.jpeg,.png"
                   >
                     {fileList.length >= 1 ? null : uploadButton}
                   </Upload>
                   <Modal
                     open={previewOpen}
-                    title={previewTitle}
+                   // title={previewTitle}
                     footer={null}
                     onCancel={handleCancel}
                   >
@@ -204,7 +205,7 @@ const UserInfo = () => {
             </Row>
           </Form>
 
-          <Form style={{ marginTop: "2rem" }}>
+          {/* <Form style={{ marginTop: "2rem" }}>
             <Row style={{ marginTop: "0.5rem" }} gutter={16}>
               <Col
                 span={10}
@@ -290,7 +291,7 @@ const UserInfo = () => {
                 <Button type="primary">Save</Button>
               </Col>
             </Row>
-          </Form>
+          </Form> */}
         </Col>
       </Row>
     </div>

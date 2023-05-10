@@ -26,7 +26,7 @@ const TableFilms = ({keyword,startDatePicker,endDatePicker}) => {
 
   const depatch = useDispatch();
   const reload = useSelector((state) => state.reload);
-
+  console.log(keyword);
   const showModalDetail = (e) => {
     setShowModalDetailMovie(true);
     setSelectedId(e);
@@ -132,17 +132,17 @@ const TableFilms = ({keyword,startDatePicker,endDatePicker}) => {
           </Tag>
         );
       },
-      filters: [
-        {
-          text: "Hoạt động",
-          value: "Hoạt động",
-        },
-        {
-          text: "Ngừng hoạt động",
-          value: "Ngừng hoạt động",
-        },
-      ],
-      onFilter: (value, record) => record.status.indexOf(value) === 0,
+      // filters: [
+      //   {
+      //     text: "Hoạt động",
+      //     value: "Hoạt động",
+      //   },
+      //   {
+      //     text: "Ngừng hoạt động",
+      //     value: "Ngừng hoạt động",
+      //   },
+      // ],
+      // onFilter: (value, record) => record.status.indexOf(value) === 0,
     },
     {
       render: (val,record) => {

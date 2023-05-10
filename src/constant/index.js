@@ -16,11 +16,15 @@ export const MESSAGE_NOT_ACCEPT =
 
 export const REASON_REFULT = [
   {
-    value: 1,
+    value: "0",
+    label: "Lý do khác",
+  },
+  {
+    value: "1",
     label: "Khách muốn hủy vé",
   },
   {
-    value: 2,
+    value: "2",
     label: "Khách đặt nhầm suất chiếu ",
   },
 ];

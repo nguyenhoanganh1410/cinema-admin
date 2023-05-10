@@ -458,7 +458,7 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
   return (
     <>
       <Drawer
-        title="Tạo mới bảng giá"
+        title="Tạo mới suất chiếu"
         width={720}
         onClose={onClose}
         open={showModalAddCustomer}
@@ -563,12 +563,12 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
                   }}
                   placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
                   onChange={onChangeDate}
-                  // disabledDate={
-                  //   (current) => {
-                  //     return current && current < moment().endOf('day');
-                  //   }
-                  // }
-                  disabledDate={disabledDate}
+                  disabledDate={
+                    (current) => {
+                      return current && current < moment().endOf('day');
+                    }
+                  }
+                 // disabledDate={disabledDate}
                   disabled={moviePicked ? false : true}
                 />
               </Form.Item>

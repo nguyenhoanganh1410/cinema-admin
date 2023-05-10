@@ -54,11 +54,7 @@ const IndexCinema = ({ setTab, setSelectedIdCinema, setStatusDb }) => {
           <Input
             placeholder="Nhập tên rạp hoặc mã rạp"
             prefix={<SearchOutlined />}
-            onKeyUp={(e) => {
-              if (e.keyCode === 13) {
-                setKeyword(e.target.value);
-              }
-            }}
+            onChange={(e) =>  setKeyword(e.target.value)}
           />
         </Col>
         <Col span={8}>
