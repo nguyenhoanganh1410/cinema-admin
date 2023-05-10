@@ -15,6 +15,7 @@ function App() {
   const depatch = useDispatch();
   const user = useSelector((state) => state.user);
   const pathname = window.location.pathname
+  console.log(pathname)
   React.useEffect(() => {
     const userInLocalStorage = tokenService.getUser();
     if (userInLocalStorage) {
@@ -25,7 +26,7 @@ function App() {
         depatch(setCinema(data))
       } 
       getCinemaId(userInLocalStorage?.staff?.cinema_id)
-    } else if(!userInLocalStorage) {
+    } else if(!userInLocalStorage && pathname !== "/auth/reset-password") {
       navigator("/login");
     }
   }, []);
