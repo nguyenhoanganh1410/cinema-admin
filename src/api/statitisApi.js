@@ -4,11 +4,11 @@ const statitisApi = {
   getRevenueByCustomer: (params) => {
     if (!params?.customer_id) {
       return axiosApi.get(
-        `/statistics/revenuebycustomer?start_date=${params.start_date}&end_date=${params.end_date}&cinema_id=${params.cinema_id}`
+        `/statistics/revenuebycustomer?start_date=${params.start_date}&end_date=${params.end_date}&cinema_id=${params?.cinema_id}`
       );
     } else {
       return axiosApi.get(
-        `/statistics/revenuebycustomer?staff_id=${params?.customer_id}&start_date=${params.start_date}&end_date=${params.end_date}&cinema_id=${params.cinema_id}`
+        `/statistics/revenuebycustomer?customer_id=${params?.customer_id}&start_date=${params.start_date}&end_date=${params.end_date}&cinema_id=${params.cinema_id}`
       );
     }
   },

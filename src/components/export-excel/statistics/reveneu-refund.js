@@ -34,7 +34,7 @@ export async function exportExcel (data, start_date, end_date) {
 
 
     const worksheet = workbook.addWorksheet
-    ('DTBN_MV',{ 
+    ('TKTH',{ 
         views: [{ showGridLines: false }],
         pageSetup: { paperSize: 9, orientation: 'landscape' },
         properties: { defaultColWidth: 20, defaultRowHeight: 30 },
@@ -42,11 +42,11 @@ export async function exportExcel (data, start_date, end_date) {
     worksheet.addRow(['Hệ thống rạp chiếu phim CMS'])
     worksheet.addRow(['04 Nguyễn Văn Bảo, phường 2, quận Gò Vấp, thành phố Hồ Chí Minh'])
     worksheet.addRow(['Ngày xuất báo cáo: ' + new Date().toLocaleDateString()])
-    worksheet.addRow(['DOANH THU THEO PHIM'])
+    worksheet.addRow(['BẢNG THỐNG KÊ CHI TIẾT HÓA ĐƠN TRẢ VÉ'])
     worksheet.addRow(['Từ ngày: ' + start_date +"         "+' Đến ngày ' + end_date])
     worksheet.addRow([])
     worksheet.addRow(
-        ['STT','Mã Phim', 'Tên Phim', 'Ngày','Số vé', 'Chiết khấu', 'Doanh số trước CK', 'Doanh số sau CK'],
+        ['STT','Mã HD', 'Ngày mua', 'Ngày trả','Số lượng', 'Chiết khấu', 'Doanh số trước CK', 'Doanh số sau CK'],
     )
     // set font header
    
@@ -69,9 +69,9 @@ export async function exportExcel (data, start_date, end_date) {
     worksheet.getCell('G7').fill = colorHeader;
     worksheet.getCell('H7').fill = colorHeader;
 
-    worksheet.mergeCells('A1:C1');
-    worksheet.mergeCells('A2:C2');
-    worksheet.mergeCells('A3:C3');
+    worksheet.mergeCells('A1:D1');
+    worksheet.mergeCells('A2:D2');
+    worksheet.mergeCells('A3:D3');
 
     worksheet.mergeCells('A4:H4');
     worksheet.mergeCells('A5:H5');
@@ -79,9 +79,9 @@ export async function exportExcel (data, start_date, end_date) {
 
     worksheet.columns = [
         { key: 'index', width: 5 },
-        { key: 'id', width: 10 },
-        { key: 'name', width: 35 },
-        { key: 'date', width: 20 },
+        { key: 'id', width: 15 },
+        { key: 'createdAt', width: 20 },
+        { key: 'refundAt', width: 20 },
         { key: 'count', width: 10 },
         { key: 'discount', width: 25 },
         { key: 'revenueBeforeDiscount', width: 25 },
@@ -98,24 +98,55 @@ export async function exportExcel (data, start_date, end_date) {
 
     worksheet.getColumn('index').font = fontNormal;
     worksheet.getColumn('id').font = fontNormal;
-    worksheet.getColumn('name').font = fontNormal;
-    worksheet.getColumn('date').font = fontNormal;
+    worksheet.getColumn('createdAt').font = fontNormal;
+    worksheet.getColumn('refundAt').font = fontNormal;
     worksheet.getColumn('count').font = fontNormal;
     worksheet.getColumn('discount').font = fontNormal;
     worksheet.getColumn('revenueBeforeDiscount').font = fontNormal;
     worksheet.getColumn('revenueAfterDiscount').font = fontNormal;
 
+    // await Promise.all(data.map(async (item, index) => {
+    //     worksheet.addRow({
+    //         index: index + 1,
+    //         id: item?.id,
+    //         createdAt: moment(item.createdAt).format('DD/MM/YYYY HH:mm'),
+    //         refundAt: moment(item.refundDate).format('DD/MM/YYYY HH:mm'),
+    //         count: item.qty,
+    //         discount: item.totalDiscount,
+    //         revenueBeforeDiscount: item.totalBeforeDiscount,
+    //         revenueAfterDiscount: item.totalPrice,
+    //     })
+
+    //     // if ( index < data.length - 1) {
+    //         const detail = await statitisApi.getRefundDetail(item.id)
+    //         if (detail) {
+    //             detail.forEach((item, index) => {
+    //                 worksheet.addRow({
+    //                     index: '',
+    //                     id: item.Product.id,
+    //                     createdAt: item.Product.productName,
+    //                     refundAt: item.Product.type === 'SP' ? 'Sản phẩm' : 'Ghế',
+    //                     count: item.amount,
+    //                     discount:'',
+    //                     revenueBeforeDiscount:'',
+    //                     revenueAfterDiscount: item.total,
+    //                 }).alignment = alignmentRight;
+    //             })
+    //         }
+    //     // }
+    // }))
+
     for (let i = 0; i< data.length; i++) {
         const item = data[i]
         worksheet.addRow({
-            index: index_curr,
-            id: item?.idMovie,
-            name: item?.name,
-            date: moment(item.createdAt).format('DD/MM/YYYY'),
-            count: item.tickets,
-            discount: item.discount,
-            revenueBeforeDiscount: item.totalDiscount,
-            revenueAfterDiscount: item.total,
+            index: i + 1,
+            id: item?.id,
+            createdAt: moment(item.createdAt).format('DD/MM/YYYY HH:mm'),
+            refundAt: moment(item.refundDate).format('DD/MM/YYYY HH:mm'),
+            count: item.qty,
+            discount: item.totalDiscount,
+            revenueBeforeDiscount: item.totalBeforeDiscount,
+            revenueAfterDiscount: item.totalPrice,
         })
 
         const val = worksheet.getCell(`B${row_index}`).value
@@ -129,30 +160,25 @@ export async function exportExcel (data, start_date, end_date) {
             worksheet.getCell(`G${row_index}`).fill = colorItem;
             worksheet.getCell(`H${row_index}`).fill = colorItem;
 
-            count += item.tickets
-            discount += item.discount
-            total_revenue_before_discount += item.totalDiscount
-            total_revenue += item.total
+            count += item.qty
+            discount += item.totalDiscount
+            total_revenue_before_discount += item.totalBeforeDiscount
+            total_revenue += item.totalPrice
         }
         if ( i < data.length ) {
-            const show = await statitisApi.getRevenueByShow({
-                date: item.createdAt,
-                idMovie: item.idMovie
-            })
-            show.sort((a, b) => {
-                return new Date(a.time) - new Date(b.time)
-            })
-
-            for (let i = 0; i < show.length; i++) {
+            const detail = await statitisApi.getRefundDetail(item.id)
+            
+            for (let i = 0; i < detail.length; i++) {
+                const item = detail[i]
                 worksheet.addRow({
                     index: '',
-                    id: '',
-                    name:'',
-                    date:  show[i].time,
-                    count: show[i].count,
-                    discount: show[i].discount,
-                    revenueBeforeDiscount: show[i].totalDiscount,
-                    revenueAfterDiscount: show[i].total,
+                    id: item.Product.id,
+                    createdAt: item.Product.productName,
+                    refundAt: item.Product.type === 'SP' ? 'Sản phẩm' : 'Ghế',
+                    count: Number(item.amount),
+                    discount:'',
+                    revenueBeforeDiscount:'',
+                    revenueAfterDiscount: item.total,
                 }).alignment = alignmentRight;
                 row_index++
             }
@@ -163,8 +189,9 @@ export async function exportExcel (data, start_date, end_date) {
 
     worksheet.addRow({
         index: 'Tổng cộng',
-        name: '',
-        date: '',
+        id: '',
+        createdAt: '',
+        refundAt: '',
         count: count,
         discount: discount, 
         revenueBeforeDiscount: total_revenue_before_discount,
@@ -172,7 +199,7 @@ export async function exportExcel (data, start_date, end_date) {
     }).font = fontBold;
 
     const val = worksheet.lastRow.number
-    // console.log('v',val)
+    // // console.log('v',val)
 
     for (let i = 8; i <= val; i++) {
         worksheet.getRow(i).height = 20;
@@ -220,7 +247,7 @@ export async function exportExcel (data, start_date, end_date) {
     worksheet.getRow(7).height = 30;
     worksheet.getRow(7).alignment = alignmentCenter;
 
-    const fileName = `DTBH_MV_${new Date().toLocaleDateString()}.xlsx`
+    const fileName = `TKTH_${new Date().toLocaleDateString()}.xlsx`
     const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     const xls64 = workbook.xlsx.writeBuffer().then((buffer) => {
         const blob = new Blob([buffer], { type: fileType })

@@ -20,6 +20,7 @@ const TableData = ({ data }) => {
     {
       title: "Số lượng",
       dataIndex: "qty",
+      align: "right",
       render: (val) => {
         return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
       },
@@ -27,6 +28,7 @@ const TableData = ({ data }) => {
     {
       title: "Chiết khấu",
       dataIndex: "totalDiscount",
+      align: "right",
       render: (val) => {
         return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
       },
@@ -34,6 +36,7 @@ const TableData = ({ data }) => {
     {
       title: "Doanh số trước CK",
       dataIndex: "totalBeforeDiscount",
+      align: "right",
       render: (val) => {
         return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
       },
@@ -41,6 +44,7 @@ const TableData = ({ data }) => {
     {
       title: "Doanh số sau CK",
       dataIndex: "totalPrice",
+      align: "right",
       render: (val) => {
         return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
       },

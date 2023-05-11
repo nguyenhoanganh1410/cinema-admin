@@ -22,6 +22,7 @@ const TableData = ({ data }) => {
         {
             title: 'Số lượng sử dụng',
             dataIndex: 'count',
+            align: "right",
             render: (val) => {
                 return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
             }
@@ -29,6 +30,7 @@ const TableData = ({ data }) => {
         {
             title: 'Số tiền CK',
             dataIndex: 'discount',
+            align: "right",
             render: (val) => {
                 if (val === 0) return "0";
                 return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -37,6 +39,7 @@ const TableData = ({ data }) => {
         {
             title: 'Ngân sách tổng',
             dataIndex: 'budget',
+            align: "right",
             render: (val) => {
                 return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
             }
@@ -44,6 +47,7 @@ const TableData = ({ data }) => {
         {
             title: 'Ngân sách đã dùng',
             dataIndex: 'totalUsed',
+            align: "right",
             render: (val) => {
                 return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
             }
@@ -51,6 +55,7 @@ const TableData = ({ data }) => {
         {
             title: 'Ngân sách còn lại',
             dataIndex: 'budgetLeft',
+            align: "right",
             render: (val) => {
                 return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
             }
