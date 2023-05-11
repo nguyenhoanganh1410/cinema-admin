@@ -59,7 +59,6 @@ const ModelAddCustomer = ({
       startDate: startDatePicked,
       endDate: endDatePicked,
       note: values.note,
-      status: 1,
       userCreate:user.id,
     }
     const res = await priceApi.createPriceHeader(data);
