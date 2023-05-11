@@ -386,13 +386,13 @@ const TableShows = ({ setShowModalAddCustomer, setTab }) => {
           >
             Thêm
           </Button>
-          <Button
+          {/* <Button
             type="primary"
             icon={<ScheduleOutlined />}
             onClick={() => handleShowChart()}
           >
             Xem lịch chiếu
-          </Button>
+          </Button> */}
         </div>
       </div>
       <Table
