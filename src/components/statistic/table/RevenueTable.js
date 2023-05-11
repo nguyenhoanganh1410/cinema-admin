@@ -47,6 +47,7 @@ const columnsWithEmployee = [
   {
     title: "Doanh số trước chiết khấu",
     dataIndex: "totalDiscount",
+    align: "right",
     render:(val) => {
       return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
     }
@@ -54,6 +55,7 @@ const columnsWithEmployee = [
   {
     title: "Chiết khấu",
     dataIndex: "discount",
+    align: "right",
     render:(val) => {
       return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
     }
@@ -61,6 +63,7 @@ const columnsWithEmployee = [
   {
     title: "Doanh số sau chiết khấu",
     dataIndex: "total",
+    align: "right",
     render:(val) => {
       return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
     }
@@ -107,35 +110,6 @@ const columnsCustomerStattits = [
     sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
   },
   {
-    title: "Số vé",
-    dataIndex: "tickets",
-
-    sorter: (a, b) => a.totalOrder - b.totalOrder,
-  },
-  {
-    title: "DS trước CK",
-    dataIndex: "totalDiscount",
-    render:(val) => {
-      return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-    }
-  },
-  {
-    title: "Chiết khấu",
-    dataIndex: "discount",
-    render:(val) => {
-      return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-    }
-  },
-  {
-    title: "DS sau CK",
-    dataIndex: "total",
-    render:(val) => {
-      return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-    }
-    // defaultSortOrder: 'descend',
-    // sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt )
-  },
-  {
     title: "Xã",
     dataIndex: "ward",
   },
@@ -147,6 +121,41 @@ const columnsCustomerStattits = [
     title: "Tỉnh",
     dataIndex: "city",
   },
+  {
+    title: "Số vé",
+    dataIndex: "tickets",
+    align: "right",
+
+    sorter: (a, b) => a.totalOrder - b.totalOrder,
+  },
+  {
+    title: "Chiết khấu",
+    dataIndex: "discount",
+    align: "right",
+    render:(val) => {
+      return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    }
+  },
+  {
+    title: "DS trước CK",
+    dataIndex: "totalDiscount",
+    align: "right",
+    render:(val) => {
+      return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    }
+  },
+
+  {
+    title: "DS sau CK",
+    dataIndex: "total",
+    align: "right",
+    render:(val) => {
+      return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    }
+    // defaultSortOrder: 'descend',
+    // sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt )
+  },
+  
 ];
 
 const columnsFilmStattits = [
@@ -167,35 +176,35 @@ const columnsFilmStattits = [
   {
     title: "Số vé",
     dataIndex: "tickets",
-  },
-  {
-    title: "Doanh số trước chiết khấu",
-    dataIndex: "totalDiscount",
-    render:(val) => {
-      return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-    }
+    align: "right",
   },
   {
     title: "Chiết khấu",
     dataIndex: "discount",
+    align: "right",
     render:(val) => {
       return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
     }
   },
   {
+    title: "Doanh số trước chiết khấu",
+    dataIndex: "totalDiscount",
+    align: "right",
+    render:(val) => {
+      return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    }
+  },
+  
+  {
     title: "Doanh số sau chiết khấu",
     dataIndex: "total",
+    align: "right",
     render:(val) => {
       return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
     }
   },
 ];
 
-const colPromotion = [
-  {
-    
-  }
-]
 
 
 const onChange = (pagination, filters, sorter, extra) => {
@@ -219,27 +228,32 @@ const ExpandedRowRender = ({ record }) => {
       title: "Số vé",
       dataIndex: "count",
       key: "count",
-    },
-    {
-      title: "DS trước CK",
-      dataIndex: "totalDiscount",
-      key: "totalDiscount",
-      render:(val) => {
-        return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-      }
+      align: "right",
     },
     {
       title: "Chiết khấu",
       dataIndex: "discount",
       key: "discount",
+      align: "right",
       render:(val) => {
         return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       }
     },
     {
+      title: "DS trước CK",
+      dataIndex: "totalDiscount",
+      key: "totalDiscount",
+      align: "right",
+      render:(val) => {
+        return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+      }
+    },
+    
+    {
       title: "DS sau CK",
       dataIndex: "total",
       key: "total",
+      align: "right",
       render:(val) => {
         return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       }

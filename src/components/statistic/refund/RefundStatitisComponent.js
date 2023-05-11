@@ -18,6 +18,8 @@ import useCustomerComponentHook from "./useCustomerComponentHook";
 import TableData from "./TableData";
 import statitisApi from "../../../api/statitisApi";
 import TableExpand from "./TableExpand";
+import { exportExcel } from "../../export-excel/statistics/reveneu-refund";
+
 const { Title, Text } = Typography;
 
 const { RangePicker } = DatePicker;
@@ -69,6 +71,11 @@ const RefundStatitisComponent = () => {
     setType(value);
   };
 
+  const handleExportExcel = async () => {
+    console.log(data);
+    await exportExcel(data, dayjs(start_date).format('DD/MM/YYYY'), dayjs(end_date).format('DD/MM/YYYY'));
+  };
+
   return (
     <div className="site-card-wrapper">
       <Title level={5} style={{ marginBottom: "1rem" }}>
@@ -112,7 +119,9 @@ const RefundStatitisComponent = () => {
           />
         </Col>
         <Col span={4} style={{ position: "absolute", right: "2.5%" }}>
-          <Button type="primary" title="Xuất file">
+          <Button type="primary" title="Xuất file"
+            onClick={handleExportExcel}
+          >
             Xuất báo cáo
           </Button>
         </Col>

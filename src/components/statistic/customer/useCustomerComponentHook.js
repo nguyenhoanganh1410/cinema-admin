@@ -17,8 +17,8 @@ const useCustomerComponentHook = () => {
   const [params, setParams] = useState({
     end_date: moment().format(dateFormat),
     start_date: moment().startOf("month").format(dateFormat),
-    cinema_id: user?.cinema_id || 1,
-    customer_id: null,
+    cinema_id: "",
+    customer_id: "",
   });
 
   const onChangeDate = (date, dateString) => {
@@ -29,7 +29,16 @@ const useCustomerComponentHook = () => {
     });
   };
 
+  const onChangeCustomer = (value) =>{
+    if ( value === undefined) {
+      setParams({...params, customer_id: ""})
+      return;
+    }
+    setParams({...params, customer_id: value})
+  };
+
   useEffect(() => {
+    console.log(params);
     fetchRevenueByCustomer(params)
       .then((data) => {
         if (data.length === 0) {
@@ -44,9 +53,9 @@ const useCustomerComponentHook = () => {
             return {
               ...val,
               createdAt: val?.createdAt.substring(0, 10),
-              discount: val?.discount.toString(),
-              totalDiscount: val?.totalDiscount.toString(),
-              total: val?.total.toString(),
+              discount: val?.discount,
+              totalDiscount: val?.totalDiscount,
+              total: val?.total,
               idCustomer: val?.Customer?.id,
               name: val?.Customer?.phone === SDT_VANG_LAI ? "Khách vãng lai" : val?.Customer?.firstName + " " + val?.Customer?.lastName,
               phone: val?.Customer.phone,
@@ -87,7 +96,8 @@ const useCustomerComponentHook = () => {
   return {
     revenues,
     onChangeDate,
-    listCinema
+    listCinema,
+    onChangeCustomer
   };
 };
 
