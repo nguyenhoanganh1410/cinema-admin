@@ -473,7 +473,14 @@ const IndexLinePromotion = ({ setTab }) => {
             <Form.Item name="id" hidden={true}>
               <Input />
             </Form.Item>
-            <Form.Item name="promotionCode" label="Mã CT Khuyến mãi">
+            <Form.Item name="promotionCode" label="Mã CT Khuyến mãi"
+              rules={[
+                {
+                  required: true,
+
+                }
+              ]}
+            >
               <Input disabled={true} />
             </Form.Item>
           </Col>
@@ -483,18 +490,39 @@ const IndexLinePromotion = ({ setTab }) => {
             <Form.Item
               name="namePromotion"
               label="Tên CT Khuyến mãi"
-              rules={[yupSync]}
+              rules={[
+                {
+                  required: true,
+                  message: "Hãy nhập tên CT khuyến mãi...",
+                }
+              ]}
             >
               <Input
-                disabled={statusDb === true ? true : false}
+                disabled={statusDb === 1 ? true : false}
                 placeholder="Hãy nhập tên CT khuyến mãi..."
               />
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label="Ngày bắt đầu" name="date">
+            <Form.Item label="Thời gian hoạt động" name="date"
+              rules={[
+                {
+                  required: true,
+                  message: "Hãy chọn thời gian hoạt động...",
+                }
+              ]}
+            >
               <RangePicker
-                disabled={[moment().diff( moment(startDate), "seconds" ) > 0 ? true : false, false]}
+                disabled={
+                  statusDb === 1
+                    ? true
+                    : false || [
+                        moment().diff(moment(startDate), "seconds") > 0
+                          ? true
+                          : false,
+                        false,
+                      ]
+                }
                 placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
                 onChange={onChangeDate}
                 disabledDate={(current) => {
@@ -516,7 +544,7 @@ const IndexLinePromotion = ({ setTab }) => {
               type="file"
             >
               <Upload
-                disabled={statusDb === true ? true : false}
+                disabled={statusDb === 1 ? true : false}
                 style={{ fontSize: "0.2rem" }}
                 name="logo"
                 customRequest={dummyRequest}
@@ -563,16 +591,10 @@ const IndexLinePromotion = ({ setTab }) => {
             <Form.Item
               name="rankCustomer"
               label="Nhóm khách hàng áp dụng"
-              rules={[
-                {
-                  required: true,
-                  message: "Hãy Chọn nhóm khách hàng áp dụng.",
-                },
-              ]}
             >
               <Select
                 disabled={
-                  currentDate > startDate || statusDb === true ? true : false
+                  currentDate > startDate || statusDb === 1 ? true : false
                 }
                 placeholder="Chọn nhóm khách hàng áp dụng"
                 style={{
@@ -591,7 +613,7 @@ const IndexLinePromotion = ({ setTab }) => {
           <Col span={24}>
             <Form.Item name="desc" label="Mô tả CTKM">
               <TextArea
-                disabled={statusDb === true ? true : false}
+                disabled={statusDb === 1 ? true : false}
                 rows={4}
                 placeholder="Nhập chi tiết CTKM"
                 // maxLength={6}
@@ -619,7 +641,8 @@ const IndexLinePromotion = ({ setTab }) => {
               Dòng khuyến mãi
             </span>
           </Space>
-          {/* {currentDate < startDate && statusDb === false ? ( */}
+          {currentDate < startDate ||
+          (currentDate < endDate && statusDb === 0) ? (
             <Button
               type="primary"
               onClick={() => handleOpenModel()}
@@ -631,7 +654,7 @@ const IndexLinePromotion = ({ setTab }) => {
             >
               Thêm
             </Button>
-         {/* // ) : null} */}
+          ) : null}
         </div>
         <Table columns={columns} dataSource={listPromotionLine} />
       </div>

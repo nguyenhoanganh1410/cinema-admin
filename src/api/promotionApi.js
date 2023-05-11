@@ -1,8 +1,8 @@
 import axiosApi from "./axisosApi";
 
 const promotionApi = {
-  getPromotionHeader: () => {
-    return axiosApi.get("/promotionHeader");
+  getPromotionHeader: ({ startDate, endDate}) => {
+    return axiosApi.get(`/promotionHeader?start_date=${startDate}&end_date=${endDate} `);
   },
   updatePromotionHeader: (data,id) => {
     return axiosApi.put(`/promotionHeader/${id}`, data, {
@@ -45,6 +45,9 @@ const promotionApi = {
   getAllPromotionLine: () => {
     return axiosApi.get("/promotionLine");
   },
+  delete: (id) => {
+    return axiosApi.delete(`/promotionHeader/${id}`);
+  }
 };
 
 export default promotionApi;

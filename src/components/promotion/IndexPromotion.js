@@ -124,7 +124,9 @@ const IndexPromotion = ({ setTab }) => {
         }}
       >
         <Col span={24}>
-          <TablePromotionHeader searchText={searchText} setTab={setTab} valueStatusPick={valueStatusPick}/>
+          <TablePromotionHeader searchText={searchText} setTab={setTab} valueStatusPick={valueStatusPick}
+            startDatePicker={startDatePicker} endDatePicker={endDatePicker}
+          />
         </Col>
       </Row>
       {showModalAddCustomer ? (

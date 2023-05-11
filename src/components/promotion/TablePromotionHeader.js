@@ -1,12 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { Button, Table, Modal, Space, Badge } from "antd";
+import { Button, Table, Modal, Space, Badge, message } from "antd";
 import promotionApi from "../../api/promotionApi";
 import { setPromotionHeader } from "../../redux/actions";
 import { useDispatch, useSelector } from "react-redux";
 import { setReload } from "../../redux/actions";
 import moment from "moment";
+import {
+  DeleteOutlined,
 
-const TablePromotionHeader = ({ setTab, valueStatusPick, searchText }) => {
+} from "@ant-design/icons";
+
+const TablePromotionHeader = ({
+  setTab,
+  valueStatusPick,
+  searchText,
+  startDatePicker,
+  endDatePicker,
+}) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [promotionHeaderList, setPromotionHeaderList] = useState([]);
@@ -14,6 +24,8 @@ const TablePromotionHeader = ({ setTab, valueStatusPick, searchText }) => {
   const [promotionHeaderListTmp, setPromotionHeaderListTmp] = useState([]);
   const dispatch = useDispatch();
   const reload = useSelector((state) => state.reload);
+  const [selectedId, setSelectedId] = useState([]);
+
 
   //handle delete customer in here...
   const handleDelete = () => {
@@ -26,7 +38,21 @@ const TablePromotionHeader = ({ setTab, valueStatusPick, searchText }) => {
   };
   const handleOk = () => {
     setIsModalOpen(false);
-
+    const deletePro = async () => {
+      try {
+        const rs = await promotionApi.delete(selectedId);
+        if (rs) {
+          message.success("Xóa thành công!");
+          dispatch(setReload(!reload));
+        } else {
+          message.error("Xóa thất bại!");
+        }
+      } catch (error) {
+        message.error("Xóa thất bại!");
+        console.log("Failed to fetch product list: ", error);
+      }
+    };
+    deletePro();
     //handle code for log out in here
   };
   const handleCancel = () => {
@@ -37,7 +63,10 @@ const TablePromotionHeader = ({ setTab, valueStatusPick, searchText }) => {
     //load
     const getListPromotionHeader = async () => {
       try {
-        const response = await promotionApi.getPromotionHeader();
+        const response = await promotionApi.getPromotionHeader({
+          startDate: startDatePicker,
+          endDate: endDatePicker,
+        });
         if (response) {
           console.log(response);
           //handle data
@@ -58,7 +87,7 @@ const TablePromotionHeader = ({ setTab, valueStatusPick, searchText }) => {
       }
     };
     getListPromotionHeader();
-  }, [reload]);
+  }, [reload, startDatePicker, endDatePicker]);
 
   useEffect(() => {
     if (valueStatusPick === 2) {
@@ -78,12 +107,14 @@ const TablePromotionHeader = ({ setTab, valueStatusPick, searchText }) => {
   }, [valueStatusPick]);
 
   useEffect(() => {
-    if(!searchText){
+    if (!searchText) {
       setPromotionHeaderList(promotionHeaderListTmp);
       return;
     }
     const newArr = promotionHeaderListTmp.filter((val) => {
-      return val?.promotionCode.toLowerCase().search(searchText.toLowerCase()) !== -1
+      return (
+        val?.promotionCode.toLowerCase().search(searchText.toLowerCase()) !== -1
+      );
     });
     setPromotionHeaderList(newArr);
   }, [searchText]);
@@ -92,6 +123,7 @@ const TablePromotionHeader = ({ setTab, valueStatusPick, searchText }) => {
     dispatch(setPromotionHeader(id));
     setTab(1);
   };
+  const currentDay = moment().format("YYYY-MM-DD");
 
   const columns = [
     {
@@ -123,11 +155,35 @@ const TablePromotionHeader = ({ setTab, valueStatusPick, searchText }) => {
       title: "Trạng thái",
       dataIndex: "statusPromotion",
       render: (text) => {
-        if (text === true) {
+        if (text === 1) {
           return <Badge status="success" text="Hoạt động" />;
         } else {
           return <Badge status="error" text="Ngưng hoạt đông" />;
         }
+      },
+    },
+    {
+      dataIndex: "id",
+      align: "center",
+      render: (val, record) => {
+        return (
+          <Space size="middle">
+            <Button
+              disabled={
+                currentDay >= moment(record.startDate).format("YYYY-MM-DD") ||
+                record.statusPromotion === true
+                  ? true
+                  : false
+              }
+              icon={<DeleteOutlined />}
+              onClick={() => {
+                setSelectedId(record.id);
+                handleDelete();
+              }}
+              danger
+            ></Button>
+          </Space>
+        );
       },
     },
   ];
@@ -136,10 +192,16 @@ const TablePromotionHeader = ({ setTab, valueStatusPick, searchText }) => {
     <div>
       <Table columns={columns} dataSource={promotionHeaderList} />
       <Modal
-        title="Xóa bộ phim"
+        title="Xóa chương trình khuyến mãi"
         open={isModalOpen}
-        onOk={handleOk}
-        onCancel={handleCancel}
+        footer={[
+          <Button key="back" onClick={handleCancel}>
+            Hủy
+          </Button>,
+          <Button key="submit" type="primary" onClick={handleOk}>
+            Xóa
+          </Button>,
+        ]}
       >
         <p>Bạn muốn xóa chương trình khuyến mãi này không?</p>
       </Modal>

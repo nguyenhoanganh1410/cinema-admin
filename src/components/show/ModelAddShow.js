@@ -61,6 +61,7 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCheck, setIsCheck] = useState(false);
   const [listTimePassed, setListTimePassed] = useState([]);
+  const [endDateMoviePicked, setEndDateMoviePicked] = useState("");
 
   const columns = [
     {
@@ -147,6 +148,7 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
     const { duration, releaseDate, endDate } = await movieApi.getMovieById(
       value
     );
+    setEndDateMoviePicked(moment(endDate).format("YYYY-MM-DD"));
     const hours = Math.floor(duration / 60);
     const minutes = duration % 60;
     const durationString = `${hours} giờ ${minutes} phút`;
@@ -565,7 +567,7 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
                   onChange={onChangeDate}
                   disabledDate={
                     (current) => {
-                      return current && current < moment().endOf('day');
+                      return current && current < moment().endOf('day') || current > moment(endDateMoviePicked).endOf("day");
                     }
                   }
                  // disabledDate={disabledDate}

@@ -111,7 +111,7 @@ const TableCustomer = ({ setTab, setSelectedIdHeader,startDatePicker,endDatePick
               }}
             ></Button>
             <Button
-              disabled={ currentDay > moment(record.startDate).format("YYYY-MM-DD") || record.status === true ? true : false }
+              disabled={ currentDay >= moment(record.startDate).format("YYYY-MM-DD") || record.status === 1 ? true : false }
               icon={<DeleteOutlined />}
               onClick={() => {
                 setSelectedId(record.id);

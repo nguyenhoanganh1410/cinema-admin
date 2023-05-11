@@ -56,7 +56,6 @@ const ModelAddPromoLine = ({
 
   //handle submit form create new customer...
   const handleSubmit = (val) => {
-
     const payloadLine = {
       promotionCode: val.promotionCode.toUpperCase(),
       desc: val.desc,
@@ -77,7 +76,7 @@ const ModelAddPromoLine = ({
       qty_receive: val.qtyReceive,
       total_purchase_amount: val.moneyBought,
       percent_reduction: val.percent,
-      max_money_reduction: val.maxMoneyPercent
+      max_money_reduction: val.maxMoneyPercent,
     };
 
     try {
@@ -112,11 +111,29 @@ const ModelAddPromoLine = ({
     setStartDate(dateString[0]);
     setEndDate(dateString[1]);
   };
+  const newDateFormat = "YYYY-MM-DD";
+
+  useEffect(() => {
+    if (startDateDb && endDateDb) {
+      setStartDate(startDateDb);
+      setEndDate(endDateDb);
+      console.log("startDateDb", startDateDb);
+      console.log("endDateDb", endDateDb);
+      form.setFieldsValue({
+        date: [
+          dayjs(startDateDb, newDateFormat),
+          dayjs(endDateDb, newDateFormat),
+        ],
+      });
+    }
+  }, []);
 
   useEffect(() => {
     const fetchProductSeats = async () => {
       try {
-        const response = await productApi.getListProductByType(TYPE_SEAT_PRODUCT);
+        const response = await productApi.getListProductByType(
+          TYPE_SEAT_PRODUCT
+        );
         const options = response.map((item) => ({
           value: item.id,
           label: item.productName,
@@ -128,7 +145,9 @@ const ModelAddPromoLine = ({
     };
     const fetchAllProduct = async () => {
       try {
-        const response = await productApi.getListProductByType(TYPE_FOOD_PRODUCT);
+        const response = await productApi.getListProductByType(
+          TYPE_FOOD_PRODUCT
+        );
         const options = response.map((item) => ({
           value: item.id,
           label: item.productName,
@@ -155,9 +174,9 @@ const ModelAddPromoLine = ({
         }}
         extra={
           <Space>
-            <Button onClick={onClose}>Cancel</Button>
+            <Button onClick={onClose}>Hủy</Button>
             <Button form="myFormAddLinePro" htmlType="submit" type="primary">
-              Submit
+              Lưu
             </Button>
           </Space>
         }
@@ -173,7 +192,12 @@ const ModelAddPromoLine = ({
               <Form.Item
                 name="promotionCode"
                 label="Mã áp dụng"
-                rules={[yupSync]}
+                rules={[
+                  {
+                    required: true,
+                    message: "Hãy nhập mã áp dụng...",
+                  },
+                ]}
               >
                 <Input
                   style={{ textTransform: "uppercase" }}
@@ -285,12 +309,12 @@ const ModelAddPromoLine = ({
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                name="startDate"
-                label="Ngày bắt đầu - Ngày kết thúc"
+                name="date"
+                label="Thời gian họat động"
                 rules={[
                   {
                     required: true,
-                    message: "Hãy chọn ngày bắt đầu...",
+                    message: "Hãy chọn thời gian hoạt động",
                   },
                 ]}
               >
@@ -307,7 +331,7 @@ const ModelAddPromoLine = ({
                   placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
                   onChange={onChangeDate}
                   disabledDate={(current) => {
-                    return current && current < moment().endOf('day');
+                    return current && current < moment().endOf("day") || current > moment(endDateDb).endOf("day");
                   }}
                 />
               </Form.Item>

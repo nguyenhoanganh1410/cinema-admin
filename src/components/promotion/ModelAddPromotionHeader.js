@@ -56,10 +56,10 @@ const ModelAddPromotionHeader = ({
         }}
         extra={
           <Space>
-            <Button onClick={onClose}>Cancel</Button>
+            <Button onClick={onClose}>Hủy</Button>
 
             <Button form="myForm" htmlType="submit" type="primary">
-              Submit
+              Lưu
             </Button>
           </Space>
         }
@@ -70,7 +70,12 @@ const ModelAddPromotionHeader = ({
               <Form.Item
                 name="namePromotion"
                 label="Tên CT Khuyến mãi"
-                rules={[yupSync]}
+                rules={[
+                  {
+                    required: true,
+                    message: "Hãy nhập tên CT khuyến mãi...",
+                  },
+                ]}
               >
                 <Input placeholder="Hãy nhập tên CT khuyến mãi..." />
               </Form.Item>
@@ -78,14 +83,27 @@ const ModelAddPromotionHeader = ({
             <Col span={12}>
               <Form.Item
                 name="promotionCode"
-                label="Mã CT Khuyến mãi"
-                rules={[yupSync]}
+                label="Mã CT Khuyến mãi tối đa 5 ký tự"
+                rules={[
+                  {
+                    required: true,
+                    message: "Hãy nhập mã CT khuyến mãi...",
+                  }
+                ]}
               >
-                <InputNumber
+                <Input
                   placeholder="Hãy nhập mã CT khuyến mãi..."
                   addonBefore="PRO"
                   min={1}
+                  maxLength={5}
+                  showCount
                   style={{ width: "100%" }}
+                  // onChange={handleChangeCode}
+                  onKeyPress={(e) => {
+                    if (!/[0-9]/.test(e.key)) {
+                      e.preventDefault();
+                    }
+                  }}
                 />
               </Form.Item>
             </Col>
@@ -94,26 +112,12 @@ const ModelAddPromotionHeader = ({
             <Col span={12}>
               <Form.Item
                 name="startDate"
-                label="Ngày bắt đầu"
+                label="Thời gian hoạt động"
                 rules={[
-                  ({ getFieldValue }) => ({
-                    validator(rule, value) {
-                      if (!value) {
-                        return Promise.reject("Hãy nhập ngày bắt đầu.");
-                      }
-                      if (value < new Date()) {
-                        return Promise.reject(
-                          "Ngày bắt đầu nhỏ hơn ngày kết thúc!"
-                        );
-                      }
-                      if (value > moment(endDate)) {
-                        return Promise.reject(
-                          "Ngày bắt đầu phải nhỏ hơn ngày kết thúc."
-                        );
-                      }
-                      return Promise.resolve();
-                    },
-                  }),
+                  {
+                    required: true,
+                    message: "Hãy nhập thời gian hoạt động.",
+                  }
                 ]}
               >
                 <RangePicker
