@@ -31,7 +31,9 @@ const ModelPromtionLineDetail = ({
   startDateDb,
   endDateDb,
   idPromotionLine,
-  setIdPromotionLine
+  setIdPromotionLine,
+  endDateHeader,
+  statusDb,
 }) => {
   const {
     form,
@@ -79,12 +81,14 @@ const ModelPromtionLineDetail = ({
           paddingBottom: 80,
         }}
         extra={
-          <Space>
-            <Button onClick={onClose}>Cancel</Button>
+          statusDb === 0 ? (
+            <Space>
+            <Button onClick={onClose}>Hủy</Button>
             <Button form="myFormAddLinePro" htmlType="submit" type="primary">
-              Submit
+              Lưu
             </Button>
           </Space>
+          ) : null
         }
       >
         <Form
@@ -115,6 +119,7 @@ const ModelPromtionLineDetail = ({
             </Col>
             <Col span={12}>
               <Form.Item
+              
                 name="desc"
                 label="Mô tả"
                 rules={[
@@ -124,7 +129,13 @@ const ModelPromtionLineDetail = ({
                   },
                 ]}
               >
-                <Input placeholder="Hãy nhập mô tả..." />
+                <Input placeholder="Hãy nhập mô tả..."
+                  disabled={
+                    statusDb === 1
+                    ? true
+                    : false 
+                  }
+                 />
               </Form.Item>
             </Col>
           </Row>
@@ -196,6 +207,8 @@ const ModelPromtionLineDetail = ({
                   style={{ width: "100%" }}
                   min={1}
                   max={100}
+                  disabled
+
                   // defaultValue={1}
                   placeholder="Nhập số lương KH áp dụng tối đa..."
                 />
@@ -210,6 +223,8 @@ const ModelPromtionLineDetail = ({
                   style={{ width: "100%" }}
                   min={1}
                   max={10}
+                  disabled
+
                   // defaultValue={1}
                   placeholder="Nhập số lần KH được sử dụng KM/ngày..."
                 />
@@ -231,15 +246,47 @@ const ModelPromtionLineDetail = ({
                 <RangePicker
                   placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
                   onChange={onChangeDate}
-                  disabled={[moment().diff( moment(startDate), "seconds" ) > 0 ? true : false, false]}
+                  disabled={ statusDb === 1
+                    ? true
+                    : false ||  [moment().diff( moment(startDate), "seconds" ) > 0 ? true : false, false]}
                   disabledDate={(current) => {
                     return (
-                      (current && current < moment(startDateDb)) 
+                      (current && current < moment(startDateDb) ) || current > moment(endDateDb).endOf("day")
                     );
                   }}
                 />
               </Form.Item>
             </Col>
+            <Col span={12}>
+            <Form.Item
+              name="status"
+              label="Trạng thái"
+              rules={[
+                {
+                  required: true,
+                  message: "Hãy chọn trạng thái...",
+                },
+              ]}
+            >
+              <Select
+                placeholder="Chọn trạng thái"
+                style={{
+                  width: "100%",
+                }}
+                // onChange={handleChangePosition}
+                options={[
+                  {
+                    value: 0,
+                    label: "Ngưng hoạt động",
+                  },
+                  {
+                    value: 1,
+                    label: "Hoạt động",
+                  },
+                ]}
+              />
+            </Form.Item>
+          </Col>
           </Row>
           <Space
             direction="vertical"

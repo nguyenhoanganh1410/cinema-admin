@@ -68,53 +68,32 @@ const useModelPromotionLine = ({
 
 //   //handle submit form create new customer...
   const handleSubmit = (val) => {
+    console.log("val", val);
+
     // const payloadLine = {
-    //   promotionCode: val.promotionCode.toUpperCase(),
     //   desc: val.desc,
-    //   type: val.type,
     //   startDate: startDate,
     //   endDate: endDate,
-    //   max_qty: val.maxUse,
-    //   max_qty_per_customer_per_day: val.maxUsePerCustomer,
-    //   budget: val.budget,
-    //   promotionHeaderId: idHeaderPromotion,
-    // };
-
-    // const payloadDetail = {
-    //   IdProduct_buy: val.productBuy,
-    //   qty_buy: val.qtyBuy,
-    //   money_received: val.moneyReceived,
-    //   IdProduct_receive: val.productReceive,
-    //   qty_receive: val.qtyReceive,
-    //   total_purchase_amount: val.moneyBought,
-    //   percent_reduction: val.percent,
-    // };
+    //   status: val.status,
+    // }
 
     // try {
-    //   const createLine = async () => {
-    //     const response = await promotionApi.createPromotionLine(payloadLine);
-    //     setIdPromotionLine(response.id);
-    //     if (response) {
-    //       const createDetail = async () => {
-    //         console.log("idPromotionLine", idPromotionLine);
-    //         payloadDetail.idPromotionLine = response.id;
-    //         console.log("payloadDetail", payloadDetail);
-    //         const res = await promotionApi.createPromotionDetail(payloadDetail);
-    //         console.log("res", res);
-    //         if (res) {
-    //           message.success("Thêm thành công");
-    //           depatch(setReload(!reload));
-    //           onClose();
-    //         }
-    //       };
-    //       createDetail();
+    //   const updateProLine = async () => {
+    //     const rs = await promotionApi.updateLine(idPromotionLine, payloadLine);
+    //     if (rs) {
+    //       message.success("Cập nhật thành công");
+    //       depatch(setReload(!reload));
+    //       onClose();
+    //     } else {
+    //       message.error("Cập nhật thất bại");
     //     }
-    //   };
-
-    //   createLine();
+    //   }
+    //   updateProLine();
     // } catch (error) {
+    //   message.error("Cập nhật thất bại");
     //   console.log("error", error);
     // }
+    
   };
 
   const handleChangeTypePro = (value) => {
@@ -177,6 +156,7 @@ const useModelPromotionLine = ({
             dayjs(response.startDate, newDateFormat),
             dayjs(response.endDate, newDateFormat),
           ],
+          status: response.status,
         
         });
         setPromotionLine(response)
