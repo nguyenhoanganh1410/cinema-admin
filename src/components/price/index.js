@@ -123,7 +123,7 @@ const IndexCustomer = ({ setTab ,setSelectedIdHeader}) => {
         }}
       >
         <Col span={24}>
-          {isShowTable ? <TableCustomer setTab={setTab} setSelectedIdHeader={setSelectedIdHeader}  /> :
+          {isShowTable ? <TableCustomer setTab={setTab} setSelectedIdHeader={setSelectedIdHeader} startDatePicker={startDatePicker} endDatePicker={endDatePicker}  /> :
            <Table
            columns={columns}
            dataSource={listProduct}

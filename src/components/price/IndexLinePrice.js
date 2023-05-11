@@ -72,6 +72,9 @@ const IndexLinePrice = ({ setTab, selectedIdHeader }) => {
   const [selectedId, setSelectedId] = useState([]);
   const [showModalDetailCustomer, setShowModalDetailCustomer] = useState(false);
 
+  const { RangePicker } = DatePicker;
+
+
   const columns = [
     {
       title: "Mã Sản phẩm",
@@ -95,6 +98,7 @@ const IndexLinePrice = ({ setTab, selectedIdHeader }) => {
     {
       title: "Giá bán",
       dataIndex: "price",
+      align: "right",
       render: (val) => {
         return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
       },
@@ -102,7 +106,7 @@ const IndexLinePrice = ({ setTab, selectedIdHeader }) => {
     {
       dataIndex:"id",
       render: (text, record) => (
-        currentDate < startDate && statusDb === false ? 
+        currentDate < startDate && statusDb === 0 ? 
         (
           <Button style={{
             border: "none",
@@ -154,6 +158,7 @@ const IndexLinePrice = ({ setTab, selectedIdHeader }) => {
 
   const onChangeStartDate = (date, dateString) => {
     setStartDate(dateString);
+    
   };
 
   const onChangeEndDate = (date, dateString) => {
@@ -192,11 +197,20 @@ const IndexLinePrice = ({ setTab, selectedIdHeader }) => {
 
   //choise date start worling
   const onChangeDate = (date, dateString) => {
-    console.log(date, dateString);
+    console.log(dateString);
+    if (dateString[0] === "") {
+      setStartDate(moment().format(newDateFormat));
+      return;
+    }
+    if (dateString[1] === "") {
+      setEndDate(moment().format(newDateFormat));
+      return;
+    }
+    setStartDate(dateString[0]);
+    setEndDate(dateString[1]);
   };
 
   const handleSubmit = async (val) => {
-    console.log("value::", val);
     const data = {
       name: val.namePrice,
       startDate: startDate,
@@ -231,18 +245,6 @@ const IndexLinePrice = ({ setTab, selectedIdHeader }) => {
         message.error(messageError, 7);
       }
     }
-
-    // try {
-    //   const response = await priceApi.updatePriceHeaderById(selectedIdHeader,data)
-    //   if (response) {
-    //     console.log(response);
-    //     depatch(setReload(!reload));
-    //     message.success("Cập nhật thành công");
-    //     handleRouter();
-    //   }
-    // } catch (error) {
-    //   console.log("Failed to login ", error);
-    // }
   };
 
   // price detail
@@ -275,20 +277,19 @@ const IndexLinePrice = ({ setTab, selectedIdHeader }) => {
           console.log(response);
           setApplyTo(response.applyTo);
           setStatus(response.status);
-          setStartDate(response.startDate);
-          setEndDate(response.endDate);
+          setStartDate(moment(response.startDate).format("YYYY-MM-DD"));
+          setEndDate(moment(response.endDate).format("YYYY-MM-DD"));
           setApplyToHall(response.applyToHall);
           setStartDateDb(response.startDate);
           setEndDateDb(response.endDate);
           setStatusDb(response.status);
           form.setFieldsValue({
-            codePrice: response.id,
+            priceCode: response.priceCode,
             namePrice: response.name,
-            startDate: dayjs(response.startDate, newDateFormat),
-            endDate: dayjs(response.endDate, newDateFormat),
             status: response.status,
             applyTo: response.applyTo,
             applyToHall: response.applyToHall,
+            date: [dayjs(response.startDate, newDateFormat), dayjs(response.endDate, newDateFormat)],
           });
         }
       } catch (error) {
@@ -393,15 +394,13 @@ const IndexLinePrice = ({ setTab, selectedIdHeader }) => {
       >
         <Row gutter={16}>
           <Col span={12}>
-            <Form.Item name="codePrice" label="Mã bảng giá">
+            <Form.Item name="priceCode" label="Mã bảng giá">
               <Input
                 disabled={true}
                 placeholder="Hãy nhập tên CT khuyến mãi..."
               />
             </Form.Item>
           </Col>
-          <Col span={12}></Col>
-
           <Col span={12}>
             <Form.Item
               name="namePrice"
@@ -421,42 +420,31 @@ const IndexLinePrice = ({ setTab, selectedIdHeader }) => {
           </Col>
           <Col span={12}>
             <Form.Item
-              label="Ngày bắt đầu"
-              name="startDate"
-              rules={
-                [
-                  // ( {getFieldValue})=>({
-                  //   validator(rule,value){
-                  //     if(!value){
-                  //       return Promise.reject("Hãy nhập ngày bắt đầu!");
-                  //     }
-                  //     if(value < new Date()){
-                  //       return Promise.reject("Ngày bắt đầu phải lớn hơn ngày hiện tại!");
-                  //     }
-                  //     return Promise.resolve();
-                  //   }
-                  // })
-                ]
-              }
-            >
-              <DatePicker
-                disabledDate={(current) =>
-                  current && current < moment().endOf(startDate)
-                }
-                disabled={
-                  currentDate > startDate || statusDb === true ? true : false
-                }
-                onChange={onChangeStartDate}
-                style={{ width: "100%" }}
-                placeholder="Chọn ngày bắt đầu"
-                defaultValue={dayjs(startDate, newDateFormat)}
-                format={newDateFormat}
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={4}>
+                name="date"
+                label="Thời gian hoạt động"
+                rules={[
+                  {
+                    required: true,
+                    message: "Hãy chọn thời gian hoạt động...",
+
+                  },
+                ]}
+              >
+                <RangePicker 
+                  placeholder={['Ngày bắt đầu', 'Ngày kết thúc']}
+                  
+                  onChange={onChangeDate}
+                  disabledDate={
+                    (current) => {
+                      return current && current < moment().endOf('day');
+                    }
+                  }
+                  disabled={[moment().diff( moment(startDate), "seconds" ) > 0 ? true : false, false]}
+                />
+                  
+              </Form.Item>
+            </Col>
+          <Col span={12}>
             <Form.Item
               name="status"
               label="Trạng thái"
@@ -475,50 +463,20 @@ const IndexLinePrice = ({ setTab, selectedIdHeader }) => {
                 onChange={onChangeStatus}
                 options={[
                   {
-                    value: false,
+                    value: 0,
                     label: "Ngưng hoạt động",
                   },
                   {
-                    value: true,
+                    value: 1,
                     label: "Hoạt động",
                   },
                 ]}
               />
             </Form.Item>
           </Col>
-          <Col span={8}></Col>
-
-          <Col span={12}>
-            <Form.Item
-              name="endDate"
-              label="Ngày kết thúc"
-              rules={[
-                ({ getFieldValue }) => ({
-                  validator(rule, value) {
-                    if (!value) {
-                      return Promise.reject("Hãy nhập ngày kết thúc!");
-                    }
-                    if (value < moment(startDate)) {
-                      return Promise.reject(
-                        "Ngày kết thúc phải lớn hơn hoặc ngày bắt đầu!"
-                      );
-                    }
-                    return Promise.resolve();
-                  },
-                }),
-              ]}
-            >
-              <DatePicker
-                onChange={onChangeEndDate}
-                style={{ width: "100%" }}
-                placeholder="Chọn ngày kết thúc"
-                defaultValue={dayjs(endDate, newDateFormat)}
-                format={newDateFormat}
-                disabled={statusDb === true ? true : false}
-              />
-            </Form.Item>
-          </Col>
         </Row>
+
+
       </Form>
       {/* table */}
       <div>
@@ -539,7 +497,7 @@ const IndexLinePrice = ({ setTab, selectedIdHeader }) => {
               Danh sách giá
             </span>
           </Space>
-          {currentDate < startDate && statusDb === false ? (
+          {currentDate < startDate || currentDate < endDate && statusDb === 0 ? (
             <Button
               type="primary"
               onClick={() => handleOpenModel()}

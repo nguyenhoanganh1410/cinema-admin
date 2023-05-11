@@ -68,7 +68,7 @@ const ModelAddPromoLine = ({
     const data = {
       price: val.price,
       idProduct: val.product,
-      idPriceHeader: val.priceHeaderId,
+      idPriceHeader: val.id,
     };
     const fetchAddPromoLine = async () => {
       try {
@@ -109,15 +109,16 @@ const ModelAddPromoLine = ({
     const fetchDetailPriceHeader = async () => {
       const res = await priceApi.getPriceHeaderById(selectedIdHeader);
       const data = {
-        priceHeaderId: res.id,
+        priceHeaderId: res.priceCode,
         startDate: moment(res.startDate),
         endDate: moment(res.endDate),
+        id: res.id,
       }
       form.setFieldsValue(data);
     };
 
     const fetchListProduct = async () => {
-      const res = await productApi.getProducts();
+      const res = await productApi.getProducts("");
       setListProduct(res);
     };
 
@@ -137,9 +138,9 @@ const ModelAddPromoLine = ({
         }}
         extra={
           <Space>
-            <Button onClick={onClose}>Cancel</Button>
+            <Button onClick={onClose}>Hủy</Button>
             <Button  form="myFormLine" htmlType="submit" type="primary">
-              Submit
+              Thêm
             </Button>
           </Space>
         }
@@ -150,6 +151,9 @@ const ModelAddPromoLine = ({
           id="myFormLine"
         layout="vertical">
           <Row gutter={16}>
+            <Form.Item name="id" hidden={true}>
+              <Input />
+            </Form.Item>
             <Col span={12}>
               <Form.Item name="priceHeaderId" label="Mã bảng giá">
                 <Input disabled={true} />

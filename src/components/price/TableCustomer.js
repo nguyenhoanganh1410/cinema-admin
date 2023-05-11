@@ -27,8 +27,9 @@ import openAddressApi from "../../api/openApi";
 import { useDispatch, useSelector } from "react-redux";
 import { setReload } from "../../redux/actions";
 import priceApi from "../../api/priceApi";
+import moment from "moment";
 
-const TableCustomer = ({ setTab, setSelectedIdHeader }) => {
+const TableCustomer = ({ setTab, setSelectedIdHeader,startDatePicker,endDatePicker }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [listCustomer, setListCustomer] = useState([]);
@@ -38,6 +39,9 @@ const TableCustomer = ({ setTab, setSelectedIdHeader }) => {
   const [refreshKey, setRefreshKey] = useState(0);
   const depatch = useDispatch();
   const reload = useSelector((state) => state.reload);
+
+  const currentDay = moment().format("YYYY-MM-DD");
+
 
   const showModalDetail = (e) => {
     setTab(1);
@@ -51,19 +55,9 @@ const TableCustomer = ({ setTab, setSelectedIdHeader }) => {
 
   const columns = [
     {
-      title: "Id",
-      dataIndex: "id",
-      render: (val) => {
-        setSelectedId(val);
-        return val;
-      }
-      
-    },
-    {
-      title: "Tên bảng giá",
-      dataIndex: "name",
-      render: (val,recod) => {
-        console.log(recod)
+      title: "Mã bảng giá",
+      dataIndex: "priceCode",
+      render: (val, recod) => {
         return (
           <a
             onClick={() => {
@@ -74,6 +68,11 @@ const TableCustomer = ({ setTab, setSelectedIdHeader }) => {
           </a>
         );
       },
+    },
+    {
+      title: "Tên bảng giá",
+      dataIndex: "name",
+      
     },
     {
       title: "Ngày bắt đầu",
@@ -87,33 +86,40 @@ const TableCustomer = ({ setTab, setSelectedIdHeader }) => {
       title: "Trạng thái",
       dataIndex: "status",
       render: (status) => {
-        console.log(status);
         let color;
         let name;
-        if (status === true) {
+        if (status === 1) {
           color = "success";
           name = "Hoạt động";
-        } else if (status === false) {
+        } else if (status === 0) {
           color = "error";
           name = "Ngưng hoạt động";
-        } else if (status === 2) {
-          color = "processing";
-          name = "Sắp Chiếu";
         }
         return <Badge status={color} text={name} />;
       },
     },
     {
-      
       dataIndex: "id",
-      render: (val) => {
+      align: "center",
+      render: (val,record) => {
         return (
-          <Button
-            icon={<EyeOutlined />}
-            onClick={() => {
-              showModalPriceViewDetail(val);
-            }}
-          ></Button>
+          <Space size="middle">
+            <Button
+              icon={<EyeOutlined />}
+              onClick={() => {
+                showModalPriceViewDetail(val);
+              }}
+            ></Button>
+            <Button
+              disabled={ currentDay > moment(record.startDate).format("YYYY-MM-DD") || record.status === true ? true : false }
+              icon={<DeleteOutlined />}
+              onClick={() => {
+                setSelectedId(record.id);
+                handleDelete();
+              }}
+              danger
+            ></Button>
+          </Space>
         );
       },
     },
@@ -123,14 +129,17 @@ const TableCustomer = ({ setTab, setSelectedIdHeader }) => {
     //get list customer in here
     const fetchListCustomer = async () => {
       try {
-        const data = await priceApi.getPriceHeader();
-        setListCustomer(data.reverse());
+        const data = await priceApi.getPriceHeader({
+          startDate: startDatePicker,
+          endDate: endDatePicker,
+        });
+        setListCustomer(data);
       } catch (error) {
         console.log("Failed to fetch product list: ", error);
       }
     };
     fetchListCustomer();
-  }, [reload]);
+  }, [reload,startDatePicker,endDatePicker]);
 
   const handleShowDetail = (val) => {
     console.log(val);
@@ -172,22 +181,19 @@ const TableCustomer = ({ setTab, setSelectedIdHeader }) => {
     setIsModalOpen(false);
     const fetchDeleteCustomer = async () => {
       try {
-        const response = await customerApi.deleteCustomer(selectedId);
-        if (response == 1) {
+        console.log(selectedId);
+        const response = await priceApi.delete(selectedId)
+        if (response) {
           depatch(setReload(!reload));
+          message.success("Xóa thành công");
         } else {
-          setTimeout(() => {
-            message.success("Xóa thất bại");
-          }, 1000);
+          message.success("Xóa thất bại");
         }
       } catch (error) {
         console.log("Failed to fetch product list: ", error);
       }
     };
     fetchDeleteCustomer();
-    setTimeout(() => {
-      message.success("Xóa thành công");
-    }, 1000);
   };
 
   const handleCancel = () => {
@@ -203,12 +209,18 @@ const TableCustomer = ({ setTab, setSelectedIdHeader }) => {
       ></div>
       <Table columns={columns} dataSource={listCustomer} />
       <Modal
-        title="Xóa khách hàng"
+        title="Xóa bảng giá"
         open={isModalOpen}
-        onOk={handleOk}
-        onCancel={handleCancel}
+        footer={[
+          <Button key="back" onClick={handleCancel}>
+            Hủy
+          </Button>,
+          <Button key="submit" type="primary" onClick={handleOk}>
+            Xóa
+          </Button>,
+        ]}
       >
-        <p>Bạn muốn xóa khách hàng không?</p>
+        <p>Bạn muốn xóa bảng giá này không?</p>
       </Modal>
       {showModalDetailCustomer ? (
         <ModelDetailCustomer

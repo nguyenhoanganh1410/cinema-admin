@@ -112,13 +112,13 @@ const ModelPriceView = ({
               }} >Thông tin cơ bản</span>
             </Col>
             <Col span={12}>
-              <Button
+              {/* <Button
                 style={{ float: "right" }}
                 onClick={handleExportExcel}
                 icon={<FileExcelOutlined />}
               >
                 Xuất excel
-              </Button>
+              </Button> */}
             </Col>
           </Row> 
         </Space>

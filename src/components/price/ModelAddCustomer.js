@@ -12,7 +12,6 @@ import {
   Space,
   Upload,
   message,
-  
 } from "antd";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -59,17 +58,18 @@ const ModelAddCustomer = ({
       startDate: startDatePicked,
       endDate: endDatePicked,
       note: values.note,
-      userCreate:user.id,
-    }
+      userCreate: user.id,
+      priceCode: values.priceCode,
+    };
     const res = await priceApi.createPriceHeader(data);
     console.log("res:", res);
-    if(res){
+    if (res) {
       message.success("Tạo mới bảng giá thành công!");
       depatch(setReload(!reload));
       onClose();
     }
   };
- 
+
   return (
     <>
       <Drawer
@@ -82,19 +82,14 @@ const ModelAddCustomer = ({
         }}
         extra={
           <Space>
-            <Button onClick={onClose}>Cancel</Button>
+            <Button onClick={onClose}>Hủy</Button>
             <Button form="myForm" htmlType="submit" type="primary">
-              Submit
+              Lưu
             </Button>
           </Space>
         }
       >
-        <Form
-          form={form}
-          onFinish={handleSubmit}
-          id="myForm"
-          layout="vertical"
-        >
+        <Form form={form} onFinish={handleSubmit} id="myForm" layout="vertical">
           <Row gutter={16}>
             <Col span={24}>
               <Form.Item
@@ -112,25 +107,54 @@ const ModelAddCustomer = ({
             </Col>
           </Row>
           <Row gutter={16}>
-          <Col span={24}>
+            <Col span={12}>
               <Form.Item
-                name="startDate"
-                label="Ngày bắt đầu"
-               
+                name="priceCode"
+                label="Mã Bảng giá"
+                rules={[
+                  {
+                    required: true,
+                    message: "Hãy nhập mã bảng giá...",
+                  },
+                ]}
               >
-                 <RangePicker
-                  placeholder={['Ngày bắt đầu', 'Ngày kết thúc']}
-                  onChange={onChangeDate}
-                  style={{width: "250px"}}
-                  disabledDate={
-                    (current) => {
-                      return current && current < moment().endOf('day');
+                <Input
+                  placeholder="Hãy nhập mã bảng giá tối đa 5 ký tự"
+                  addonBefore="PRI"
+                  min={1}
+                  maxLength={5}
+                  showCount
+                  style={{ width: "100%" }}
+                  // onChange={handleChangeCode}
+                  onKeyPress={(e) => {
+                    if (!/[0-9]/.test(e.key)) {
+                      e.preventDefault();
                     }
-                  }
+                  }}
                 />
               </Form.Item>
             </Col>
-         
+            <Col span={12}>
+              <Form.Item
+                name="startDate"
+                label="Thời gian họat động"
+                rules={[
+                  {
+                    required: true,
+                    message: "Hãy chọn thời gian cho bảng giá...",
+                  },
+                ]}
+              >
+                <RangePicker
+                  placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
+                  onChange={onChangeDate}
+                  style={{ width: "100%" }}
+                  disabledDate={(current) => {
+                    return current && current < moment().endOf("day");
+                  }}
+                />
+              </Form.Item>
+            </Col>
           </Row>
           <Row style={{ marginTop: "16px" }} gutter={16}>
             <Col span={24}>

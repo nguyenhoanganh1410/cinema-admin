@@ -1,8 +1,8 @@
 import axiosApi from "./axisosApi";
 
 const priceApi = {
-    getPriceHeader: () => {
-        return axiosApi.get("/priceHeader");
+    getPriceHeader: ({ startDate, endDate}) => {
+        return axiosApi.get(`/priceHeader?start_date=${startDate}&end_date=${endDate}`);
     },
     createPriceHeader: (data) => {
         return axiosApi.post("/priceHeader", data);
@@ -32,6 +32,9 @@ const priceApi = {
 
     getPriceProduct: () => {
         return axiosApi.get("/product/list/price");
+    },
+    delete: (id) => {
+        return axiosApi.delete(`/priceHeader/${id}`);
     },
 
 };
