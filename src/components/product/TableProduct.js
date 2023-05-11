@@ -92,9 +92,12 @@ const TableProduct = ({keyword}) => {
     {
       
       render: (val,record) => {
+        console.log(record)
         return (
           <Button
-            icon={<DeleteOutlined  style={{ color: '#ff4d4f' }}/>}
+          danger
+            disabled={record.type === "Ghe" ? true : false}
+            icon={<DeleteOutlined />}
             onClick={()=>{
               setIdPick(record.id)
               handleDelete()

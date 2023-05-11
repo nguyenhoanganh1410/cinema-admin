@@ -15,6 +15,7 @@ import ModelAddCustomer from "./ModelAddCustomer";
 const { Title, Text } = Typography;
 const IndexCustomer = () => {
   const [showModalAddCustomer, setShowModalAddCustomer] = useState(false);
+  const [keySearch, setKeySearch] = useState("");
 
   const showModal = () => {
     setShowModalAddCustomer(true);
@@ -37,20 +38,19 @@ const IndexCustomer = () => {
           <Input
             placeholder="Nhập tên, số điện thoại hoặc email..."
             prefix={<SearchOutlined />}
+            onChange={(e) => setKeySearch(e.target.value)}
           />
         </Col>
         <Col span={6}>
         </Col>
         <Col span={3}>
-          <Button  type="default" icon={<DownloadOutlined />}>
-            Xuất file
-          </Button>
+          
         </Col>
         <Col span={2}>
           {" "}
-          <Button type="primary" icon={<UserAddOutlined />} onClick={showModal}>
+          {/* <Button type="primary" icon={<UserAddOutlined />} onClick={showModal}>
             Thêm
-          </Button>
+          </Button> */}
         </Col>
       </Row>
 
@@ -64,7 +64,7 @@ const IndexCustomer = () => {
         }}
       >
         <Col span={24}>
-          <TableCustomer />
+          <TableCustomer  keySearch ={keySearch}/>
         </Col>
       </Row>
       {showModalAddCustomer ? (

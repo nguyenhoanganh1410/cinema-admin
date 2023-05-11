@@ -9,8 +9,8 @@ import { parse, stringify } from "qs";
 
 const axiosApi = axios.create({
   // baseURL: process.env.REACT_APP_API_URL,
-  baseURL: "https://18.142.51.247",
-//  baseURL: "http://localhost:3001",
+  // baseURL: "https://18.142.51.247",
+ baseURL: "http://localhost:3001",
   headers: {
     "content-type": "application/json",
   },

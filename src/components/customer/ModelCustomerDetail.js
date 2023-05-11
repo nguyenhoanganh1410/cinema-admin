@@ -16,6 +16,10 @@ import {
 import openAddressApi from "../../api/openApi";
 import customerApi from "../../api/customerApi";
 import moment from "moment";
+import dayjs from "dayjs";
+import { setReload } from "../../redux/actions";
+import { useDispatch, useSelector } from "react-redux";
+
 
 const { Option } = Select;
 
@@ -34,6 +38,9 @@ const ModelDetailCustomer = ({
   const [fileList, setFileList] = useState([]);
   const [form] = Form.useForm();
   const [image, setImage] = useState("");
+
+  const depatch = useDispatch();
+  const reload = useSelector((state) => state.reload);
 
   const normFile = (e) => {
     console.log("Upload event:", e);
@@ -73,42 +80,32 @@ const ModelDetailCustomer = ({
     data.append("firstName", firstName);
     data.append("lastName", lastname);
     data.append("phone", phone);
-    data.append("email", email);
+    data.append("email", email );
     data.append("address", address);
-    data.append("dob", dob);
-    data.append("note", note);
+    // data.append("dob", dob);
+    // data.append("note", note);
     data.append("city_id", provincePicked);
     data.append("district_id", districtPicked);
     data.append("ward_id", wardPicked);
     data.append("street", address);
     console.log("data", image);
-    if (image) {
+    if ( image.length > 0 && image[0].uid !== "-1"  ) {
       data.append("image", image[0].originFileObj);
+    } 
+    if (image.length === 0) {
+      data.append("image", image);
     }
 
-    // const data = {
-    //   firstName: firstName,
-    //   lastName: lastname,
-    //   phone: phone,
-    //   email: email,
-    //   address: address,
-    //   dob: dob,
-    //   note: note,
-    //   city_id: provincePicked,
-    //   district_id: districtPicked,
-    //   ward_id: wardPicked,
-    //   street: address,
-    // };
     try {
       const response = await customerApi.updateCustomer(id, data);
       console.log(response);
       if (response) {
         onClose();
-        setTimeout(() => {
           message.success("Cập nhật thành công");
-        }, 1000);
+        depatch(setReload(!reload));
       }
     } catch (error) {
+      message.error("Cập nhật thất bại");
       console.log(error);
     }
   };
@@ -132,12 +129,12 @@ const ModelDetailCustomer = ({
             firstName: response.firstName,
             lastname: response.lastName,
             phone: response.phone,
-            email: response.email,
-            dob: response.dob,
-            address: response.address,
-            province: response.province,
-            district: response.district,
-            ward: response.ward,
+            email: response.email ? response.email : undefined,
+            dob: response.dob ? dayjs(response?.dob, "YYYY-MM-DD") : undefined,
+            address: response.address ? response.address : undefined,
+            province: response.province ? response.province : undefined,
+            district: response.district ? response.district : undefined,
+            ward: response.ward ? response.ward : undefined,
             image: [
               {
                 uid: "-1",
@@ -252,9 +249,9 @@ const ModelDetailCustomer = ({
         }}
         extra={
           <Space>
-            <Button onClick={onClose}>Cancel</Button>
+            <Button onClick={onClose}>Hủy</Button>
             <Button form="myForm" htmlType="submit" type="primary">
-              Submit
+              Lưu
             </Button>
           </Space>
         }
@@ -271,12 +268,26 @@ const ModelDetailCustomer = ({
           </Row>
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item name="firstName" label="Họ">
+              <Form.Item name="firstName" label="Họ"
+              rules={[
+                {
+                  required: true,
+                  message: "Vui lòng nhập họ",
+                },
+              ]}
+              >
                 <Input />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="lastname" label="Tên">
+              <Form.Item name="lastname" label="Tên"
+              rules={[
+                {
+                  required: true,
+                  message: "Vui lòng nhập tên",
+                },
+              ]}
+              >
                 <Input />
               </Form.Item>
             </Col>
@@ -284,8 +295,23 @@ const ModelDetailCustomer = ({
           </Row>
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item name="phone" label="Số điện thoại">
-                <Input />
+              <Form.Item name="phone" label="Số điện thoại"
+              rules={[
+                {
+                  required: true,
+                  message: "Vui lòng nhập số điện thoại",
+                },
+              ]}
+              >
+                <Input 
+                maxLength={10}
+                showCount
+                onKeyPress={(e) => {
+                  if (!/[0-9]/.test(e.key)) {
+                    e.preventDefault();
+                  }
+                }}
+                />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -301,7 +327,7 @@ const ModelDetailCustomer = ({
                 showSearch
                 placeholder="Chọn tỉnh thành"
                 optionFilterProp="children"
-                value={provincePicked}
+                value={provincePicked === 0 ? undefined : provincePicked}
                 onChange={onChangeProvince}
                 onSearch={onSearch}
                 style={{ width: "100%" }}
@@ -318,9 +344,9 @@ const ModelDetailCustomer = ({
                 showSearch
                 placeholder="Chọn quận huyện"
                 optionFilterProp="children"
-                value={districtPicked}
                 onChange={onChangeDistrict}
                 onSearch={onSearch}
+                value={districtPicked === 0 ? undefined : districtPicked}
                 style={{ width: "100%" }}
                 filterOption={(input, option) =>
                   (option?.label ?? "")
@@ -338,7 +364,7 @@ const ModelDetailCustomer = ({
                 placeholder="Chọn phường/xã"
                 optionFilterProp="children"
                 onChange={onChangeWard}
-                value={wardPicked}
+                value={wardPicked === 0 ? undefined : wardPicked}
                 onSearch={onSearch}
                 style={{ width: "100%" }}
                 filterOption={(input, option) =>
@@ -359,17 +385,18 @@ const ModelDetailCustomer = ({
                 />
               </Form.Item>
             </Col>
-            <Col span={12}>
-              <Form.Item name="dob" label="Ngày sinh" valuePropName="date">
+            {/* <Col span={12}>
+              <Form.Item name="dob" label="Ngày sinh" >
                 <DatePicker
-                  value={moment(customerInfo?.dob)}
+                  placeholder="Chọn ngày sinh"
+                  // value={moment(customerInfo?.dob)}
                   style={{
                     width: "100%",
                   }}
                   format="YYYY-MM-DD"
                 />
               </Form.Item>
-            </Col>
+            </Col> */}
             <Col span={12}>
               <Form.Item
                 name="image"
@@ -393,13 +420,13 @@ const ModelDetailCustomer = ({
             <Col span={12}></Col>
           </Row>
 
-          <Row style={{ marginTop: "16px" }} gutter={16}>
+          {/* <Row style={{ marginTop: "16px" }} gutter={16}>
             <Col span={24}>
               <Form.Item name="description" label="Ghi chú">
                 <Input.TextArea rows={4} placeholder="Nhập ghi chú..." />
               </Form.Item>
             </Col>
-          </Row>
+          </Row> */}
         </Form>
       </Drawer>
     </>

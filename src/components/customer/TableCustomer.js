@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Table, Modal, Tag, Image, Alert, Space, message } from "antd";
+import { Button, Table, Modal, Tag, Image, Alert, Space, message, Badge, Select } from "antd";
 import {
   SearchOutlined,
   PlusSquareFilled,
@@ -15,7 +15,7 @@ import openAddressApi from "../../api/openApi";
 import { useDispatch, useSelector } from "react-redux";
 import { setReload } from "../../redux/actions";
 
-const TableCustomer = () => {
+const TableCustomer = ({ keySearch }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [listCustomer, setListCustomer] = useState([]);
@@ -107,29 +107,81 @@ const TableCustomer = () => {
       onFilter: (value, record) => record.rank.indexOf(value) === 0,
     },
     {
+      title: "Trạng thái",
+      dataIndex: "status",
       render: (val,record) => {
+        let color = "";
+        let text = "";
+        if (val === false) {
+          text = "Hoạt động";
+          color = "green";
+        } else {
+          text = "Ngừng hoạt động";
+          color = "red";
+        }
         return (
-          <Button
-            disabled={record.active === "Hoạt động" ? true : false}
-            icon={<DeleteOutlined />}
-            onClick={() => {
-              setSelectedId(record.id);
-              handleDelete();
-            }}
-            danger
-          >
-          </Button>
+          <>
+            <Badge
+              color={color}
+            />
+            <Select
+              value={val}
+              style={{
+                width: 170,
+              }}
+              bordered={false}
+              // value={val}
+
+              onChange={(value) => {
+                handleChangeStatus(value, record);
+                }
+              }
+            >
+              <Option value={false}>Hoạt động</Option>
+              <Option value={true}>Ngừng hoạt động</Option>
+            </Select>
+          </>
         );
       },
+      filters: [
+        {
+          text: "Hoạt động",
+          value: false,
+        },
+        {
+          text: "Ngừng hoạt động",
+          value: true,
+        },
+      ],
+      onFilter: (value, record) => record.status === value,
+      
     },
   ];
+
+  const handleChangeStatus = async (value, record) => {
+    const updateStatus = async () => {
+      try {
+        const rs = await customerApi.updateCustomer(record.id, {
+          isDeleted: value,
+        });
+        if (rs) {
+          message.success("Cập nhật thành công");
+          depatch(setReload(!reload));
+        } else {
+          message.error("Cập nhật thất bại");
+        }
+      } catch (error) {
+        message.error("Cập nhật thất bại");
+      }
+    };
+    updateStatus();
+  };
 
   useEffect(() => {
     //get list customer in here
     const fetchListCustomer = async () => {
       try {
-        const response = await customerApi.getCustomers();
-
+        const response = await customerApi.getCustomers(keySearch);
         const data = await Promise.all(
           response.map(async (item, index) => {
             let address;
@@ -161,16 +213,17 @@ const TableCustomer = () => {
               dob: item.dob,
               rank: item.Rank?.nameRank,
               image: item.image,
+              status: item.isDeleted,
             };
           })
         );
-        setListCustomer(data.reverse());
+        setListCustomer(data);
       } catch (error) {
         console.log("Failed to fetch product list: ", error);
       }
     };
     fetchListCustomer();
-  }, [reload]);
+  }, [reload,keySearch]);
 
 
   //handle delete customer in here...

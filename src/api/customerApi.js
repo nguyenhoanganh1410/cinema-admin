@@ -1,8 +1,8 @@
 import axiosApi from "./axisosApi";
 
 const customerApi = {
-    getCustomers: () => {
-        return axiosApi.get("/customer");
+    getCustomers: (keySearch) => {
+        return axiosApi.get(`/customer?keyword=${keySearch}`);
     },
 
     getCustomer: (id) => {

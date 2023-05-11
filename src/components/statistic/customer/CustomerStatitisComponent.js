@@ -28,13 +28,13 @@ const CustomerStatitisComponent = () => {
 
   useEffect(() => {
     const fetchListCustomer = async () => {
-      const res = await customerApi.getCustomers();
+      const res = await customerApi.getCustomers("");
       console.log(res);
       if (res) {
         const newLs = res.map((item) => {
           return {
             value: item.id,
-            label: "KH00001" +" - "+ item?.firstName + " " + item?.lastName + " - " + item?.phone,
+            label: item?.firstName + " " + item?.lastName + " - " + item?.phone,
           };
         });
         setCustomers(newLs);
