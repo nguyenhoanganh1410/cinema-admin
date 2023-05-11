@@ -47,7 +47,10 @@ const promotionApi = {
   },
   delete: (id) => {
     return axiosApi.delete(`/promotionHeader/${id}`);
-  }
+  },
+  updateLine: (id,data) => {
+    return axiosApi.put(`/promotionLine/${id}`, data);
+  },
 };
 
 export default promotionApi;

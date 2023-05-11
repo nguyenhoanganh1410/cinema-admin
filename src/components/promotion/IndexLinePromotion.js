@@ -123,6 +123,7 @@ const IndexLinePromotion = ({ setTab }) => {
       dataIndex: "endDate",
       key: "endDate",
       render: (endDate) => {
+        console.log(endDate);
         return dayjs(endDate).format(newDateFormat);
       },
     },
@@ -131,16 +132,21 @@ const IndexLinePromotion = ({ setTab }) => {
       key: "status",
       dataIndex: "status",
       render: (status) => {
-        let color;
-        let text;
+        let color = "green";
+        let text = "Hoạt động";
         if (status === 1) {
-          color = "green";
+          color = "success";
           text = "Hoạt động";
-        } else {
-          color = "red";
-          text = "Ngưng hoạt động";
         }
-        return <Badge status={color} text={text} />;
+        if (status === 0) {
+          color = "error";
+          text = "Ngừng hoạt động";
+        }
+        return (
+          <Tag color={color} key={text}>
+            {text.toUpperCase()}
+          </Tag>
+        );
       },
     },
     {
@@ -761,6 +767,8 @@ const IndexLinePromotion = ({ setTab }) => {
           setIdPromotionLine={setIdPromotionLine}
           isShowModelDetail={isShowModelDetail}
           setIsShowModelDetail={setIsShowModelDetail}
+          endDateHeader={endDate}
+          statusDb={statusDb}
         />
       ) : null}
     </div>
