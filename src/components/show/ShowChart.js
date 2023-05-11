@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Input,
   Col,
@@ -10,14 +10,14 @@ import {
   Card,
   DatePicker,
   Select,
+  Form,
 } from "antd";
+
 import "./ShowChart.scss";
 import moment from "moment";
-
-import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
 import CardTime from "./CardTime";
+import useShowChartHook from "./useShowChartHook.js";
 
-const { Title, Text } = Typography;
 const dateFormat = "YYYY/MM/DD";
 const caculatorDay = (dateNumber) => {
   let day = "";
@@ -47,7 +47,71 @@ const caculatorDay = (dateNumber) => {
   return day;
 };
 const ShowChart = ({ setTab }) => {
-  //back to
+  const {
+    listMovie,
+    listCinema,
+    cinema,
+    handleChange,
+    handleChangeCinema,
+    dataTimes,
+    movie,
+    form,
+    handleChangeDate,
+    dateAmount,
+    handeChangeDatePicker
+  } = useShowChartHook();
+  const [showsSang, setShowSang] = useState([]);
+  const [showsChieu, setShowChieu] = useState([]);
+  const [showsToi, setShowToi] = useState([]);
+
+  useEffect(() => {
+    if (dataTimes.length === 7) {
+      const dataSang = dataTimes.map((val) => {
+        const data = val.filter((item) => {
+          const hour = +item?.showTime?.substring(0, 2);
+          if (hour < 12) {
+            return item;
+          }
+        });
+
+        const sortData = data.sort((a, b) => {
+          return +a.showTime?.substring(0, 2) - +b.showTime?.substring(0, 2);
+        });
+        return sortData;
+      });
+
+      const dataChieu = dataTimes.map((val) => {
+        const data = val.filter((item) => {
+          const hour = +item?.showTime?.substring(0, 2);
+          if (hour >= 12 && hour < 18) {
+            return item;
+          }
+        });
+
+        const sortData = data.sort((a, b) => {
+          return +a.showTime?.substring(0, 2) - +b.showTime?.substring(0, 2);
+        });
+        return sortData;
+      });
+      const dataToi = dataTimes.map((val) => {
+        const data = val.filter((item) => {
+          const hour = +item?.showTime?.substring(0, 2);
+          if (hour >= 18 && hour < 24) {
+            return item;
+          }
+        });
+
+        const sortData = data.sort((a, b) => {
+          return +a.showTime?.substring(0, 2) - +b.showTime?.substring(0, 2);
+        });
+        return sortData;
+      });
+      setShowChieu(dataChieu);
+      setShowToi(dataToi);
+      setShowSang(dataSang);
+    }
+  }, [dataTimes]);
+
   const handleReturn = () => {
     setTab(0);
   };
@@ -69,65 +133,68 @@ const ShowChart = ({ setTab }) => {
           marginBottom: "1rem",
         }}
       >
-        <div>
+        <Form form={form} style={{display: "flex"}}>
+          <Form.Item
+            name="cinemaPick"
+            style={{marginBottom: "0px"}}
+          >
           <Select
             placeholder="Chọn chi nhánh"
-            style={{ width:150}}
+            style={{ width: 150 }}
+            options={listCinema}
+            defaultValue={cinema?.id}
+            onChange={handleChangeCinema}
+          ></Select>
+           </Form.Item>
+          <Form.Item
+            name="moviePick"
+            style={{marginBottom: "0px"}}
           >
-            {/* <Option value="jack">Jack</Option>
-            <Option value="lucy">Lucy</Option>
-            <Option value="disabled" disabled>
-              Disabled
-            </Option>
-            <Option value="Yiminghe">yiminghe</Option> */}
-          </Select>
-
-          <Select
+            <Select
             style={{ margin: "0 0.5rem", width: 300 }}
             placeholder="Chọn phim"
-          >
-            {/* <Option value="jack">Jack</Option>
-            <Option value="lucy">Lucy</Option>
-            <Option value="disabled" disabled>
-              Disabled
-            </Option>
-            <Option value="Yiminghe">yiminghe</Option> */}
-          </Select>
-        </div>
+            options={listMovie}
+            defaultValue={listMovie[0]?.value}
+            onChange={handleChange}
+          ></Select>
+          </Form.Item>
+        
+        </Form>
         <div
           style={{
             justifyContent: "flex-end",
           }}
-
         >
-          <DatePicker
+          {/* <DatePicker
             defaultValue={moment()}
             format={dateFormat}
             style={{ margin: "0 0.5rem" }}
-          />
-          <Button type="primary" title="Lịch hiện tại">
+            onChange={handeChangeDatePicker}
+          /> */}
+          <Button type="primary" title="Lịch hiện tại" onClick={() => handleChangeDate(0)}>
             Hiện tại
           </Button>
           <Button
             type="primary"
             title="Lịch hiện tại"
+            onClick={() => handleChangeDate(1)}
             style={{ margin: "0 0.5rem" }}
           >
             Trở về
           </Button>
-          <Button type="primary" title="Lịch hiện tại">
+          <Button type="primary" title="Lịch hiện tại" onClick={() => handleChangeDate(2)}>
             Tiếp
           </Button>
         </div>
       </div>
 
       <Row
-        // style={{ margin: "1rem 0 1rem 0" }}
+        style={{ marginBottom: "5rem" }}
         gutter={{
           xs: 8,
           sm: 16,
           md: 16,
-          lg: 16,   
+          lg: 16,
         }}
       >
         <Col span={24}>
@@ -135,79 +202,83 @@ const ShowChart = ({ setTab }) => {
             <tr>
               <th>Ca chiếu</th>
               <th>
-                {caculatorDay(moment().day())} <br />
-                {moment().format(dateFormat)}
+                {caculatorDay(moment().startOf("week").add(1 + dateAmount, "days").day())}{" "}
+                <br />
+                {moment().startOf("week").add(1 + dateAmount, "days").format(dateFormat)}
               </th>
               <th>
-                {caculatorDay(moment().add(1, "days").day())} <br />
-                {moment().add(1, "days").format(dateFormat)}
+                {caculatorDay(moment().startOf("week").add(2 + dateAmount, "days").day())}{" "}
+                <br />
+                {moment().startOf("week").add(2 + dateAmount, "days").format(dateFormat)}
               </th>
               <th>
-                {caculatorDay(moment().add(2, "days").day())} <br />{" "}
-                {moment().add(2, "days").format(dateFormat)}
+                {caculatorDay(moment().startOf("week").add(3 + dateAmount, "days").day())}{" "}
+                <br />
+                {moment().startOf("week").add(3 + dateAmount, "days").format(dateFormat)}
               </th>
               <th>
-                {caculatorDay(moment().add(3, "days").day())} <br />{" "}
-                {moment().add(3, "days").format(dateFormat)}
+                {caculatorDay(moment().startOf("week").add(4 + dateAmount, "days").day())}{" "}
+                <br />
+                {moment().startOf("week").add(4 + dateAmount, "days").format(dateFormat)}
               </th>
               <th>
-                {caculatorDay(moment().add(4, "days").day())} <br />{" "}
-                {moment().add(4, "days").format(dateFormat)}
+                {caculatorDay(moment().startOf("week").add(5 + dateAmount, "days").day())}{" "}
+                <br />
+                {moment().startOf("week").add(5 + dateAmount, "days").format(dateFormat)}
               </th>
               <th>
-                {caculatorDay(moment().add(5, "days").day())} <br />{" "}
-                {moment().add(5, "days").format(dateFormat)}
+                {caculatorDay(moment().startOf("week").add(6 + dateAmount, "days").day())}{" "}
+                <br />
+                {moment().startOf("week").add(6 + dateAmount, "days").format(dateFormat)}
               </th>
               <th>
-                {caculatorDay(moment().add(6, "days").day())} <br />{" "}
-                {moment().add(6, "days").format(dateFormat)}
+                {caculatorDay(moment().startOf("week").add(7 + dateAmount, "days").day())}{" "}
+                <br />
+                {moment().startOf("week").add(7 + dateAmount, "days").format(dateFormat)}
               </th>
             </tr>
             <tbody className="style-table">
               <tr className="css-row">
                 {" "}
                 <td className="time-row">Sáng </td>
-                <td>
-                  <CardTime />
-                  <CardTime />
-                </td>
-                <td>
-                <CardTime />
-                </td>
-                <td>
-                  <CardTime />
-                </td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                {showsSang.length > 0 &&
+                  showsSang.map((val) => {
+                    return (
+                      <td>
+                        {val?.map((item) => {
+                          return <CardTime movie={movie} item={item} />;
+                        })}
+                      </td>
+                    );
+                  })}
               </tr>
               <tr className="css-row">
                 {" "}
                 <td className="time-row">Chiều </td>
-                <td></td>
-                <td>
-                  <CardTime />
-                </td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>
-                  <CardTime />
-                  <CardTime />
-                </td>
-                <td></td>
+                {showsChieu.length > 0 &&
+                  showsChieu.map((val) => {
+                    return (
+                      <td>
+                        {val?.map((item) => {
+                          return <CardTime movie={movie} item={item} />;
+                        })}
+                      </td>
+                    );
+                  })}
               </tr>
               <tr className="css-row">
                 {" "}
                 <td className="time-row">Tối </td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <CardTime />
-                <td></td>
-                <td></td>
-                <td></td>
+                {showsToi.length > 0 &&
+                  showsToi.map((val) => {
+                    return (
+                      <td>
+                        {val?.map((item) => {
+                          return <CardTime movie={movie} item={item} />;
+                        })}
+                      </td>
+                    );
+                  })}
               </tr>
             </tbody>
           </table>

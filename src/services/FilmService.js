@@ -12,3 +12,13 @@ export const getFilmByCinemaId = async (id) =>{
     }
    
 }
+
+export const getFilmById = async (id) =>{
+    try {
+        const dataResult = await movieApi.getMovieById(id)
+        return dataResult
+    } catch (error) {
+        throw error;
+    }
+   
+}

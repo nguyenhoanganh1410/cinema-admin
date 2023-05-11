@@ -26,7 +26,11 @@ const showApi = {
   },
   updateStatus: (id, status) => {
     return axiosApi.put(`/show/status/${id}`, status);
-  }
+  },
+  getShowByDate: ({idCinema, showDate, idMovie}) => {
+    return axiosApi.get(`/showTimesMovie/showTime/movie?idCinema=${idCinema}&showDate=${showDate}&idMovie=${idMovie}`
+    );
+  },
 
 };
 
