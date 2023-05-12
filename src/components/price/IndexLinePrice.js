@@ -413,7 +413,7 @@ const IndexLinePrice = ({ setTab, selectedIdHeader }) => {
               ]}
             >
               <Input
-                disabled={statusDb === true ? true : false}
+                disabled={statusDb === 1 ? true : false}
                 placeholder="Hãy nhập tên bảng giá..."
               />
             </Form.Item>
@@ -439,7 +439,9 @@ const IndexLinePrice = ({ setTab, selectedIdHeader }) => {
                       return current && current < moment().endOf('day');
                     }
                   }
-                  disabled={[moment().diff( moment(startDate), "seconds" ) > 0 ? true : false, false]}
+                  disabled={ statusDb === 1
+                    ? true
+                    : false || [moment().diff( moment(startDate), "seconds" ) > 0 ? true : false, false]}
                 />
                   
               </Form.Item>

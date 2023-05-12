@@ -338,6 +338,7 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
         });
         const { duration } = await movieApi.getMovieById(moviePicked);
         if (response && res) {
+
           let arrTime = [];
           for (let i = 0; i < response.length; i++) {
             const options = {
@@ -347,6 +348,7 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
             arrTime.push(options);
           }
 
+          
           let arrTimePassed = [];
           for (let i = 0; i < res.length; i++) {
             const options = {
@@ -355,11 +357,9 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
             };
             arrTimePassed.push(options);
           }
-          // console.log("timePicked--", timePicked);
           const timePic = timePicked[timePicked.length - 1];
-          // console.log("timePic", timePic);
+        // console.log("arrTimePassed", arrTimePassed);
 
-          // get list time start from timePicked[0] with condition between element in list time is greater than duration
 
           if (isCheck && arrTimePassed.length > 0) {
             const index = arrTimePassed.findIndex((item) => item.value === timePic);
@@ -384,7 +384,10 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
               } 
             }
             setListTime(arrTimePassed);
-          } else {
+          } else if (isCheck && arrTimePassed.length === 0){
+            setListTime([]);
+          }
+          else {
             const index = arrTime.findIndex((item) => item.value === timePic);
             // console.log("index--", index);
             if (index !== -1) {
