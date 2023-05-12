@@ -30,6 +30,7 @@ import moment from "moment/moment";
 import { useDispatch, useSelector } from "react-redux";
 import { setReload } from "../../redux/actions";
 import movieApi from "../../api/movieApi";
+import { useRoleHook } from "../../utils/useRoleHook.js";
 
 const TableShowTime = ({ record }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -50,6 +51,7 @@ const TableShowTime = ({ record }) => {
 
   const [form] = Form.useForm();
 
+  const {isEmployee} = useRoleHook()
 
   const columns = [
     {
@@ -98,6 +100,7 @@ const TableShowTime = ({ record }) => {
       dataIndex: "id",
       render: (val, record) => {
         setRecord(record);
+        if(isEmployee) return null;
         return (
           <>
             <div

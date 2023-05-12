@@ -13,6 +13,7 @@ import ModelDetailProduct from "./ModelProductDetail";
 import openAddressApi from "../../api/openApi";
 import { useDispatch, useSelector } from "react-redux";
 import { setReload } from "../../redux/actions";
+import { useRoleHook } from "../../utils/useRoleHook.js";
 
 const TableProduct = ({keyword}) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -22,7 +23,7 @@ const TableProduct = ({keyword}) => {
   const [showModalDetailProduct, setShowModalDetailProduct] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [idPick, setIdPick] = useState(0);
-
+  const {isEmployee} = useRoleHook()
 
   const depatch = useDispatch();
   const reload = useSelector((state) => state.reload);
@@ -92,7 +93,7 @@ const TableProduct = ({keyword}) => {
     {
       
       render: (val,record) => {
-        console.log(record)
+        if(isEmployee) return null
         return (
           <Button
           danger

@@ -13,6 +13,7 @@ import ModelDetailMovie from "./ModelMovieDetail";
 
 import { useDispatch, useSelector } from "react-redux";
 import { setReload } from "../../redux/actions";
+import { useRoleHook } from "../../utils/useRoleHook.js";
 
 
 
@@ -26,7 +27,8 @@ const TableFilms = ({keyword,startDatePicker,endDatePicker}) => {
 
   const depatch = useDispatch();
   const reload = useSelector((state) => state.reload);
-  console.log(keyword);
+  const {isMangement} = useRoleHook()
+
   const showModalDetail = (e) => {
     setShowModalDetailMovie(true);
     setSelectedId(e);
@@ -146,6 +148,7 @@ const TableFilms = ({keyword,startDatePicker,endDatePicker}) => {
     },
     {
       render: (val,record) => {
+        if(!isMangement) return null
         return (
           <Button
             disabled={record.status === 1 ? true : false}

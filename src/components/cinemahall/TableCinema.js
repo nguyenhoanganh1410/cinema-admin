@@ -17,12 +17,13 @@ import { BsDoorClosed } from "react-icons/bs";
 import { setReload } from "../../redux/actions";
 import ModelDetailCinema from "./ModelCinemaDetail";
 import { notifySucess } from "../../utils/Notifi";
+import { useRoleHook } from "../../utils/useRoleHook.js";
 
 
 const TableCinema = ({ keyword, setTab, setSelectedIdCinema, setStatusDb }) => {
   const [loading, setLoading] = useState(false);
   const [showModalDetailCustomer, setShowModalDetailCustomer] = useState(false);
-
+  const {isEmployee} = useRoleHook()
 
   const dispatch = useDispatch();
   const reload = useSelector((state) => state.reload);
@@ -154,6 +155,8 @@ const TableCinema = ({ keyword, setTab, setSelectedIdCinema, setStatusDb }) => {
                 }}
               >
               </Button>
+              {
+                isEmployee ? null : 
               <Button
                 disabled={record.status === 1 ? true : false}
                 icon={<DeleteOutlined />}
@@ -163,6 +166,7 @@ const TableCinema = ({ keyword, setTab, setSelectedIdCinema, setStatusDb }) => {
                 }}
                 danger
               ></Button>
+              }
             </Space>
           </>
         );

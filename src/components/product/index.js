@@ -11,12 +11,13 @@ import {
 } from "@ant-design/icons";
 import TableProduct from "./TableProduct";
 import ModelAddProduct from "./ModelAddProduct";
+import { useRoleHook } from "../../utils/useRoleHook.js";
 
 const { Title, Text } = Typography;
 const IndexProduct = () => {
   const [showModalAddProduct, setShowModalAddProduct] = useState(false);
   const [keyword, setKeyword] = useState("");
-
+  const {isEmployee} = useRoleHook()
   const showModal = () => {
     setShowModalAddProduct(true);
   };
@@ -52,9 +53,12 @@ const IndexProduct = () => {
 
         <Col span={3}>
           {" "}
+          {
+            isEmployee ? null : 
           <Button type="primary" icon={<UserAddOutlined />} onClick={showModal}>
             Thêm
           </Button>
+          }
         </Col>
       </Row>
 

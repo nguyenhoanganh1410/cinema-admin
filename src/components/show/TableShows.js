@@ -19,6 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setReload } from "../../redux/actions";
 import cinameApi from "../../api/cinemaApi";
 import movieApi from "../../api/movieApi";
+import { useRoleHook } from "../../utils/useRoleHook.js";
 const { Option } = Select;
 const TableShows = ({ setShowModalAddCustomer, setTab }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -36,7 +37,7 @@ const TableShows = ({ setShowModalAddCustomer, setTab }) => {
 
   const depatch = useDispatch();
   const reload = useSelector((state) => state.reload);
-
+  const {isEmployee} = useRoleHook()
   const [listTimeDuplicate, setListTimeDuplicate] = useState([]);
   const [isModalOpenShow, setIsModalOpenShow] = useState(false);
 
@@ -375,6 +376,8 @@ const TableShows = ({ setShowModalAddCustomer, setTab }) => {
           />
         </div>
         <div>
+          {
+            isEmployee ? null : 
           <Button
             onClick={handleOpenAddShow}
             type="primary"
@@ -386,6 +389,7 @@ const TableShows = ({ setShowModalAddCustomer, setTab }) => {
           >
             Thêm
           </Button>
+          }
           <Button
             type="primary"
             icon={<ScheduleOutlined />}

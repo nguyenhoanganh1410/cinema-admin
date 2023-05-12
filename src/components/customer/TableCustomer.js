@@ -14,6 +14,7 @@ import ModelDetailCustomer from "./ModelCustomerDetail";
 import openAddressApi from "../../api/openApi";
 import { useDispatch, useSelector } from "react-redux";
 import { setReload } from "../../redux/actions";
+import { useRoleHook } from "../../utils/useRoleHook.js";
 
 const { Option } = Select;
 
@@ -26,7 +27,7 @@ const TableCustomer = ({ keySearch }) => {
   const [refreshKey, setRefreshKey] = useState(0);
   const depatch = useDispatch();
   const reload = useSelector((state) => state.reload);
-
+  const {isEmployee} = useRoleHook()
   const showModalDetail = (e) => {
     setShowModalDetailCustomer(true);
     setSelectedId(e);
@@ -159,6 +160,84 @@ const TableCustomer = ({ keySearch }) => {
       
     },
   ];
+  const columnsForEmployee = [
+    {
+      title: "Id",
+      dataIndex: "id",
+    },
+    {
+      title: "Họ và Tên",
+      dataIndex: "name",
+      render: (val,record) => {
+        return (
+          <a
+            onClick={() => {
+              showModalDetail(record.id);
+            }}
+          >
+            {val}
+          </a>
+        );
+      },
+    },
+    {
+      title: "Số điện thoại",
+      dataIndex: "phone",
+    },
+    {
+      title: "Địa chỉ",
+      dataIndex: "address",
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+    },
+    {
+      title: "Cấp bậc",
+      dataIndex: "rank",
+      key: "rank",
+      render: (rank) => {
+        let color = "";
+        if (rank === "START") {
+          color = "green";
+        }
+        if (rank === "GOLD") {
+          color = "gold";
+        }
+        if (rank === "SILVER") {
+          color = "silver";
+        }
+        if (rank === "DIAMOND") {
+          color = "blue";
+        }
+        return (
+          <Tag color={color} key={rank}>
+            {rank?.toUpperCase()}
+          </Tag>
+        );
+      },
+      filters: [
+        {
+          text: "START",
+          value: "START",
+        },
+        {
+          text: "GOLD",
+          value: "GOLD",
+        },
+        {
+          text: "SILVER",
+          value: "SILVER",
+        },
+        {
+          text: "DIAMOND",
+          value: "DIAMOND",
+        },
+      ],
+      onFilter: (value, record) => record.rank.indexOf(value) === 0,
+    },
+
+  ];
 
   const handleChangeStatus = async (value, record) => {
     const updateStatus = async () => {
@@ -190,18 +269,23 @@ const TableCustomer = ({ keySearch }) => {
             if (
               item.city_id && item.district_id && item.ward_id
             ) {
-              const ward = await openAddressApi.getWardByCode(item?.ward_id);
-              const district = await openAddressApi.getDistrictByCode(
-                item?.district_id
-              );
-              const city = await openAddressApi.getProvinceByCode(item?.city_id);
-              item.ward_id = ward?.name;
-              item.district_id = district?.name;
-              item.city_id = city?.name;
-
-              address = ` ${item?.ward_id + " /"} ${item?.district_id + " /"} ${
-                item?.city_id
-              }`;
+              try {
+                const ward = await openAddressApi.getWardByCode(item?.ward_id);
+                const district = await openAddressApi.getDistrictByCode(
+                  item?.district_id
+                );
+                const city = await openAddressApi.getProvinceByCode(item?.city_id);
+                item.ward_id = ward?.name;
+                item.district_id = district?.name;
+                item.city_id = city?.name;
+  
+                address = ` ${item?.ward_id + " /"} ${item?.district_id + " /"} ${
+                  item?.city_id
+                }`;
+                
+              } catch (error) {
+                address = "";
+              }
             } else {
               address = "";
             }
@@ -289,7 +373,7 @@ const TableCustomer = ({ keySearch }) => {
   return (
     <div>
       <Table
-        columns={columns}
+        columns={isEmployee ? columnsForEmployee : columns}
         dataSource={listCustomer}
       />
       <Modal

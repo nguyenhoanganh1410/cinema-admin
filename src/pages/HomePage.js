@@ -55,7 +55,6 @@ import CustomerStatitisComponent from "../components/statistic/customer/Customer
 import PromotionStatitisComponent from "../components/statistic/promotion/PromotionStatitisComponent";
 import FilmStatisticComponent from "../components/statistic/film/FilmStatisticComponent";
 import RefundStatitisComponent from "../components/statistic/refund/RefundStatitisComponent";
-import { IsManager } from "../utils/RoleUser";
 const { Header, Content, Footer, Sider } = Layout;
 
 const { Text } = Typography;
@@ -89,7 +88,6 @@ const items = [
 
   getItem("Sản phẩm", "12", <ProjectOutlined />, [
     getItem("Sản phẩm", "20"),
-    getItem("Bảng giá", "21"),
   ]),
   // getItem("Hệ thống", "sub100", <ProjectOutlined />, [
   //   getItem("Nhân viên", "15"),

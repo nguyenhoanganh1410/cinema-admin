@@ -21,12 +21,13 @@ import {
 import moment from "moment";
 import ModelAddCinema from "./ModelAddCinema";
 import TableCinema from "./TableCinema";
+import { useRoleHook } from "../../utils/useRoleHook.js";
 const { Title, Text } = Typography;
 const dateFormat = "YYYY/MM/DD";
 const IndexCinema = ({ setTab, setSelectedIdCinema, setStatusDb }) => {
+  const { isEmployee } = useRoleHook();
   const [showModalAddCustomer, setShowModalAddCustomer] = useState(false);
   const [keyword, setKeyword] = useState("");
-
 
   const showModal = () => {
     setShowModalAddCustomer(true);
@@ -38,7 +39,6 @@ const IndexCinema = ({ setTab, setSelectedIdCinema, setStatusDb }) => {
 
   return (
     <div className="site-card-wrapper">
-      
       <Title level={5} style={{ marginBottom: "1rem" }}>
         Rạp
       </Title>
@@ -54,21 +54,22 @@ const IndexCinema = ({ setTab, setSelectedIdCinema, setStatusDb }) => {
           <Input
             placeholder="Nhập tên rạp hoặc mã rạp"
             prefix={<SearchOutlined />}
-            onChange={(e) =>  setKeyword(e.target.value)}
+            onChange={(e) => setKeyword(e.target.value)}
           />
         </Col>
         <Col span={8}>
           {" "}
-          <Button
-            type="primary"
-            icon={<UserAddOutlined />}
-            onClick={showModal}
-            title="Thêm mới rạp"
-          >
-            Thêm
-          </Button>
+          {isEmployee ? null : (
+            <Button
+              type="primary"
+              icon={<UserAddOutlined />}
+              onClick={showModal}
+              title="Thêm mới rạp"
+            >
+              Thêm
+            </Button>
+          )}
         </Col>
-        
       </Row>
 
       <Row
@@ -81,7 +82,12 @@ const IndexCinema = ({ setTab, setSelectedIdCinema, setStatusDb }) => {
         }}
       >
         <Col span={24}>
-          <TableCinema keyword={keyword} setTab={setTab} setSelectedIdCinema={setSelectedIdCinema} setStatusDb={setStatusDb} />
+          <TableCinema
+            keyword={keyword}
+            setTab={setTab}
+            setSelectedIdCinema={setSelectedIdCinema}
+            setStatusDb={setStatusDb}
+          />
         </Col>
       </Row>
       {showModalAddCustomer ? (
