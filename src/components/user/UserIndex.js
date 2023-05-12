@@ -35,6 +35,8 @@ const UserInfo = () => {
     handleCancel,
     setFileList,
     handlePreview,
+    loadingPassword,
+    handleUpdatePassword
   } = useUserHook();
   useEffect(() => {
     form.setFieldsValue({
@@ -95,7 +97,7 @@ const UserInfo = () => {
                   </Upload>
                   <Modal
                     open={previewOpen}
-                   // title={previewTitle}
+                    // title={previewTitle}
                     footer={null}
                     onCancel={handleCancel}
                   >
@@ -129,9 +131,8 @@ const UserInfo = () => {
               <Col span={14}>
                 <Form.Item rules={[yupSync]} name="first_name">
                   <Input
-                    style={{ width: "50%", textTransform:"capitalize" }}
+                    style={{ width: "50%", textTransform: "capitalize" }}
                     placeholder="Enter first name"
-
                   />
                 </Form.Item>
               </Col>
@@ -155,7 +156,7 @@ const UserInfo = () => {
               <Col span={14}>
                 <Form.Item rules={[yupSync]} name="last_name">
                   <Input
-                     style={{ width: "50%", textTransform:"capitalize" }}
+                    style={{ width: "50%", textTransform: "capitalize" }}
                     placeholder="Enter last name"
                   />
                 </Form.Item>
@@ -205,8 +206,14 @@ const UserInfo = () => {
             </Row>
           </Form>
 
-          {/* <Form style={{ marginTop: "2rem" }}>
-            <Row style={{ marginTop: "0.5rem" }} gutter={16}>
+          <Form
+            style={{ marginTop: "2rem" }}
+            layout="vertical"
+            id="myForm"
+            form={form}
+            onFinish={handleUpdatePassword}
+          >
+            {/* <Row style={{ marginTop: "0.5rem" }} gutter={16}>
               <Col
                 span={10}
                 style={{ display: "flex", justifyContent: "flex-end" }}
@@ -230,7 +237,7 @@ const UserInfo = () => {
                   />
                 </Form.Item>
               </Col>
-            </Row>
+            </Row> */}
             <Row style={{ marginTop: "0.5rem" }} gutter={16}>
               <Col
                 span={10}
@@ -288,10 +295,17 @@ const UserInfo = () => {
                 className="gutter-row"
               ></Col>
               <Col span={14}>
-                <Button type="primary">Save</Button>
+                <Button
+                  form="myForm"
+                  htmlType="submit"
+                  type="primary"
+                  loading={loadingPassword}
+                >
+                  Save
+                </Button>
               </Col>
             </Row>
-          </Form> */}
+          </Form>
         </Col>
       </Row>
     </div>

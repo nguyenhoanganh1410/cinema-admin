@@ -18,3 +18,12 @@ export const handleResetPassword = async (email, token, password) =>{
         throw error;
     }
 }
+
+export const handleUpdatePass = async (email, password) =>{
+    try {
+        const dataResult = await authApi.updatePassword(email, password)
+        return dataResult
+    } catch (error) {
+        throw error;
+    }
+}

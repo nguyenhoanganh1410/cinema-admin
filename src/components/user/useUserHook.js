@@ -27,10 +27,14 @@ import { notifyError, notifySucess } from "../../utils/Notifi";
 import tokenService from "../../service/token.service";
 import { useNavigate } from "react-router-dom";
 import { setCinema, setUser } from "../../redux/actions";
+import { handleUpdatePass } from "../../services/AuthService";
 
 let schema = yup.object().shape({
   first_name: yup.string().trim().required(NOT_EMPTY),
   last_name: yup.string().trim().required(NOT_EMPTY),
+  current_password: yup.string().trim().required(NOT_EMPTY),
+  new_password: yup.string().trim().required(NOT_EMPTY),
+  confirm_password: yup.string().trim().required(NOT_EMPTY),
 });
 
 export const yupSync = {
@@ -60,6 +64,7 @@ const useUserHook = (showModalAddCustomer, setShowModalAddCustomer) => {
   const [userCurrent, setUserCurrent] = useState(null);
   const [file, setFile] = useState(null);
   const [loadingProfile, setLoadingProfile] = useState(false);
+  const [loadingPassword, setLoadingPassword] = useState(false);
   const depatch = useDispatch();
   const navigate = useNavigate();
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -113,7 +118,6 @@ const useUserHook = (showModalAddCustomer, setShowModalAddCustomer) => {
       const newStaff = {
         staff
       }
-      console.log(newStaff)
         //luu thông tin acessTonken vào localstorage
       tokenService.setUser(newStaff);
       depatch(setUser(staff));
@@ -128,6 +132,20 @@ const useUserHook = (showModalAddCustomer, setShowModalAddCustomer) => {
     
   };
 
+  const handleUpdatePassword = (values) => {
+    if(values?.new_password !== values?.confirm_password) {
+      notifyError("Mật khẩu phải trùng khớp.");
+      return;
+    }
+    handleUpdatePass(userCurrent?.email,values?.new_password).then(() => {
+      notifySucess("Cập nhật thành công.");
+      form.setFieldValue("current_password","")
+      form.setFieldValue("new_password","")
+      form.setFieldValue("confirm_password","")
+    }).catch(() => {
+      notifySucess("Cập nhật thất bại.");
+    })
+  }
   useEffect(() => {
     //get info user in local storage
     setUserCurrent(TokenService.getUser().staff);
@@ -150,7 +168,9 @@ const useUserHook = (showModalAddCustomer, setShowModalAddCustomer) => {
     fileList,
     handleCancel,
     handlePreview,
-    setFileList
+    setFileList,
+    loadingPassword,
+    handleUpdatePassword
   };
 };
 
