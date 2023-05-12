@@ -59,8 +59,9 @@ const FilmStatisticComponent = () => {
         <Col span={12}>
           <Select
             placeholder="Chọn phim"
+            allowClear
             style={{
-              width: "200px",
+              width: "70%",
               margin: "0 1rem",
             }}
             options={listMovie}

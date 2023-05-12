@@ -81,18 +81,24 @@ const ResultPage = ({ setCurrent, setIsSucess, idOrder }) => {
           };
         });
         setOrderDetail(listSeat);
-        listSeat.forEach((item) => {
-          if (item.productCode === "G001") {
-            setDetailSeatNomal((detailSeatNomal) => [...detailSeatNomal, item]);
-          } else {
-            setDetailSeatVip((detailSeatVip) => [...detailSeatVip, item]);
-          }
-        });
+        // listSeat.forEach((item) => {
+        //   if (item.productCode === "G001") {
+        //     setDetailSeatNomal();
+        //   } else {
+        //     setDetailSeatVip((detailSeatVip) => [...detailSeatVip, item]);
+        //   }
+        // });
+        const listNormal = listSeat.filter(
+          (item) => item.productCode === "G001"
+        );
+        const listVip = listSeat.filter((item) => item.productCode === "G003");
+        setDetailSeatNomal(listNormal);
+        setDetailSeatVip(listVip);
       }
     };
     fetchOrder();
     fetchOrderDetail();
-  }, [idOrder]);
+  }, []);
 
   const PageBreakWrapper = styled.div`
     && {
@@ -190,21 +196,26 @@ const ResultPage = ({ setCurrent, setIsSucess, idOrder }) => {
                       alignItems: "normal",
                     }}
                   >
-                    {seatNomal.map((item, index) => (
-                      <>
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                          }}
-                        >
-                          <span>Seat: {item?.position} </span>
-                          <span>{item?.productCode}</span>
-                          <span>{item?.price}</span>
-                        </div>
-                      </>
-                    ))}
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <span>
+                        {seatNomal.map((item, index) => (
+                          <>
+                            {item?.position}
+                            {index < seatNomal.length - 1 ? ", " : ""}
+                          </>
+                        ))}
+                      </span>
+                      <span>{seatNomal[0]?.productCode}</span>
+                      <span>
+                        {seatNomal[0]?.price * seatNomal.length}
+                      </span>
+                    </div>
                   </Row>
                   <Row className="print-content">
                     <span>
@@ -223,7 +234,26 @@ const ResultPage = ({ setCurrent, setIsSucess, idOrder }) => {
                       alignItems: "normal",
                     }}
                   >
-                    {seatVip.map((item, index) => (
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <span>
+                        {seatVip.map((item, index) => (
+                          <>
+                            {item?.position}
+                            {index < seatVip.length - 1 ? ", " : ""}
+                          </>
+                        ))}
+                      </span>
+                      <span>{seatVip[0]?.productCode}</span>
+                      <span>{seatVip[0]?.price * seatVip.length}</span>
+
+                    </div>
+                    {/* {seatVip.map((item, index) => (
                       <>
                         <div
                           style={{
@@ -237,7 +267,7 @@ const ResultPage = ({ setCurrent, setIsSucess, idOrder }) => {
                           <span>{item?.price}</span>
                         </div>
                       </>
-                    ))}
+                    ))} */}
                   </Row>
                   <Row className="print-content">
                     <span>
@@ -305,7 +335,7 @@ const ResultPage = ({ setCurrent, setIsSucess, idOrder }) => {
 
   const handleReset = () => {
     setCurrent(0);
-    setIsSucess(false)
+    setIsSucess(false);
   };
 
   const handlePrint = () => {};

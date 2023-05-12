@@ -87,7 +87,7 @@ const ModelAddProduct = ({
     console.log("name", productCode.valueAsNumber);
 
     const data = new FormData();
-    data.append("type", type? type : "");
+    data.append("type", "SP");
     data.append("productCode", productCode? productCode : "");
     data.append("productName", productName ? productName : "");
     data.append("typeHall", typeHall ? typeHall : "");
@@ -102,10 +102,11 @@ const ModelAddProduct = ({
         onClose();
         depatch(setReload(!reload));
         form.resetFields();
-          message.success("Thêm khách hàng thành công!");
+          message.success("Thêm sản phẩm thành công!");
       }
     } catch (error) {
       console.log(error);
+      message.error("Mã sản phẩm đã tồn tại!");
     }
   };
 
@@ -142,35 +143,6 @@ const ModelAddProduct = ({
         <Form form={form} onFinish={handleSubmit} id="myForm" layout="vertical">
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item name="type" label="Loại sản phẩm"
-                rules={[
-                  {
-                    required: true,
-                    message: "Hãy chọn loại sản phẩm",
-                  },
-                ]}
-              >
-                <Select
-                  placeholder="Chọn loại sản phẩm"
-                  style={{
-                    width: "100%",
-                  }}
-                  
-                  onChange={onChangeType}
-                  options={[
-                    {
-                      value: "Ghe",
-                      label: "Ghế",
-                    },
-                    {
-                      value: "SP",
-                      label: "Sản phẩm",
-                    },
-                  ]}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
               <Form.Item name="productCode" label="Mã sản phẩm"
                 rules={[
                   {
@@ -193,9 +165,6 @@ const ModelAddProduct = ({
                 />
               </Form.Item>
             </Col>
-            <Col span={12}></Col>
-          </Row>
-          <Row gutter={16}>
             <Col span={12}>
               <Form.Item name="productName" label="Tên sản phẩm"
                 rules={[
@@ -208,6 +177,9 @@ const ModelAddProduct = ({
                 <Input />
               </Form.Item>
             </Col>
+          </Row>
+          <Row gutter={16}>
+            
             <Col span={12}>
             <Form.Item
                 name="image"

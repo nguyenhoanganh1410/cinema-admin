@@ -61,17 +61,17 @@ const useCustomerComponentHook = () => {
               phone: val?.Customer.phone,
               tickets: val?.totalOrder,
               rank: val?.Customer?.Rank?.nameRank,
-              city: address?.length > 0 ? address[2].replace("Thành phố", "") : "-",
-              district: address?.length > 0 ? address[1].replace("Thành phố", "").replace("Quận", "").replace("huyện", "") : "-",
-              ward: address?.length > 0 ? address[0].replace("Phường", "") : "-"
+              city: address?.length > 0 ? address[2]?.replace("Thành phố", "") : "-",
+              district: address?.length > 0 ? address[1]?.replace("Thành phố", "")?.replace("Quận", "")?.replace("huyện", "") : "-",
+              ward: address?.length > 0 ? address[0]?.replace("Phường", "") : "-"
             };
           });
           console.log(newDate);
           setRevenues(newDate);
         }
       })
-      .catch(() => {
-        console.log("fetch revunues failed!!"); 
+      .catch((err) => {
+        console.log(err); 
       });
   }, [params]);
 

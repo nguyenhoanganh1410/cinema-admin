@@ -132,6 +132,22 @@ const TableShows = ({ setShowModalAddCustomer, setTab }) => {
         );
       },
     },
+    {
+      render: (val,record) => {
+        return (
+          <Button
+            disabled={record.status === 1 ? true : false}
+            icon={<DeleteOutlined />}
+            onClick={() => {
+              setSelectedId(record.id);
+              handleDelete();
+            }}
+            danger
+          >
+          </Button>
+        );
+      },
+    },
   ];
 
   useEffect(() => {
@@ -249,10 +265,20 @@ const TableShows = ({ setShowModalAddCustomer, setTab }) => {
   };
   const handleOk = () => {
     setIsModalOpen(false);
-
-    //handle code for log out in here
-
-    ////////
+    const deleteShow = async () => {
+      try {
+        const response = await showApi.deleteShow(selectedId);
+        if (response) {
+          message.success("Xóa thành công");
+          depatch(setReload(!reload));
+          setSelectedId(0);
+        }
+      } catch (error) {
+        console.log(error);
+        message.error("Xóa thất bại");
+      }
+    };
+    deleteShow();
   };
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -412,12 +438,19 @@ const TableShows = ({ setShowModalAddCustomer, setTab }) => {
         dataSource={listShow}
       />
       <Modal
-        title="Xóa bộ phim"
+        title="Xóa lịch chiếu"
         open={isModalOpen}
-        onOk={handleOk}
         onCancel={handleCancel}
+        footer={[
+          <Button key="back" onClick={handleCancel}>
+            Hủy
+          </Button>,
+          <Button key="submit" danger type="primary" onClick={handleOk}>
+            Xóa
+          </Button>,
+        ]}
       >
-        <p>Bạn muốn xóa bộ phim này không?</p>
+        <p>Bạn muốn xóa lịch chiếu này không?</p>
       </Modal>
       <Modal
         title="Danh sách lịch trùng"

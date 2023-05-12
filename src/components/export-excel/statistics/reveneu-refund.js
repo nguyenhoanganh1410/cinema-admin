@@ -172,7 +172,7 @@ export async function exportExcel (data, start_date, end_date) {
                 const item = detail[i]
                 worksheet.addRow({
                     index: '',
-                    id: item.Product.id,
+                    id: item.Product.productCode,
                     createdAt: item.Product.productName,
                     refundAt: item.Product.type === 'SP' ? 'Sản phẩm' : 'Ghế',
                     count: Number(item.amount),
