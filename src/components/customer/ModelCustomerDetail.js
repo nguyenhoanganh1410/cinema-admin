@@ -80,15 +80,18 @@ const ModelDetailCustomer = ({
     data.append("firstName", firstName);
     data.append("lastName", lastname);
     data.append("phone", phone);
-    data.append("email", email );
-    data.append("address", address);
     // data.append("dob", dob);
     // data.append("note", note);
-    data.append("city_id", provincePicked);
-    data.append("district_id", districtPicked);
-    data.append("ward_id", wardPicked);
-    data.append("street", address);
-    console.log("data", image);
+    if ( provincePicked !== 0  || districtPicked !== 0 || wardPicked !== 0 || address || email) {
+      data.append("city_id", provincePicked  );
+      data.append("district_id", districtPicked   );
+      data.append("ward_id", wardPicked   );
+      data.append("address", address);
+      data.append("street", address);
+      data.append("email", email );
+
+
+    }
     if ( image.length > 0 && image[0].uid !== "-1"  ) {
       data.append("image", image[0].originFileObj);
     } 
@@ -105,8 +108,9 @@ const ModelDetailCustomer = ({
         depatch(setReload(!reload));
       }
     } catch (error) {
-      message.error("Cập nhật thất bại");
-      console.log(error);
+      const err_mess = error.response.data.message;
+      message.error("Cập nhật thất bại: " + err_mess + " ");
+
     }
   };
 

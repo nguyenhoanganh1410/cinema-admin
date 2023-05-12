@@ -123,7 +123,8 @@ const TableProduct = ({keyword}) => {
               key: item.id,
             };
           });
-          setListProduct(data.reverse());
+          const newList = data.filter((item) => item.type === "SP");
+          setListProduct(newList.reverse());
         }
       } catch (error) {
         console.log("Failed to fetch product list: ", error);
@@ -212,6 +213,7 @@ const TableProduct = ({keyword}) => {
       <Modal
         title="Xóa sản phẩm"
         open={isModalOpen}
+        onCancel={handleCancel}
         footer={[
           <Button key="back" onClick={handleCancel}>
             Hủy

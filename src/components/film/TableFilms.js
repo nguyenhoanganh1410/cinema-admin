@@ -74,44 +74,6 @@ const TableFilms = ({keyword,startDatePicker,endDatePicker}) => {
       title: "Ngày kết thúc",
       dataIndex: "endDate",
     },
-    // {
-    //   title: "Tình trạng",
-    //   dataIndex: "status",
-    //   render: (status) => {
-    //       let color = "green";
-    //       let text = "Đang chiếu";
-    //       if (status === 1) {
-    //         color = "success";
-    //         text = "Đang chiếu";
-    //       }
-    //       if (status === 0) {
-    //         color = "processing";
-    //         text = "Sắp chiếu";
-    //       }
-    //       if (status === 2) {
-    //         color = "error";
-    //         text = "Đã kết thúc";
-    //       }
-    //     return (
-    //       <Badge status={color} text={text} />
-    //     );
-    //   },
-    //   filters: [
-    //     {
-    //       text: "Đang chiếu",
-    //       value: 1,
-    //     },
-    //     {
-    //       text: "Sắp chiếu",
-    //       value: 0,
-    //     },
-    //     {
-    //       text: "Đã kết thúc",
-    //       value: 2,
-    //     },
-    //   ],
-    //   onFilter: (value, record) => record.status === value,
-    // },
     {
       title: "Trạng thái",
       dataIndex: "status",
@@ -246,12 +208,19 @@ const TableFilms = ({keyword,startDatePicker,endDatePicker}) => {
        
       />
       <Modal
-        title="Xóa bộ phim"
+        title="Xóa phim"
         open={isModalOpen}
-        onOk={handleOk}
         onCancel={handleCancel}
+        footer={[
+          <Button key="back" onClick={handleCancel}>
+            Hủy
+          </Button>,
+          <Button key="submit" danger type="primary" onClick={handleOk}>
+            Xóa
+          </Button>,
+        ]}
       >
-        <p>Bạn muốn xóa bộ phim này không?</p>
+        <p>Bạn muốn phim này không?</p>
       </Modal>
 
       {showModalDetailMovie ? (

@@ -161,6 +161,17 @@ const TablePromotionHeader = ({
           return <Badge status="error" text="Ngưng hoạt đông" />;
         }
       },
+      filters: [
+        {
+          text: "Hoạt động",
+          value: 1,
+        },
+        {
+          text: "Ngưng hoạt động",
+          value: 0,
+        }
+      ],
+      onFilter: (value, record) => record.statusPromotion === value,
     },
     {
       dataIndex: "id",

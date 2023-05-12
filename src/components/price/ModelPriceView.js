@@ -65,7 +65,7 @@ const ModelPriceView = ({
   };
 
   const handleExportExcel = () => {
-    console.log("export excel");
+    console.log("priceLine",priceLine);
   };
 
   
@@ -112,13 +112,15 @@ const ModelPriceView = ({
               }} >Thông tin cơ bản</span>
             </Col>
             <Col span={12}>
-              {/* <Button
+              {/* {priceLine.length > 0 && (
+                <Button
                 style={{ float: "right" }}
                 onClick={handleExportExcel}
                 icon={<FileExcelOutlined />}
               >
                 Xuất excel
-              </Button> */}
+              </Button>
+              )} */}
             </Col>
           </Row> 
         </Space>
@@ -140,7 +142,7 @@ const ModelPriceView = ({
               <span
               >
                 Mã bảng giá:
-                <span> {priceDetail?.id} </span>
+                <span> {priceDetail?.priceCode} </span>
               </span>
             </Col>
             <Col span={12}>

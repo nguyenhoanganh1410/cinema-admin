@@ -61,12 +61,17 @@ const ModelAddCustomer = ({
       userCreate: user.id,
       priceCode: values.priceCode,
     };
-    const res = await priceApi.createPriceHeader(data);
-    console.log("res:", res);
-    if (res) {
-      message.success("Tạo mới bảng giá thành công!");
-      depatch(setReload(!reload));
-      onClose();
+    try {
+      const res = await priceApi.createPriceHeader(data);
+      console.log("res:", res);
+      if (res) {
+        message.success("Tạo mới bảng giá thành công!");
+        depatch(setReload(!reload));
+        onClose();
+      }
+    } catch (error) {
+      console.log("error:", error);
+      message.error("Mã bảng giá đã tồn tại!");
     }
   };
 

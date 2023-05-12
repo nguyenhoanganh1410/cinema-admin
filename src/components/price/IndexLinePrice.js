@@ -239,8 +239,9 @@ const IndexLinePrice = ({ setTab, selectedIdHeader }) => {
         const { data } = error.response;
         let messageError;
         if (data.status === 409) {
+          console.log(data.data[0].PriceHeader);
           messageError = `Thêm thất bại: Sản phẩm đã được áp dụng cho bảng giá:
-           Mã: ${data.data[0].PriceHeader.id} - Tên: ${data.data[0].PriceHeader.name} - (${data.data[0].PriceHeader.startDate} - ${data.data[0].PriceHeader.endDate} )`;
+           Mã: ${data.data[0].PriceHeader.priceCode} - Tên: ${data.data[0].PriceHeader.name} - (${data.data[0].PriceHeader.startDate} - ${data.data[0].PriceHeader.endDate} )`;
         }
         message.error(messageError, 7);
       }

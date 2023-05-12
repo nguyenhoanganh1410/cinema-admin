@@ -242,6 +242,7 @@ const TableFilms = ({ start_date, end_date }) => {
     }
     try {
       const res = await orderApi.refund(order?.id, payload);
+      console.log(res);
       if (res) {
         message.success("Đổi trả thành công");
         depatch(setReload(!reload));
@@ -304,7 +305,7 @@ const TableFilms = ({ start_date, end_date }) => {
       }
     };
     gettListOrder();
-  }, [reload,start_date,end_date]);
+  }, [reload ,start_date,end_date]);
 
   return (
     <div>

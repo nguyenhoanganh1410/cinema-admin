@@ -78,29 +78,7 @@ const IndexPromotion = ({ setTab }) => {
         </Col>
     
         <Col span={5}>
-          <Form.Item>
-            <Select
-              defaultValue={1}
-              style={{
-                width: 220,
-              }}
-              onChange={handleChange}
-              options={[
-                {
-                  value: 1,
-                  label: "Tất cả",
-                },
-                {
-                  value: 2,
-                  label: "Hoạt động",
-                },
-                {
-                  value: 3,
-                  label: "Ngưng Hoạt động",
-                },
-              ]}
-            />
-          </Form.Item>
+         
         </Col>
         <Col span={2}>
           {" "}

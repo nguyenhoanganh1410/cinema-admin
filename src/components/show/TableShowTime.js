@@ -96,8 +96,8 @@ const TableShowTime = ({ record }) => {
     },
     {
       dataIndex: "id",
-      render: (val, record) => {
-        setRecord(record);
+      render: (val, rc) => {
+
         return (
           <>
             <div
@@ -113,12 +113,15 @@ const TableShowTime = ({ record }) => {
                 onClick={() => showModalDetail()}
               ></Button> */}
               <Button
+                disabled={record.status === 1 ? true : false}
                 style={{
                   marginLeft: "10px",
                 }}
                 onClick={() => {
                   setIsModalOpenDelete(true);
                   // setIdPriceLine(record.id);
+                  setRecord(rc);
+
                 }}
                 danger
                 icon={<MinusCircleOutlined color="red" />}
@@ -138,6 +141,7 @@ const TableShowTime = ({ record }) => {
         for (const index in response) {
           console.log(response[index]);
           data.push({
+            id: response[index][0].id,
             showDate: index,
             showTime: response[index].map((item, index) => {
               return item.showTime;
@@ -263,8 +267,8 @@ const TableShowTime = ({ record }) => {
 
   const handleOkDelete = async () => {
     setIsModalOpenDelete(false);
+    console.log(records);
     try {
-      console.log(records);
       const res = await showTimeApi.deleteShowTime(record.id, records.showDate);
       console.log(res);
       if (res) {
@@ -273,7 +277,7 @@ const TableShowTime = ({ record }) => {
       }
     } catch (error) {
       console.log(error);
-      message.error("Xóa thất bại");
+      message.error("Suất chiếu này đã có người đặt vé, không thể xóa");
     }
   };
 
@@ -311,7 +315,7 @@ const TableShowTime = ({ record }) => {
           <Button key="back" onClick={handleCancelDelete}>
             Hủy
           </Button>,
-          <Button key="submit" type="primary" onClick={handleOkDelete}>
+          <Button key="submit" type="primary" onClick={handleOkDelete} danger>
             Xác nhận
           </Button>,
         ]}
@@ -320,6 +324,7 @@ const TableShowTime = ({ record }) => {
       </Modal>
       <Modal
         title="Cập nhật ngày chiếu"
+        
         open={isModalOpenDetail}
         onOk={handleOkDetail}
         onCancel={handleCancelDetail}
