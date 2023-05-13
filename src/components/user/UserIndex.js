@@ -12,7 +12,7 @@ import {
   Form,
   Modal,
 } from "antd";
-import useUserHook, { yupSync } from "./useUserHook";
+import useUserHook, { yupSync, yupSyncPassword } from "./useUserHook";
 import { PlusOutlined } from "@ant-design/icons";
 
 const UserInfo = () => {
@@ -36,7 +36,9 @@ const UserInfo = () => {
     setFileList,
     handlePreview,
     loadingPassword,
-    handleUpdatePassword
+    handleUpdatePassword,
+    schemaPassword,
+    form1
   } = useUserHook();
   useEffect(() => {
     form.setFieldsValue({
@@ -210,7 +212,7 @@ const UserInfo = () => {
             style={{ marginTop: "2rem" }}
             layout="vertical"
             id="myForm"
-            form={form}
+            form={form1}
             onFinish={handleUpdatePassword}
           >
             {/* <Row style={{ marginTop: "0.5rem" }} gutter={16}>
@@ -255,7 +257,7 @@ const UserInfo = () => {
                 </p>
               </Col>
               <Col span={14}>
-                <Form.Item rules={[yupSync]} name="new_password">
+                <Form.Item rules={[yupSyncPassword]} name="new_password">
                   <Input.Password
                     style={{ width: "50%" }}
                     placeholder="Enter password"
@@ -280,7 +282,7 @@ const UserInfo = () => {
                 </p>
               </Col>
               <Col span={14}>
-                <Form.Item rules={[yupSync]} name="confirm_password">
+                <Form.Item rules={[yupSyncPassword]} name="confirm_password">
                   <Input.Password
                     style={{ width: "50%" }}
                     placeholder="Enter password"

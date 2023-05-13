@@ -37,12 +37,27 @@ let schema = yup.object().shape({
   confirm_password: yup.string().trim().required(NOT_EMPTY),
 });
 
+let schemaPassword = yup.object().shape({
+  current_password: yup.string().trim().required(NOT_EMPTY),
+  new_password: yup.string().trim().required(NOT_EMPTY),
+  confirm_password: yup.string().trim().required(NOT_EMPTY),
+});
 export const yupSync = {
   async validator({ field }, value) {
     if (field === "namePromotion") {
       value = removeAscent(value);
     }
     await schema.validateSyncAt(field, { [field]: value });
+  },
+};
+
+
+export const yupSyncPassword = {
+  async validator({ field }, value) {
+    if (field === "namePromotion") {
+      value = removeAscent(value);
+    }
+    await schemaPassword.validateSyncAt(field, { [field]: value });
   },
 };
 
@@ -59,6 +74,7 @@ const getBase64 = (file) =>
 
 const useUserHook = (showModalAddCustomer, setShowModalAddCustomer) => {
   const [form] = Form.useForm();
+  const [form1] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState(null);
   const [userCurrent, setUserCurrent] = useState(null);
@@ -139,9 +155,9 @@ const useUserHook = (showModalAddCustomer, setShowModalAddCustomer) => {
     }
     handleUpdatePass(userCurrent?.email,values?.new_password).then(() => {
       notifySucess("Cập nhật thành công.");
-      form.setFieldValue("current_password","")
-      form.setFieldValue("new_password","")
-      form.setFieldValue("confirm_password","")
+      form1.setFieldValue("current_password","")
+      form1.setFieldValue("new_password","")
+      form1.setFieldValue("confirm_password","")
     }).catch(() => {
       notifySucess("Cập nhật thất bại.");
     })
@@ -170,7 +186,9 @@ const useUserHook = (showModalAddCustomer, setShowModalAddCustomer) => {
     handlePreview,
     setFileList,
     loadingPassword,
-    handleUpdatePassword
+    handleUpdatePassword,
+    schemaPassword,
+    form1
   };
 };
 
