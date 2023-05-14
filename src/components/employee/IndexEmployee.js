@@ -49,11 +49,11 @@ const IndexEmployee = () => {
             Thêm
           </Button>
         </Col>
-        <Col span={1}>
+        {/* <Col span={1}>
           <Button type="primary" icon={<DownloadOutlined />}>
             Xuất file
           </Button>
-        </Col>
+        </Col> */}
       </Row>
 
       <Row

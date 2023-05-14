@@ -117,14 +117,12 @@ const ModelAddPromoLine = ({
     if (startDateDb && endDateDb) {
       setStartDate(startDateDb);
       setEndDate(endDateDb);
-      console.log("startDateDb", startDateDb);
-      console.log("endDateDb", endDateDb);
-      form.setFieldsValue({
-        date: [
-          dayjs(startDateDb, newDateFormat),
-          dayjs(endDateDb, newDateFormat),
-        ],
-      });
+      // form.setFieldsValue({
+      //   date: [
+      //     dayjs(startDateDb, newDateFormat),
+      //     dayjs(endDateDb, newDateFormat),
+      //   ],
+      // });
     }
   }, []);
 

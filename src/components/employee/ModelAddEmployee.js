@@ -46,9 +46,9 @@ const ModelAddEmployee = ({
         }}
         extra={
           <Space>
-            <Button onClick={onClose}>Cancel</Button>
+            <Button onClick={onClose}>Hủy</Button>
             <Button form="myFormAddLinePro" htmlType="submit" type="primary">
-              Submit
+              Lưu
             </Button>
           </Space>
         }
@@ -110,11 +110,7 @@ const ModelAddEmployee = ({
                     },
                     {
                       value: "2",
-                      label: "Nhân viên thu ngân",
-                    },
-                    {
-                      value: "4",
-                      label: "Nhân viên hậu cần",
+                      label: "Nhân viên",
                     },
                   ]}
                 />

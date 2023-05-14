@@ -61,6 +61,8 @@ const LoginForm = () => {
         if(error?.response?.data?.message === "Password is not valid" || error?.response?.data?.message === "Tài khoản hoặc mật khẩu sai.") {
           setError("Tên tài khoản hoặc mật khẩu không chính xác.")
 
+        }  else {
+          setError(error?.response?.data?.message)
         }
         setLoadingStatus(false)
       }

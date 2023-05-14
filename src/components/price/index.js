@@ -64,7 +64,7 @@ const IndexCustomer = ({ setTab ,setSelectedIdHeader}) => {
           return {
             productCode: item.productCode,
             productName: item.productName,
-            price: item.price,
+            price: item.price || 0,
           };
         });
         setListProduct(data);

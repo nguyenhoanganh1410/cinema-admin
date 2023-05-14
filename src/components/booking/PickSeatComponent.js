@@ -83,7 +83,12 @@ const PickSeatComponent = ({ next }) => {
       try {
         const response = await priceApi.getPriceProduct();
         if (response) {
-          setListPrice(response);
+          const data = response?.filter(val => {
+            return val?.price > 0;
+
+          })
+          
+          setListPrice(data)
         }
       } catch (error) {
         console.log("Featch erro: ", error);

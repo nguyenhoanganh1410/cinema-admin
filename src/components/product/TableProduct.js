@@ -84,13 +84,6 @@ const TableProduct = ({keyword}) => {
 
     },
     {
-      title: "Hình ảnh",
-      dataIndex: "image",
-      width: "20%",
-
-      render: (image) => <Image width={50} src={image} />,
-    },
-    {
       
       render: (val,record) => {
         if(isEmployee) return null

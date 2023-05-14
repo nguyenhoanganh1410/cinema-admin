@@ -239,7 +239,7 @@ const TableEmployee = ({searchText}) => {
         >
           Xóa
         </Button>
-        <Button
+        {/* <Button
           type="primary"
           onClick={handleUpdate}
           disabled={!selectedOne}
@@ -247,7 +247,7 @@ const TableEmployee = ({searchText}) => {
           icon={<ToolOutlined />}
         >
           Cập nhật
-        </Button>
+        </Button> */}
         <span
           style={{
             marginLeft: 8,

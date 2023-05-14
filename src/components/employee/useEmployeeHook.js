@@ -64,7 +64,7 @@ const useEmployeeHook = (showModalAddCustomer, setShowModalAddCustomer) => {
   const [startDate, setStartDate] = useState("");
   const depatch = useDispatch();
   const cinema = useSelector((state) => state.cinema);
-
+  const reload = useSelector((state) => state.reload);
   const onChangeProvince = (value) => {
     console.log(`selected ${value}`);
     setProvincePicked(value);
@@ -190,11 +190,17 @@ const useEmployeeHook = (showModalAddCustomer, setShowModalAddCustomer) => {
       if (rs) {
         message.success("Tạo mới thành công");
         setShowModalAddCustomer(false);
+        depatch(setReload(!reload))
       }
     } catch (error) {
       console.log(error);
+      if("Email or Phone is exist" === error?.response?.data?.message ){
+        notifyError("Email hoặc số điện thoại đã tồn tại.");
+      } else{
+        notifyError( error?.response?.data?.message)
+      }
 
-      notifyError(error?.response?.data?.message);
+     
     }
   };
 

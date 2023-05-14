@@ -68,8 +68,6 @@ const useModelPromotionLine = ({
 
 //   //handle submit form create new customer...
   const handleSubmit = (val) => {
-    console.log("val", val);
-
     const payloadLine = {
       desc: val.desc,
       startDate: startDate,
@@ -173,8 +171,8 @@ const useModelPromotionLine = ({
     fetchPromotionLine(idPromotionLine)
 
   }, [])
+  
   useEffect(() =>{
-
     let date1 = moment();
     let date2 = moment(startDate);
     let difference = date1.diff( date2, "seconds" );
