@@ -58,7 +58,10 @@ const LoginForm = () => {
         }
       } catch (error) {
         console.log("Failed to login ", error);
-        setError(error?.response?.data?.message)
+        if(error?.response?.data?.message === "Password is not valid" || error?.response?.data?.message === "Tài khoản hoặc mật khẩu sai.") {
+          setError("Tên tài khoản hoặc mật khẩu không chính xác.")
+
+        }
         setLoadingStatus(false)
       }
     };

@@ -128,10 +128,11 @@ const itemManager = [
     getItem("Nhân viên", "15"),
   ]),
   getItem("Thống kê", "18", <PieChartOutlined />, [
-    getItem("Thống kê doanh thu", "1000"),
-    getItem("Thống kê khuyến mãi", "1001"),
-    getItem("Thống kê theo phim", "1002"),
-    getItem("Thống kê khách hàng", "1003"),
+    getItem("Doanh số bán hàng", "1000"),
+    getItem("Khuyến mãi", "1001"),
+    getItem("Phim", "1002"),
+    getItem("Khách hàng", "1003"),
+    getItem("Trả hàng", "1004"),
   ]),
 ];
 
@@ -424,6 +425,7 @@ const HomePage = () => {
                       <Menu.Item
                         key="profile"
                         style={{ padding: " 12px 12px" }}
+                        onClick={() => handleUserInfo()}
                       >
                         {" "}
                         <div onClick={() => handleUserInfo()}>
@@ -431,7 +433,7 @@ const HomePage = () => {
                           <Text style={{ marginLeft: "12px" }}>Thông tin</Text>
                         </div>
                       </Menu.Item>
-                      <Menu.Item
+                      {/* <Menu.Item
                         key="setting"
                         style={{ padding: " 12px 12px" }}
                       >
@@ -440,7 +442,7 @@ const HomePage = () => {
                           <SettingOutlined />
                           <Text style={{ marginLeft: "12px" }}>Cài đặt</Text>
                         </div>
-                      </Menu.Item>
+                      </Menu.Item> */}
                       <Menu.Item key="logout" style={{ padding: " 12px 12px" }}>
                         <div onClick={() => showModal()}>
                           <LogoutOutlined />
