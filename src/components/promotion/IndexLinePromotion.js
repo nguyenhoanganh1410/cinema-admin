@@ -24,6 +24,7 @@ import {
   UploadOutlined,
   EyeOutlined,
   ExportOutlined,
+  MinusCircleOutlined
 } from "@ant-design/icons";
 import ModelAddPromoLine from "./ModelAddPromoLine";
 import promotionApi from "../../api/promotionApi";
@@ -52,6 +53,7 @@ const IndexLinePromotion = ({ setTab }) => {
 
   const [changeImage, setChangeImage] = useState(false);
 
+
   const [startDateDb, setStartDateDb] = useState("");
   const [endDateDb, setEndDateDb] = useState("");
   const [statusDb, setStatusDb] = useState(0);
@@ -67,6 +69,10 @@ const IndexLinePromotion = ({ setTab }) => {
   const reload = useSelector((state) => state.reload);
 
   const [isShowModelDetail, setIsShowModelDetail] = useState(false);
+
+  const [isModalOpenDel, setIsModalOpenDel] = useState(false);
+  const [idLine, setIdLine] = useState(0);
+
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [totalMoneyProUsed, setTotalMoneyProUsed] = useState(0);
@@ -85,7 +91,7 @@ const IndexLinePromotion = ({ setTab }) => {
           style={{ textTransform: "capitalize" }}
           onClick={() => handleOnclik(record.id)}
         >
-          {text.toLowerCase()}
+          {text}
         </a>
       ),
     },
@@ -162,6 +168,18 @@ const IndexLinePromotion = ({ setTab }) => {
               ></Button>
             </Space>
           )}
+          <Button
+            disabled={ statusDb === 0 && moment(record.startDate).format(newDateFormat) >  currentDate ? false : true}
+            style={{
+              marginLeft: "10px",
+            }}
+            onClick={() => {
+              showModalDel()
+              setIdLine(record.id)
+            }}
+            danger
+            icon={<MinusCircleOutlined color="red" />}
+          ></Button>
         </>
       ),
     },
@@ -247,6 +265,32 @@ const IndexLinePromotion = ({ setTab }) => {
 
   const handleOk = () => {
     setIsModalOpen(false);
+  };
+
+  const handleCancelDel = () => {
+    setIsModalOpenDel(false);
+  };
+
+  const handleDel = () => {
+    setIsModalOpenDel(false);
+    const deleteLine = async () => {
+      try {
+        const rs = await promotionApi.deleteLine(idLine);
+        if (rs) {
+          message.success("Xóa thành công");
+          depatch(setReload(!reload));
+        }
+      } catch (error) {
+        console.log("Failed to login ", error);
+        message.error("Xóa thất bại");
+      }
+
+    };
+    deleteLine();
+  };
+
+  const showModalDel = () => {
+    setIsModalOpenDel(true);
   };
 
   const tagRender = (props) => {
@@ -479,12 +523,13 @@ const IndexLinePromotion = ({ setTab }) => {
             <Form.Item name="id" hidden={true}>
               <Input />
             </Form.Item>
-            <Form.Item name="promotionCode" label="Mã CT Khuyến mãi"
+            <Form.Item
+              name="promotionCode"
+              label="Mã CT Khuyến mãi"
               rules={[
                 {
                   required: true,
-
-                }
+                },
               ]}
             >
               <Input disabled={true} />
@@ -500,7 +545,7 @@ const IndexLinePromotion = ({ setTab }) => {
                 {
                   required: true,
                   message: "Hãy nhập tên CT khuyến mãi...",
-                }
+                },
               ]}
             >
               <Input
@@ -510,12 +555,14 @@ const IndexLinePromotion = ({ setTab }) => {
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label="Thời gian hoạt động" name="date"
+            <Form.Item
+              label="Thời gian hoạt động"
+              name="date"
               rules={[
                 {
                   required: true,
                   message: "Hãy chọn thời gian hoạt động...",
-                }
+                },
               ]}
             >
               <RangePicker
@@ -594,10 +641,7 @@ const IndexLinePromotion = ({ setTab }) => {
           </Col>
 
           <Col span={12}>
-            <Form.Item
-              name="rankCustomer"
-              label="Nhóm khách hàng áp dụng"
-            >
+            <Form.Item name="rankCustomer" label="Nhóm khách hàng áp dụng">
               <Select
                 disabled={
                   currentDate > startDate || statusDb === 1 ? true : false
@@ -647,8 +691,7 @@ const IndexLinePromotion = ({ setTab }) => {
               Dòng khuyến mãi
             </span>
           </Space>
-          {currentDate < startDate ||
-          (currentDate < endDate && statusDb === 0) ? (
+          {statusDb === 0 && currentDate < endDateDb ? (
             <Button
               type="primary"
               onClick={() => handleOpenModel()}
@@ -751,6 +794,22 @@ const IndexLinePromotion = ({ setTab }) => {
           </Row>
         </Form>
       </Modal>
+      <Modal
+        title="Xóa dòng khuyến mãi"
+        open={isModalOpenDel}
+        onCancel={handleCancelDel}
+        footer={[
+          <Button key="back" onClick={handleCancelDel}>
+            Hủy
+          </Button>,
+          <Button key="submit" type="primary" danger onClick={handleDel}>
+            Xóa
+          </Button>,
+        ]}
+      >
+        <p>Bạn muốn xóa dòng khuyến mãi này không?</p>
+      </Modal>
+
 
       {showModalAddCustomer ? (
         <ModelAddPromoLine
@@ -769,6 +828,8 @@ const IndexLinePromotion = ({ setTab }) => {
           setIsShowModelDetail={setIsShowModelDetail}
           endDateHeader={endDate}
           statusDb={statusDb}
+          startDateDb={startDateDb}
+          endDateDb={endDateDb}
         />
       ) : null}
     </div>

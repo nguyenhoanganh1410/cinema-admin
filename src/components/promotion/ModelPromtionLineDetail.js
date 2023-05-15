@@ -22,6 +22,7 @@ import useModelPromotionLine from "./useModelPromotionLine";
 import ProductPromotion from "./ProductPromotion";
 import MoneyPromotion from "./MoneyPromotion";
 import PercentPromotion from "./PercentPromotion";
+import dayjs from "dayjs";
 
 const newDateFormat = "YYYY-MM-DD";
 const { RangePicker } = DatePicker;
@@ -49,12 +50,12 @@ const ModelPromtionLineDetail = ({
     handleChangeTypePro,
     promotionLine,
     isEnable,
-    promtionDetails
+    promtionDetails,
+    setStartDate,
+    setEndDate,
   } = useModelPromotionLine({
     isShowModelDetail,
     setIsShowModelDetail,
-    startDateDb,
-    endDateDb,
     idPromotionLine,
   });
 
@@ -69,6 +70,35 @@ const ModelPromtionLineDetail = ({
       return <PercentPromotion disabled={isEnable} promtionDetails={promtionDetails}/>
     }
   }
+
+  // useEffect(() => {
+  //   if (startDateDb && endDateDb) {
+  //     setStartDate(startDateDb);
+  //     setEndDate(endDateDb);
+  //     const currentDate = dayjs().format(newDateFormat);
+  //     if (currentDate > startDateDb) {
+  //       form.setFieldsValue({
+  //         date: [dayjs().add("1","day"), dayjs(endDateDb, newDateFormat)],
+  //       });
+  //     } else {
+  //       form.setFieldsValue({
+  //         date: [dayjs(startDateDb, newDateFormat), dayjs(endDateDb, newDateFormat)],
+  //       });
+  //     }
+      
+  //   }
+  // }, []);
+
+
+
+  // const disabledDate = (current) => {
+  //   const currentDate = dayjs().format(newDateFormat);
+  //   if (currentDate > startDateDb) {
+  //      return current && current < moment().endOf("day") || current > moment(endDateDb).endOf("day");
+  //   } else {
+  //     return current && current < moment(startDateDb).endOf("day") || current > moment(endDateDb).endOf("day");
+  //   }
+  // };
 
   return (
     <>
@@ -249,11 +279,11 @@ const ModelPromtionLineDetail = ({
                   disabled={ statusDb === 1
                     ? true
                     : false ||  [moment().diff( moment(startDate), "seconds" ) > 0 ? true : false, false]}
-                  disabledDate={(current) => {
-                    return (
-                      (current && current < moment(startDateDb) ) || current > moment(endDateDb).endOf("day")
-                    );
-                  }}
+                  disabledDate={
+                    (current) => {
+                      return current && current < dayjs().endOf("day") || current > dayjs(endDateDb).endOf("day");
+                    }
+                  }
                 />
               </Form.Item>
             </Col>

@@ -182,7 +182,7 @@ const TablePromotionHeader = ({
             <Button
               disabled={
                 currentDay >= moment(record.startDate).format("YYYY-MM-DD") ||
-                record.statusPromotion === true
+                record.statusPromotion === 1
                   ? true
                   : false
               }
@@ -205,11 +205,12 @@ const TablePromotionHeader = ({
       <Modal
         title="Xóa chương trình khuyến mãi"
         open={isModalOpen}
+        onCancel={handleCancel}
         footer={[
           <Button key="back" onClick={handleCancel}>
             Hủy
           </Button>,
-          <Button key="submit" type="primary" onClick={handleOk}>
+          <Button key="submit" type="primary" danger onClick={handleOk}>
             Xóa
           </Button>,
         ]}

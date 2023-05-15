@@ -82,7 +82,7 @@ const ModelDetailCustomer = ({
     data.append("phone", phone);
     // data.append("dob", dob);
     // data.append("note", note);
-    if ( provincePicked !== 0  || districtPicked !== 0 || wardPicked !== 0 || address || email) {
+    if ( provincePicked !== 0  || districtPicked !== 0 || wardPicked !== 0 || address || email ) {
       data.append("city_id", provincePicked  );
       data.append("district_id", districtPicked   );
       data.append("ward_id", wardPicked   );

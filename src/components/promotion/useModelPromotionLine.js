@@ -137,15 +137,13 @@ const useModelPromotionLine = ({
     const fetchPromotionLine = async (id) => {
       try {
         const response = await promotionApi.getPromotionLineById(id)
-        setStartDate(response.startDate)
-        setEndDate(response.endDate)
+        setStartDate(dayjs(response.startDate, newDateFormat))
+        setEndDate(dayjs(response.endDate, newDateFormat))
         form.setFieldsValue({
           id: response.id,
           promotionCode: response.promotionCode,
           namePromotion: response.namePromotion,
           desc: response.desc,
-          startDate: dayjs(response.startDate, newDateFormat),
-          endDate: dayjs(response.endDate, newDateFormat),
           type: Number(response.type),
           budget: response.budget,
           maxUsePerCustomer: response.max_qty_per_customer_per_day,
@@ -196,7 +194,9 @@ const useModelPromotionLine = ({
     promotionLine,
     yupSync,
     isEnable,
-    promtionDetails
+    promtionDetails,
+    setStartDate,
+    setEndDate,
   };
 };
 

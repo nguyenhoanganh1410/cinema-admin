@@ -60,8 +60,8 @@ const ModelAddPromoLine = ({
       promotionCode: val.promotionCode.toUpperCase(),
       desc: val.desc,
       type: val.type,
-      startDate: startDate,
-      endDate: endDate,
+      startDate: dayjs(val.date[0]).format(newDateFormat),
+      endDate: dayjs(val.date[1]).format(newDateFormat),
       max_qty: val.maxUse,
       max_qty_per_customer_per_day: val.maxUsePerCustomer,
       budget: val.budget,
@@ -111,18 +111,22 @@ const ModelAddPromoLine = ({
     setStartDate(dateString[0]);
     setEndDate(dateString[1]);
   };
-  const newDateFormat = "YYYY-MM-DD";
 
   useEffect(() => {
     if (startDateDb && endDateDb) {
       setStartDate(startDateDb);
       setEndDate(endDateDb);
-      // form.setFieldsValue({
-      //   date: [
-      //     dayjs(startDateDb, newDateFormat),
-      //     dayjs(endDateDb, newDateFormat),
-      //   ],
-      // });
+      const currentDate = dayjs().format(newDateFormat);
+      if (currentDate > startDateDb) {
+        form.setFieldsValue({
+          date: [dayjs().add("1","day"), dayjs(endDateDb, newDateFormat)],
+        });
+      } else {
+        form.setFieldsValue({
+          date: [dayjs(startDateDb, newDateFormat), dayjs(endDateDb, newDateFormat)],
+        });
+      }
+      
     }
   }, []);
 
@@ -159,6 +163,15 @@ const ModelAddPromoLine = ({
     fetchAllProduct();
     fetchProductSeats();
   }, []);
+
+  const disabledDate = (current) => {
+    const currentDate = dayjs().format(newDateFormat);
+    if (currentDate > startDateDb) {
+       return current && current < moment().endOf("day") || current > moment(endDateDb).endOf("day");
+    } else {
+      return current && current < moment(startDateDb).endOf("day") || current > moment(endDateDb).endOf("day");
+    }
+  }
 
   return (
     <>
@@ -328,9 +341,7 @@ const ModelAddPromoLine = ({
                 <RangePicker
                   placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
                   onChange={onChangeDate}
-                  disabledDate={(current) => {
-                    return current && current < moment().endOf("day") || current > moment(endDateDb).endOf("day");
-                  }}
+                  disabledDate={disabledDate}
                 />
               </Form.Item>
             </Col>

@@ -64,6 +64,13 @@ const TableCustomer = ({ keySearch }) => {
     {
       title: "Email",
       dataIndex: "email",
+      render: (val) => {
+        if( val === null || val === undefined){
+          return "-"
+        }else{
+          return {val}
+        }
+      }
     },
     {
       title: "Cấp bậc",

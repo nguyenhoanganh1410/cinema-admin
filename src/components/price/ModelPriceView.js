@@ -51,7 +51,11 @@ const ModelPriceView = ({
       title: "Giá bán",
       dataIndex: "price",
       render:(val) => {
-        return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+        if (val) {
+          return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        } else {
+          return 0;
+        }
       }
     },
   ];
