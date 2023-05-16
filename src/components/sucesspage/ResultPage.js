@@ -89,7 +89,7 @@ const ResultPage = ({ setCurrent, setIsSucess, idOrder }) => {
         //   }
         // });
         const listNormal = listSeat.filter(
-          (item) => item.productCode === "G001"
+          (item) => item.productCode === "PRD001"
         );
         const listVip = listSeat.filter((item) => item.productCode === "G003");
         setDetailSeatNomal(listNormal);
@@ -308,8 +308,6 @@ const ResultPage = ({ setCurrent, setIsSucess, idOrder }) => {
 
   class ComponentToPrint extends React.Component {
     render() {
-      console.log("nomal", detailSeatNomal);
-      console.log("vip", detailSeatVip);
       if (order) {
         const template = (
           <PrintTemplate

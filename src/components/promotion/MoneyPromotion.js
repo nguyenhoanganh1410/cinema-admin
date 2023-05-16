@@ -16,22 +16,26 @@ import {
   TimePicker,
   Upload,
 } from "antd";
+import dayjs from "dayjs";
 
 import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 
 const MoneyPromotion = ({
+  handleSubmit,
   showModalAddCustomer,
   disabled,
   setShowModalAddCustomer,
   listProductSeat,
   promtionDetails,
+  startDate,
+  statusDb,
 }) => {
   const [form] = Form.useForm();
-  const handleSubmit = (values) => {
-    console.log("values", values);
-  };
+
+  const newDateFormat = "YYYY-MM-DD";
+  const currentDate = dayjs().format(newDateFormat);
   useEffect(() => {
     if (promtionDetails) {
       form.setFieldsValue({
@@ -64,7 +68,10 @@ const MoneyPromotion = ({
               ]}
             >
               <Select
-                disabled={disabled}
+                disabled= {
+                  statusDb === 1 ? true : false
+                  || currentDate > dayjs(startDate).format(newDateFormat) ? true : false
+                }
                 placeholder="Chọn sản phẩm mua"
                 style={{
                   width: "100%",
@@ -87,7 +94,10 @@ const MoneyPromotion = ({
               ]}
             >
               <InputNumber
-                disabled={disabled}
+                disabled= {
+                  statusDb === 1 ? true : false
+                  || currentDate > dayjs(startDate).format(newDateFormat) ? true : false
+                }
                 style={{ width: "100%" }}
                 min={1}
                 max={10}
@@ -111,7 +121,10 @@ const MoneyPromotion = ({
               ]}
             >
               <InputNumber
-                disabled={disabled}
+                disabled= {
+                  statusDb === 1 ? true : false
+                  || currentDate > dayjs(startDate).format(newDateFormat) ? true : false
+                }
                 style={{ width: "100%" }}
                 formatter={(value) =>
                   `VNĐ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")

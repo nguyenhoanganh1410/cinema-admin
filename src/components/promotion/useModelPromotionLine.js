@@ -68,29 +68,30 @@ const useModelPromotionLine = ({
 
 //   //handle submit form create new customer...
   const handleSubmit = (val) => {
-    const payloadLine = {
-      desc: val.desc,
-      startDate: startDate,
-      endDate: endDate,
-      status: val.status,
-    }
+    console.log("val", val);
+    // const payloadLine = {
+    //   desc: val.desc,
+    //   startDate: startDate,
+    //   endDate: endDate,
+    //   status: val.status,
+    // }
 
-    try {
-      const updateProLine = async () => {
-        const rs = await promotionApi.updateLine(idPromotionLine, payloadLine);
-        if (rs) {
-          message.success("Cập nhật thành công");
-          depatch(setReload(!reload));
-          onClose();
-        } else {
-          message.error("Cập nhật thất bại");
-        }
-      }
-      updateProLine();
-    } catch (error) {
-      message.error("Cập nhật thất bại");
-      console.log("error", error);
-    }
+    // try {
+    //   const updateProLine = async () => {
+    //     const rs = await promotionApi.updateLine(idPromotionLine, payloadLine);
+    //     if (rs) {
+    //       message.success("Cập nhật thành công");
+    //       depatch(setReload(!reload));
+    //       onClose();
+    //     } else {
+    //       message.error("Cập nhật thất bại");
+    //     }
+    //   }
+    //   updateProLine();
+    // } catch (error) {
+    //   message.error("Cập nhật thất bại");
+    //   console.log("error", error);
+    // }
     
   };
 

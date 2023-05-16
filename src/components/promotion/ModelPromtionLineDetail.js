@@ -59,46 +59,46 @@ const ModelPromtionLineDetail = ({
     idPromotionLine,
   });
 
-  const RenderDaTaType = () =>{
+  const currentDate = dayjs().format(newDateFormat);
+
+  const RenderDaTaType = () => {
     console.log(isEnable);
-    if(!promotionLine) return null;
-    if(+promotionLine.type === 1){
-      return <ProductPromotion disabled={isEnable} listProductSeat={listProductSeat} listProduct={listProduct} promtionDetails={promtionDetails}/>
-    }else if(+promotionLine.type === 2){
-      return <MoneyPromotion listProductSeat={listProductSeat} disabled={isEnable} promtionDetails={promtionDetails}/>
-    }else{
-      return <PercentPromotion disabled={isEnable} promtionDetails={promtionDetails}/>
+    if (!promotionLine) return null;
+    if (+promotionLine.type === 1) {
+      return (
+        <ProductPromotion
+          handleSubmit={handleSubmit}
+          disabled={isEnable}
+          listProductSeat={listProductSeat}
+          listProduct={listProduct}
+          promtionDetails={promtionDetails}
+          startDate={startDate}
+          statusDb={statusDb}
+        />
+      );
+    } else if (+promotionLine.type === 2) {
+      return (
+        <MoneyPromotion
+          handleSubmit={handleSubmit}
+          listProductSeat={listProductSeat}
+          disabled={isEnable}
+          promtionDetails={promtionDetails}
+          startDate={startDate}
+          statusDb={statusDb}
+        />
+      );
+    } else {
+      return (
+        <PercentPromotion
+          handleSubmit={handleSubmit}
+          disabled={isEnable}
+          promtionDetails={promtionDetails}
+          startDate={startDate}
+          statusDb={statusDb}
+        />
+      );
     }
-  }
-
-  // useEffect(() => {
-  //   if (startDateDb && endDateDb) {
-  //     setStartDate(startDateDb);
-  //     setEndDate(endDateDb);
-  //     const currentDate = dayjs().format(newDateFormat);
-  //     if (currentDate > startDateDb) {
-  //       form.setFieldsValue({
-  //         date: [dayjs().add("1","day"), dayjs(endDateDb, newDateFormat)],
-  //       });
-  //     } else {
-  //       form.setFieldsValue({
-  //         date: [dayjs(startDateDb, newDateFormat), dayjs(endDateDb, newDateFormat)],
-  //       });
-  //     }
-      
-  //   }
-  // }, []);
-
-
-
-  // const disabledDate = (current) => {
-  //   const currentDate = dayjs().format(newDateFormat);
-  //   if (currentDate > startDateDb) {
-  //      return current && current < moment().endOf("day") || current > moment(endDateDb).endOf("day");
-  //   } else {
-  //     return current && current < moment(startDateDb).endOf("day") || current > moment(endDateDb).endOf("day");
-  //   }
-  // };
+  };
 
   return (
     <>
@@ -113,11 +113,11 @@ const ModelPromtionLineDetail = ({
         extra={
           statusDb === 0 ? (
             <Space>
-            <Button onClick={onClose}>Hủy</Button>
-            <Button form="myFormAddLinePro" htmlType="submit" type="primary">
-              Lưu
-            </Button>
-          </Space>
+              <Button onClick={onClose}>Hủy</Button>
+              <Button form="myFormAddLinePro" htmlType="submit" type="primary">
+                Lưu
+              </Button>
+            </Space>
           ) : null
         }
       >
@@ -140,16 +140,14 @@ const ModelPromtionLineDetail = ({
                 ]}
               >
                 <Input
-                disabled
+                  disabled
                   style={{ textTransform: "uppercase" }}
                   placeholder="Hãy nhập mã áp dụng..."
-                
                 />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
-              
                 name="desc"
                 label="Mô tả"
                 rules={[
@@ -159,13 +157,10 @@ const ModelPromtionLineDetail = ({
                   },
                 ]}
               >
-                <Input placeholder="Hãy nhập mô tả..."
-                  disabled={
-                    statusDb === 1
-                    ? true
-                    : false 
-                  }
-                 />
+                <Input
+                  placeholder="Hãy nhập mô tả..."
+                  disabled={statusDb === 1 ? true : false}
+                />
               </Form.Item>
             </Col>
           </Row>
@@ -217,7 +212,14 @@ const ModelPromtionLineDetail = ({
                 ]}
               >
                 <InputNumber
-                  disabled
+                  disabled={
+                    statusDb === 1
+                      ? true
+                      : false ||
+                        currentDate > dayjs(startDate).format(newDateFormat)
+                      ? true
+                      : false
+                  }
                   style={{ width: "100%" }}
                   formatter={(value) =>
                     `VNĐ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
@@ -237,8 +239,14 @@ const ModelPromtionLineDetail = ({
                   style={{ width: "100%" }}
                   min={1}
                   max={100}
-                  disabled
-
+                  disabled={
+                    statusDb === 1
+                      ? true
+                      : false ||
+                        currentDate > dayjs(startDate).format(newDateFormat)
+                      ? true
+                      : false
+                  }
                   // defaultValue={1}
                   placeholder="Nhập số lương KH áp dụng tối đa..."
                 />
@@ -253,8 +261,14 @@ const ModelPromtionLineDetail = ({
                   style={{ width: "100%" }}
                   min={1}
                   max={10}
-                  disabled
-
+                  disabled={
+                    statusDb === 1
+                      ? true
+                      : false ||
+                        currentDate > dayjs(startDate).format(newDateFormat)
+                      ? true
+                      : false
+                  }
                   // defaultValue={1}
                   placeholder="Nhập số lần KH được sử dụng KM/ngày..."
                 />
@@ -276,47 +290,55 @@ const ModelPromtionLineDetail = ({
                 <RangePicker
                   placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
                   onChange={onChangeDate}
-                  disabled={ statusDb === 1
-                    ? true
-                    : false ||  [moment().diff( moment(startDate), "seconds" ) > 0 ? true : false, false]}
-                  disabledDate={
-                    (current) => {
-                      return current && current < dayjs().endOf("day") || current > dayjs(endDateDb).endOf("day");
-                    }
+                  disabled={
+                    statusDb === 1
+                      ? true
+                      : false || [
+                          moment().diff(moment(startDateDb), "seconds") > 0
+                            ? true
+                            : false,
+                          false,
+                        ]
                   }
+                  disabledDate={(current) => {
+                    return (
+                      (current && current < dayjs(startDateDb)) ||
+                      current > dayjs(endDate).endOf("day")
+                    );
+                  }}
                 />
               </Form.Item>
             </Col>
             <Col span={12}>
-            <Form.Item
-              name="status"
-              label="Trạng thái"
-              rules={[
-                {
-                  required: true,
-                  message: "Hãy chọn trạng thái...",
-                },
-              ]}
-            >
-              <Select
-                placeholder="Chọn trạng thái"
-                style={{
-                  width: "100%",
-                }}
-                // onChange={handleChangePosition}
-                options={[
+              <Form.Item
+                name="status"
+                label="Trạng thái"
+                rules={[
                   {
-                    value: 0,
-                    label: "Ngưng hoạt động",
-                  },
-                  {
-                    value: 1,
-                    label: "Hoạt động",
+                    required: true,
+                    message: "Hãy chọn trạng thái...",
                   },
                 ]}
-              />
-            </Form.Item>
-          </Col>
+              >
+                <Select
+                  placeholder="Chọn trạng thái"
+                  style={{
+                    width: "100%",
+                  }}
+                  // onChange={handleChangePosition}
+                  options={[
+                    {
+                      value: 0,
+                      label: "Ngưng hoạt động",
+                    },
+                    {
+                      value: 1,
+                      label: "Hoạt động",
+                    },
+                  ]}
+                />
+              </Form.Item>
+            </Col>
           </Row>
           <Space
             direction="vertical"

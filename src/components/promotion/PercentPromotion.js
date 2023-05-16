@@ -15,6 +15,7 @@ import {
   TimePicker,
   Upload,
 } from "antd";
+import dayjs from "dayjs";
 
 const PercentPromotion = (props) => {
   const [form] = Form.useForm();
@@ -23,6 +24,9 @@ const PercentPromotion = (props) => {
     console.log("values", values);
     props.handleSubmit("values");
   };
+
+  const newDateFormat = "YYYY-MM-DD";
+  const currentDate = dayjs().format(newDateFormat);
 
   useEffect(() => {
     if (promtionDetails) {
@@ -56,7 +60,10 @@ const PercentPromotion = (props) => {
               ]}
             >
               <InputNumber
-                disabled={disabled}
+                disabled= {
+                  props.statusDb === 1 ? true : false
+                  || currentDate > dayjs(props.startDate).format(newDateFormat) ? true : false
+                }
                 style={{ width: "100%" }}
                 formatter={(value) =>
                   `VNĐ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
@@ -81,7 +88,10 @@ const PercentPromotion = (props) => {
             >
               <InputNumber
                 min={1}
-                disabled={disabled}
+                disabled= {
+                  props.statusDb === 1 ? true : false
+                  || currentDate > dayjs(props.startDate).format(newDateFormat) ? true : false
+                }
                 style={{ width: "100%" }}
                 max={100}
                 placeholder="Nhập số phần trăm giảm.."
@@ -110,6 +120,10 @@ const PercentPromotion = (props) => {
                 parser={(value) => value.replace(/\VNĐ\s?|(,*)/g, "")}
                 // onChange={onChange}
                 placeholder="Nhập số tiền..."
+                disabled= {
+                  props.statusDb === 1 ? true : false
+                  || currentDate > dayjs(props.startDate).format(newDateFormat) ? true : false
+                }
               />
             </Form.Item>
           </Col>

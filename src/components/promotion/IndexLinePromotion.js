@@ -73,6 +73,9 @@ const IndexLinePromotion = ({ setTab }) => {
   const [isModalOpenDel, setIsModalOpenDel] = useState(false);
   const [idLine, setIdLine] = useState(0);
 
+  const [endDateMax, setEndDateMax] = useState("");
+
+  const [isInvalidDate, setIsInvalidDate] = useState(false);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [totalMoneyProUsed, setTotalMoneyProUsed] = useState(0);
@@ -129,7 +132,8 @@ const IndexLinePromotion = ({ setTab }) => {
       dataIndex: "endDate",
       key: "endDate",
       render: (endDate) => {
-        console.log(endDate);
+
+
         return dayjs(endDate).format(newDateFormat);
       },
     },
@@ -336,6 +340,12 @@ const IndexLinePromotion = ({ setTab }) => {
   };
 
   const onChangeDate = (date, dateString) => {
+    if (dayjs(dateString[1]).format('YYYY-MM-DD') < dayjs(endDateMax).format('YYYY-MM-DD')) {
+      setIsInvalidDate(true);
+      return;
+    } else {
+      setIsInvalidDate(false);
+    }
     setStartDate(dateString[0]);
     setEndDate(dateString[1]);
   };
@@ -390,6 +400,15 @@ const IndexLinePromotion = ({ setTab }) => {
             return item;
           });
           setPromotionLine(newList);
+          const endDates = newList.map((item) => item.endDate )
+          const maxDate = moment(
+            Math.max(
+              ...endDates.map((item) => {
+                return moment(item, "YYYY-MM-DD");
+              })
+            )
+          ).format("YYYY-MM-DD");
+          setEndDateMax(maxDate);
         }
       } catch (error) {
         console.log("Failed to login ", error);
@@ -478,6 +497,7 @@ const IndexLinePromotion = ({ setTab }) => {
     }, 0);
   };
 
+
   return (
     <div className="site-card-wrapper" style={{ minWidth: "100vh" }}>
       <div
@@ -563,6 +583,19 @@ const IndexLinePromotion = ({ setTab }) => {
                   required: true,
                   message: "Hãy chọn thời gian hoạt động...",
                 },
+                {
+                  validator: (_, value) => {
+                    if (value) {
+                      if (isInvalidDate) {
+                        return Promise.reject(
+                          new Error("Ngày kết thúc phải lớn hơn ngày kết thúc của dòng khuyến mãi")
+                        );
+                      } else {
+                        return Promise.resolve();
+                      }
+                    }
+                  }
+                }
               ]}
             >
               <RangePicker
@@ -579,7 +612,7 @@ const IndexLinePromotion = ({ setTab }) => {
                 placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
                 onChange={onChangeDate}
                 disabledDate={(current) => {
-                  return current && current < moment().endOf("day");
+                  return current && current < moment().endOf("day")
                 }}
               />
             </Form.Item>

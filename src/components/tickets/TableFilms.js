@@ -48,8 +48,8 @@ const TableFilms = ({ start_date, end_date }) => {
   const columns = [
     {
       title: "Mã hóa đơn",
-      dataIndex: "id",
-      width: "5%",
+      dataIndex: "code",
+      width: "15%",
     },
     {
       title: "Khách hàng",
@@ -288,6 +288,7 @@ const TableFilms = ({ start_date, end_date }) => {
             }
             return {
               id: item.id,
+              code: item.code,
               customer: item.Customer.firstName + " " + item.Customer.lastName,
               staff: name_staff,
               showTime: item.ShowMovie.ShowTime.showTime,

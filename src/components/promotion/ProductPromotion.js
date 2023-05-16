@@ -16,17 +16,20 @@ import {
   TimePicker,
   Upload,
 } from "antd";
+import dayjs from "dayjs";
 
 import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 
-const ProductPromotion = ({handleSubmit, disabled,listProduct,listProductSeat, promtionDetails}) => {
+const ProductPromotion = ({handleSubmit, disabled,listProduct,listProductSeat, promtionDetails, startDate, statusDb}) => {
   const [form] = Form.useForm();
   console.log(listProduct);
   handleSubmit = (values) => {
     console.log("values", values);
   };
+  const newDateFormat = "YYYY-MM-DD";
+  const currentDate = dayjs().format(newDateFormat);
   useEffect(() => {
     if (promtionDetails) {
       form.setFieldsValue({
@@ -63,7 +66,10 @@ const ProductPromotion = ({handleSubmit, disabled,listProduct,listProductSeat, p
                 style={{
                   width: "100%",
                 }}
-                disabled={disabled}
+                disabled= {
+                  statusDb === 1 ? true : false
+                  || currentDate > dayjs(startDate).format(newDateFormat) ? true : false
+                }
                 // onChange={handleChangePosition}
                 options={listProductSeat}
               />
@@ -81,7 +87,10 @@ const ProductPromotion = ({handleSubmit, disabled,listProduct,listProductSeat, p
               ]}
             >
               <Select
-                disabled={disabled}
+               disabled= {
+                statusDb === 1 ? true : false
+                || currentDate > dayjs(startDate).format(newDateFormat) ? true : false
+              }
                 placeholder="Chọn sản phẩm nhận"
                 style={{
                   width: "100%",
@@ -106,7 +115,10 @@ const ProductPromotion = ({handleSubmit, disabled,listProduct,listProductSeat, p
               ]}
             >
               <InputNumber
-                disabled={disabled}
+                disabled= {
+                  statusDb === 1 ? true : false
+                  || currentDate > dayjs(startDate).format(newDateFormat) ? true : false
+                }
                 min={1}
                 max={10}
                 style={{ width: "100%" }}
@@ -127,7 +139,10 @@ const ProductPromotion = ({handleSubmit, disabled,listProduct,listProductSeat, p
               ]}
             >
               <InputNumber
-                disabled={disabled}
+                disabled= {
+                  statusDb === 1 ? true : false
+                  || currentDate > dayjs(startDate).format(newDateFormat) ? true : false
+                }
                 min={1}
                 style={{ width: "100%" }}
                 max={10}
