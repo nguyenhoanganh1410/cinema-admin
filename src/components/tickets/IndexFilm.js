@@ -35,17 +35,17 @@ const IndexTicket = () => {
 
   const handleCancel = () => {
     setIsModalOpen(false);
+    // closeCamera();
   }
 
-  const closeCamera =  () => {
-    navigator.mediaDevices.getUserMedia({video: true, audio: false})
-    .then(mediaStream => {
-      const stream = mediaStream;
-      const tracks = stream.getTracks();
-  
-      tracks[0].stop;
-    })
-  };
+  // const closeCamera =  () => {
+  //   navigator.mediaDevices.getUserMedia({video: true, audio: false})
+  //   .then(mediaStream => {
+  //     const stream = mediaStream;
+  //     const tracks = stream.getTracks();
+  //     tracks[0].stop;
+  //   })
+  // };
 
 
 
@@ -128,7 +128,7 @@ const IndexTicket = () => {
               setDelayScan(false);
               setIdScan(Number(data.text));
               handleCancel();
-              closeCamera();
+              // closeCamera();
             }
           }}
         />
