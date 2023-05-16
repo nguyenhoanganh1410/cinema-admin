@@ -27,7 +27,7 @@ import orderApi from "../../api/orderApi";
 import moment from "moment";
 import { MESSAGE_SYSTEM_ERRO, REASON_REFULT } from "../../constant";
 
-const TableFilms = ({ start_date, end_date }) => {
+const TableFilms = ({ start_date, end_date, idScan }) => {
   // const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [listMovie, setListMovie] = useState([]);
@@ -125,11 +125,6 @@ const TableFilms = ({ start_date, end_date }) => {
               title="Xem chi tiết"
               icon={<EyeOutlined />}
               onClick={() => {
-                // console.log('showt',record.showTime),
-                // console.log('day',moment(record.showDate).format("YYYY-MM-DD")),
-                // console.log('cr_day',currentDay),
-                // console.log('cr_time',currentTimes),
-                // console.log('time',moment(record.showTime).format("HH:mm")),
                 showModalDetail(record.id);
               }}
             ></Button>
@@ -187,6 +182,12 @@ const TableFilms = ({ start_date, end_date }) => {
     setShowModalDetailMovie(true);
     setSelectedId(e);
   };
+
+  useEffect(() => {
+    if (idScan) {
+      showModalDetail(idScan);
+    }
+  }, [idScan]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const showModal = async (id) => {

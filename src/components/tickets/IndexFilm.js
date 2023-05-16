@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, Component  } from "react";
 import { Input, Col, Row, Typography, Button, Modal, Breadcrumb, DatePicker } from "antd";
-
+import QrReader from 'react-qr-scanner'
 import {
   SearchOutlined,
   PlusSquareFilled,
@@ -8,6 +8,7 @@ import {
   ToolOutlined,
   DeleteOutlined,
   DownloadOutlined,
+  QrcodeOutlined
 } from "@ant-design/icons";
 import TableCustomer from "../customer/TableCustomer";
 import ModelAddCustomer from "../customer/ModelAddCustomer";
@@ -20,11 +21,37 @@ const IndexTicket = () => {
   const { RangePicker } = DatePicker;
   const [startDatePicker, setStartDatePicker] = useState("");
   const [endDatePicker, setEndDatePicker] = useState("");
-
+  const [idScan, setIdScan] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [delayScan , setDelayScan] = useState(500);
 
   const showModal = () => {
-    setShowModalAddCustomer(true);
+    setIsModalOpen(true);
+  }
+
+  const handleOk = () => {
+    setIsModalOpen(false);
+  }
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  }
+
+  const closeCamera =  () => {
+    navigator.mediaDevices.getUserMedia({video: true, audio: false})
+    .then(mediaStream => {
+      const stream = mediaStream;
+      const tracks = stream.getTracks();
+  
+      tracks[0].stop;
+    })
   };
+
+
+
+  // const showModal = () => {
+  //   setShowModalAddCustomer(true);
+  // };
 
   const onChangeDate = (date, dateString) => {
     setStartDatePicker(dateString[0]);
@@ -46,13 +73,23 @@ const IndexTicket = () => {
           lg: 16,
         }}
       >
-        <Col span={20}>
+        <Col span={10}>
         <RangePicker 
             placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
             onCalendarChange={onChangeDate}
-            style={{ minWidth: "50%" }}
+            style={{ minWidth: "100%" }}
             allowClear={true}
           />
+        </Col>
+        <Col span={2}>
+        <Button
+              title="Scan QR Vé"
+              icon={<QrcodeOutlined />}
+              onClick={() => {
+                // setIdScan(264);
+                showModal();
+              }}
+            ></Button>
         </Col>
       </Row>
 
@@ -66,9 +103,37 @@ const IndexTicket = () => {
         }}
       >
         <Col span={24}>
-          <TableFilms start_date = {startDatePicker} end_date ={endDatePicker} />
+          <TableFilms start_date = {startDatePicker} end_date ={endDatePicker}  idScan={idScan}/>
         </Col>
       </Row>
+      <Modal
+        title="Scan QR Vé"
+        visible={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        width={500}
+        // height={700}
+        footer={[
+          <Button key="back" onClick={handleCancel}>
+            Đóng
+          </Button>,
+        ]}
+      >
+        <QrReader
+          delay={delayScan}
+          style={{ width: '100%' }}
+          onError={(err) => console.log(err)}
+          onScan={(data) => {
+            if (data) {
+              setDelayScan(false);
+              setIdScan(Number(data.text));
+              handleCancel();
+              closeCamera();
+            }
+          }}
+        />
+      </Modal>
+      
       {showModalAddCustomer ? (
         <ModelAddFilm
           showModalAddCustomer={showModalAddCustomer}
