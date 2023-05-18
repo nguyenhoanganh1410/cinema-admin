@@ -93,6 +93,7 @@ const ModelDetailCustomer = ({
 
     }
     if ( image.length > 0 && image[0].uid !== "-1"  ) {
+      console.log(image[0].originFileObj);
       data.append("image", image[0].originFileObj);
     } 
     if (image.length === 0) {

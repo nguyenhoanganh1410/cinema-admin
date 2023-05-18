@@ -103,6 +103,12 @@ const useUserHook = (showModalAddCustomer, setShowModalAddCustomer) => {
     console.log(newFileList);
   }
 
+  const validatePassword = (password) => {
+    return password.match(
+      /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/
+    );
+  };
+
   const uploadButton = (
     <div>
       <PlusOutlined />
@@ -153,6 +159,11 @@ const useUserHook = (showModalAddCustomer, setShowModalAddCustomer) => {
       notifyError("Mật khẩu phải trùng khớp.");
       return;
     }
+    if(!validatePassword(values?.new_password)) {
+      notifyError("Mật khẩu phải có ít nhật 8 ký tự và có ký tự số, đặc biệt.");
+      return
+    }
+
     handleUpdatePass(userCurrent?.email,values?.new_password).then(() => {
       notifySucess("Cập nhật thành công.");
       form1.setFieldValue("current_password","")

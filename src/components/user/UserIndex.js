@@ -127,7 +127,7 @@ const UserInfo = () => {
                     fontWeight: "700",
                   }}
                 >
-                  First Name
+                  Họ và tên đệm
                 </p>
               </Col>
               <Col span={14}>
@@ -152,7 +152,7 @@ const UserInfo = () => {
                     fontWeight: "700",
                   }}
                 >
-                  Last Name
+                  Tên
                 </p>
               </Col>
               <Col span={14}>
@@ -202,7 +202,7 @@ const UserInfo = () => {
                   type="primary"
                   loading={loadingProfile}
                 >
-                  Save
+                  Lưu
                 </Button>
               </Col>
             </Row>
@@ -253,14 +253,14 @@ const UserInfo = () => {
                     fontWeight: "700",
                   }}
                 >
-                  New Password
+                  Mật khẩu mới
                 </p>
               </Col>
               <Col span={14}>
                 <Form.Item rules={[yupSyncPassword]} name="new_password">
                   <Input.Password
                     style={{ width: "50%" }}
-                    placeholder="Enter password"
+                    placeholder="Nhập mật khẩu"
                   />
                 </Form.Item>
               </Col>
@@ -278,14 +278,14 @@ const UserInfo = () => {
                     fontWeight: "700",
                   }}
                 >
-                  Password Confimation
+                  Nhập lại mật khẩu
                 </p>
               </Col>
               <Col span={14}>
                 <Form.Item rules={[yupSyncPassword]} name="confirm_password">
                   <Input.Password
                     style={{ width: "50%" }}
-                    placeholder="Enter password"
+                    placeholder="Nhập mật khẩu"
                   />
                 </Form.Item>
               </Col>
@@ -303,7 +303,7 @@ const UserInfo = () => {
                   type="primary"
                   loading={loadingPassword}
                 >
-                  Save
+                  Lưu
                 </Button>
               </Col>
             </Row>

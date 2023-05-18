@@ -65,10 +65,10 @@ const TableCustomer = ({ keySearch }) => {
       title: "Email",
       dataIndex: "email",
       render: (val) => {
-        if( val === null || val === undefined){
+        if( val === null || val === "undefined"){
           return "-"
         }else{
-          return {val}
+          return val
         }
       }
     },
@@ -198,6 +198,13 @@ const TableCustomer = ({ keySearch }) => {
     {
       title: "Email",
       dataIndex: "email",
+      render: (val) => {
+        if( val === null || val === "undefined"){
+          return "-"
+        }else{
+          return val
+        }
+      }
     },
     {
       title: "Cấp bậc",

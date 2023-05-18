@@ -8,6 +8,8 @@ import moment from "moment";
 import showApi from "../../api/showApi";
 import { useDispatch, useSelector } from "react-redux";
 import { setBooking } from "../../redux/actions";
+import { notifyError } from "../../utils/Notifi";
+import priceApi from "../../api/priceApi";
 const dateFormat = "DD";
 const dateFormatQuery = "YYYY-MM-DD";
 const date = [0,1,2,3,4,5,6]
@@ -21,7 +23,7 @@ const PickShowComponent = ({next}) => {
  const [shows, setShows] = useState([])
  const depatch = useDispatch();
  const booking = useSelector((state) => state.booking);
-  console.log(shows);
+ const [listPrice, setListPrice] = useState([]);
  useEffect(()=>{
   setLoading(true)
     const getShowByDate = async (idMovie, datatDate) =>{
@@ -93,9 +95,32 @@ const PickShowComponent = ({next}) => {
   }
 
   const handlePickShow = (val) =>{
+    if(listPrice.length === 0) {
+      notifyError("Hệ thống chưa có giá của ghế. Vui lòng cập nhật giá.")
+      return
+    }
     depatch(setBooking({...booking, show: val}));
     next();
   }
+
+  useEffect(() => {
+    const getPrice = async () => {
+      try {
+        const response = await priceApi.getPriceProduct();
+        if (response) {
+          const data = response?.filter(val => {
+            return val?.price > 0;
+
+          })
+          setListPrice(data)
+        }
+      } catch (error) {
+        console.log("Featch erro: ", error);
+      }
+    };
+    getPrice();
+  }, []);
+
 
   return (
     <div className="pick-shows">

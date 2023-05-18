@@ -187,9 +187,11 @@ const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
     setMoneyCustomer(money);
   };
   const handleChange = async (value) => {
+    console.log(value);
     setTypeCustomer(value);
     if (value === "KH001") {
       const data = await customerApi.getCustomerByPhone(SDT_VANG_LAI);
+      console.log(data);
       if (data.id) {
         setCustomerSearched(data);
         return;

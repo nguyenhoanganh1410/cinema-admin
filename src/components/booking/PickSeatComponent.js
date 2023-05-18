@@ -123,12 +123,12 @@ const PickSeatComponent = ({ next }) => {
         const array = listPrice.filter((val) => {
           return val.productName == GHE_DOI;
         });
-        setSeatPicked([...seatPicked, { ...seat, price: array[0].price }]);
+        setSeatPicked([...seatPicked, { ...seat, price: array[0]?.price }]);
       } else if (seat.Product.typeSeat === 1) {
         const array = listPrice.filter((val) => {
           return val.productName == GHE_THUONG;
         });
-        setSeatPicked([...seatPicked, { ...seat, price: array[0].price }]);
+        setSeatPicked([...seatPicked, { ...seat, price: array[0]?.price }]);
       }
     }
   };
@@ -511,6 +511,8 @@ const PickSeatComponent = ({ next }) => {
         ) : (
           <Col span={16}>
             <h3>Chọn bắp/ nước</h3>
+            {
+              listPrice.length === 2 ? <p>Hiện không có bắp nước.</p> : 
             <div className="products">
               <div className="header_text">
                 <span style={{ width: "45%", textAlign: "left" }}>Combo</span>
@@ -535,7 +537,7 @@ const PickSeatComponent = ({ next }) => {
                   });
                   if (index != -1) {
                     const totalPrice =
-                      pickProducts[index].price * pickProducts[index].quatity;
+                      pickProducts[index]?.price * pickProducts[index]?.quatity;
                     return (
                       <ItemProduct
                         val={val}
@@ -558,6 +560,7 @@ const PickSeatComponent = ({ next }) => {
                 Tiền sản phẩm: <span>{VND.format(totalPriceProduct)}</span>
               </p>
             </div>
+            }
           </Col>
         )}
         <Col span={8}>
