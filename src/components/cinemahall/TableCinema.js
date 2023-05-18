@@ -86,11 +86,11 @@ const TableCinema = ({ keyword, setTab, setSelectedIdCinema, setStatusDb }) => {
   }
 
   const columns = [
-    {
-      title: "ID",
-      dataIndex: "id",
-      key: "id",
-    },
+    // {
+    //   title: "ID",
+    //   dataIndex: "id",
+    //   key: "id",
+    // },
     {
       title: "Mã rạp",
       dataIndex: "codeCinema",
@@ -118,6 +118,7 @@ const TableCinema = ({ keyword, setTab, setSelectedIdCinema, setStatusDb }) => {
     {
       title: "Số phòng",
       dataIndex: "countCinemaHall",
+      align: "right",
     },
     {
       title: "Trạng thái",
@@ -140,6 +141,7 @@ const TableCinema = ({ keyword, setTab, setSelectedIdCinema, setStatusDb }) => {
       },
     },
     {
+      align: "center",
       render: (val, record) => {
         return (
           <>

@@ -25,7 +25,7 @@ const IndexProduct = () => {
   return (
     <div className="site-card-wrapper">
       <Title level={5} style={{ marginBottom: "1rem" }}>
-        Sản phẩm
+        Quản lý sản phẩm
       </Title>
       <Row
         gutter={{

@@ -75,6 +75,7 @@ const TableFilms = ({ start_date, end_date, idScan }) => {
     {
       title: "Tổng tiền",
       dataIndex: "totalPrice",
+      align: "right",
       render: (val) => {
         return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
       },

@@ -78,9 +78,11 @@ const ModelPriceView = ({
     const fetchPriceDetail = async () => {
       console.log("selectedId", selectedId);
         const res = await priceApi.getPriceLineByHeader(selectedId);
-        console.log("res", res.priceHeader);
         if (res) {
-          setPriceDetail(res.priceHeader);
+          setPriceDetail({
+            ...res.priceHeader,
+            user_update_name: res.priceHeader.user_update ? res.priceHeader.user_update.firstName + res.priceHeader.user_update.lastName : "",
+          });
           const data = res.lines.map((item) => {
             return {
               productCode: item.Product.productCode,
@@ -219,7 +221,7 @@ const ModelPriceView = ({
             <Col span={12}>
             <span>
                 Người cập nhật:
-                <span> {priceDetail?.user_update?.firstName + priceDetail?.user_update?.lastName } </span>
+                <span> {priceDetail.user_update_name } </span>
               </span>
             </Col>
           </Row>

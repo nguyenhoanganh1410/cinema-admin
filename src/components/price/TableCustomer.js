@@ -211,11 +211,12 @@ const TableCustomer = ({ setTab, setSelectedIdHeader,startDatePicker,endDatePick
       <Modal
         title="Xóa bảng giá"
         open={isModalOpen}
+        onCancel={handleCancel}
         footer={[
           <Button key="back" onClick={handleCancel}>
             Hủy
           </Button>,
-          <Button key="submit" type="primary" onClick={handleOk}>
+          <Button key="submit" type="primary" danger onClick={handleOk}>
             Xóa
           </Button>,
         ]}

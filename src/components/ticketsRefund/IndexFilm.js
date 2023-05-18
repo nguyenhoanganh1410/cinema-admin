@@ -33,11 +33,9 @@ const IndexTicketRefund = () => {
 
   return (
     <div className="site-card-wrapper">
-      <Breadcrumb style={{ marginBottom: "1rem", marginTop: "1rem" }}>
-        <Breadcrumb.Item>Home</Breadcrumb.Item>
-
-        <Breadcrumb.Item>Hóa đơn trả</Breadcrumb.Item>
-      </Breadcrumb>
+      <Title level={5} style={{ marginBottom: "1rem", marginTop:"1rem" }}>
+        Vé trả
+      </Title>
       <Row
         gutter={{
           xs: 8,

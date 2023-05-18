@@ -43,9 +43,14 @@ const TableEmployee = ({searchText}) => {
   }, [searchText]);
 
   const columns = [
+    // {
+    //   title: "Id",
+    //   dataIndex: "id",
+      
+    // },
     {
-      title: "Id",
-      dataIndex: "id",
+      title: "Mã nhân viên",
+      dataIndex: "code",
       render: (val) => {
         return (
           <a
@@ -117,12 +122,12 @@ const TableEmployee = ({searchText}) => {
         );
       },
     },
-    {
-      title: "Hình ảnh",
-      dataIndex: "image",
-      render: (image) => <Image width={30} src={image} />,
-      width: 50,
-    },
+    // {
+    //   title: "Hình ảnh",
+    //   dataIndex: "image",
+    //   render: (image) => <Image width={30} src={image} />,
+    //   width: 50,
+    // },
   ];
 
   useEffect(() => {
@@ -156,6 +161,7 @@ const TableEmployee = ({searchText}) => {
               status: item.status,
               maneger: item.Staffs[0]?.firstName + item.Staffs[0]?.lastName,
               image: item.image,
+              code: item.code,
             };
           })
         );

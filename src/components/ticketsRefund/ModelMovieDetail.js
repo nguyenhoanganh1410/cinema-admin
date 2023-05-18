@@ -187,7 +187,10 @@ const ModelDetailMovie = ({
           const totalPrice = res.totalPrice
             .toString()
             .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-          res.totalPrice = totalPrice;
+          // res.totalPrice = totalPrice;
+          const totatBefore =
+            Number(res.totalPrice) + Number(res.totalDiscount);
+          res.totalBefore = totatBefore;
           if (name === "NN") {
             res.customerName = "Khách vãng lai";
           } else {
@@ -256,50 +259,6 @@ const ModelDetailMovie = ({
     fetchOrderDetail();
   }, []);
 
-  const handleSubmit = async () => {
-    //call api create a new movie
-    // const data = new FormData();
-    // data.append("nameMovie", nameMovie);
-    // data.append("cast", cast);
-    // data.append("director", director);
-    // data.append("linkTrailer", linkTrailer);
-    // data.append("idCategoryMovie", category);
-    // data.append("duration", time);
-    // data.append("releaseDate", releaseDate);
-    // data.append("idCinema", 1);
-    // data.append("desc", desc);
-    // data.append("classify", classify);
-    // data.append("endDate", endDate);
-    // data.append("status", status);
-    // if(image){
-    //   data.append("image", image);
-    // }
-
-    const data = {
-      nameMovie: nameMovie,
-      cast: cast,
-      director: director,
-      linkTrailer: linkTrailer,
-      idCategoryMovie: category,
-      duration: time,
-      releaseDate: releaseDate,
-      idCinema: 1,
-      desc: desc,
-      classify: classify,
-      endDate: endDate,
-      status: status,
-      image: image,
-    };
-    console.log(data);
-    const rs = await movieApi.updateMovie(selectedId, data);
-    console.log(rs);
-    if (rs) {
-      setShowModalDetailMovie(false);
-      setTimeout(() => {
-        message.success("Cập nhật phim thành công");
-      }, 500);
-    }
-  };
   useEffect(() => {
     //load categories
     const getCategories = async () => {
@@ -402,7 +361,7 @@ const ModelDetailMovie = ({
             <Col span={16}>
               <span>
                 Mã hoán đơn:
-                <span> {order?.id}</span>
+                <span> {order?.code}</span>
               </span>
             </Col>
             <Col span={8}>
@@ -466,8 +425,13 @@ const ModelDetailMovie = ({
             </Col>
             <Col span={8}>
               <span>
-                Tổng tiền:
-                <span> {order?.totalPrice} </span>
+                Tổng tiền trước CK:
+                <span>
+                  {" "}
+                  {order?.totalBefore
+                    ?.toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "đ"}
+                </span>
               </span>
             </Col>
           </Row>
@@ -480,16 +444,49 @@ const ModelDetailMovie = ({
             </Col>
             <Col span={8}>
               <span>
+                Chiết khấu:
+                <span>
+                  {" "}
+                  {order?.totalDiscount
+                    ?.toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "đ"}
+                </span>
+              </span>
+            </Col>
+            {/* <Col span={8}>
+              <span>
                 Tổng tiền hoàn trả:
                 <span> {order?.totalPrice} </span>
+              </span>
+            </Col> */}
+          </Row>
+          <Row gutter={16} style={{ marginBottom: "10px" }}>
+            <Col span={16}>
+              <span>
+                Lý do hoàn trả:
+                <span> {order?.note} </span>
+              </span>
+            </Col>
+            <Col span={8}>
+              <span>
+                Tổng tiền sau CK:
+                <span>
+                  {" "}
+                  {order?.totalPrice
+                    ?.toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "đ"}{" "}
+                </span>
               </span>
             </Col>
           </Row>
           <Row gutter={16} style={{ marginBottom: "10px" }}>
-            <Col span={24}>
+            <Col span={16}>
+            </Col>
+            <Col span={8}>
               <span>
-                Lý do hoàn trả:
-                <span> {order?.note} </span>
+                Tổng tiền hoàn trả:
+                <span> {order?.totalPrice?.toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "đ"} </span>
               </span>
             </Col>
           </Row>

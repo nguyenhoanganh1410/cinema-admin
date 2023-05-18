@@ -194,8 +194,8 @@ const ModelDetailMovie = ({
           const name = res.Customer?.firstName + res.Customer?.lastName;
           let nameStaff = res.Staff?.firstName + res.Staff?.lastName;
           // res.totalPrice = res.totalPrice.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-          const totatBefore = res.totalPrice + res.totalDiscount;
-          
+          const totatBefore =Number(res.totalPrice) + Number(res.totalDiscount);
+
           const { duration } = res.ShowMovie.Show.Movie;
           const { showTime } = res.ShowMovie.ShowTime;
           const startTime = moment(showTime, "HH:mm");
@@ -234,7 +234,6 @@ const ModelDetailMovie = ({
               productType: item?.Product?.productName,
               productCode: item?.Product?.productCode,
             });
-            
           }
           if (item.type === 2) {
             listProduct.push({
@@ -255,7 +254,9 @@ const ModelDetailMovie = ({
         const listNormal = listSeat.filter(
           (item) => item.productCode === "PRD001"
         );
-        const listVip = listSeat.filter((item) => item.productCode === "PRD003");
+        const listVip = listSeat.filter(
+          (item) => item.productCode === "PRD003"
+        );
         setSeatNomal(listNormal);
         setSeatVip(listVip);
       }
@@ -356,8 +357,7 @@ const ModelDetailMovie = ({
     console.log("export excel");
   };
 
-
-  console.log("id", selectedId);
+  // console.log("id", selectedId);
 
   const PrintTemplate = () => {
     return (
@@ -429,7 +429,7 @@ const ModelDetailMovie = ({
                 <Col span={12}>
                   <span className="info">
                     Mã hoán đơn:
-                    <span> {order?.id}</span>
+                    <span> {order?.code}</span>
                   </span>
                 </Col>
                 <Col span={12}>
@@ -808,7 +808,11 @@ const ModelDetailMovie = ({
               justifyContent: "center",
             }}
           >
-            <QRCode size={50} value={selectedId.toString()} viewBox={`0 0 256 256`} />
+            <QRCode
+              size={50}
+              value={selectedId.toString()}
+              viewBox={`0 0 256 256`}
+            />
           </Row>
           <Row
             className="print-content"
@@ -860,7 +864,7 @@ const ModelDetailMovie = ({
         }}
       >
         <Space direction="vertical" style={{ width: "100%" }}>
-          <Row gutter={16} style={{ marginBottom: "10px" }}>
+          <Row gutter={16} style={{ marginBottom: "20px" }}>
             <Col span={15}>
               <span
                 style={{
@@ -911,7 +915,7 @@ const ModelDetailMovie = ({
             <Col span={16}>
               <span>
                 Mã hoán đơn:
-                <span> {order?.id}</span>
+                <span> {order?.code}</span>
               </span>
             </Col>
             <Col span={8}>

@@ -70,13 +70,24 @@ const TableShows = ({ setShowModalAddCustomer, setTab }) => {
 
 
   const columns = [
+    // {
+    //   title: "Id",
+    //   dataIndex: "id",
+    // },
     {
-      title: "Id",
-      dataIndex: "id",
+      title: "Mã lịch chiếu",
+      dataIndex: "code",
     },
     {
       title: "Bộ phim",
       dataIndex: "filmShow",
+      render: (text) => {
+        if (text?.length > 30) {
+          return <span style={{textTransform:"capitalize"}}>{text?.substring(0, 30).toLowerCase() + "..."}</span>
+        } else {
+          return <span style={{textTransform:"capitalize"}}>{text.toLowerCase()}</span>
+        }
+      },
     },
     {
       title: "Ngày bắt đầu",
@@ -239,6 +250,7 @@ const TableShows = ({ setShowModalAddCustomer, setTab }) => {
               showDate: item.showDate,
               startTime: item.ShowTime.showTime,
               endTime: item.endTime,
+              code: item.code,
             };
           });
           setListTimeDuplicate(list);
@@ -324,6 +336,7 @@ const TableShows = ({ setShowModalAddCustomer, setTab }) => {
               locationShow: item.Cinema.name,
               roomShow: item.CinemaHall.name,
               status: item.status,
+              code: item.code,
             };
           });
 

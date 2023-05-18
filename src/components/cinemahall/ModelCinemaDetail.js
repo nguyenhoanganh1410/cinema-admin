@@ -20,10 +20,7 @@ import cinameApi from "../../api/cinemaApi";
 
 import { useDispatch, useSelector } from "react-redux";
 import { setReload } from "../../redux/actions";
-import { notifyError,
-  notifySucess
- } from "../../utils/Notifi";
-
+import { notifyError, notifySucess } from "../../utils/Notifi";
 
 const ModelDetailCinema = ({
   showModalDetailCustomer,
@@ -42,10 +39,8 @@ const ModelDetailCinema = ({
   const [districtName, setDistrictName] = useState("");
   const [wardName, setWardName] = useState("");
 
-
   const depatch = useDispatch();
   const reload = useSelector((state) => state.reload);
-
 
   const onChangeProvince = (value) => {
     setProvincePicked(value.value);
@@ -64,7 +59,6 @@ const ModelDetailCinema = ({
     form.setFieldsValue({
       ward: "",
     });
-
   };
 
   const onChangeWard = (value) => {
@@ -98,7 +92,7 @@ const ModelDetailCinema = ({
       address: address,
     };
     try {
-      const response = await cinameApi.update( selectedId, payload );
+      const response = await cinameApi.update(selectedId, payload);
       if (response) {
         notifySucess("Cập nhật thành công");
         depatch(setReload(!reload));
@@ -107,10 +101,6 @@ const ModelDetailCinema = ({
     } catch (error) {
       notifyError("Cập nhật thất bại");
     }
-
-    
-
-
   };
 
   useEffect(() => {
@@ -132,7 +122,7 @@ const ModelDetailCinema = ({
             status: response.status,
             name: response.name,
             email: response.email,
-            province:  Number(response.city_id),
+            province: Number(response.city_id),
             district: Number(response.district_id),
             ward: Number(response.ward_id),
             street: response.street,
@@ -214,11 +204,10 @@ const ModelDetailCinema = ({
     }
   }, [districtPicked]);
 
-
   return (
     <>
       <Drawer
-        title="Thông tin khách hàng"
+        title="Thông tin rạp"
         width={720}
         onClose={onClose}
         open={showModalDetailCustomer}
@@ -237,12 +226,29 @@ const ModelDetailCinema = ({
         <Form form={form} onFinish={handleSubmit} id="myForm" layout="vertical">
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item name="id" label="ID">
+              <Form.Item name="codeCinema" label="Mã rạp">
                 <Input disabled={true} />
               </Form.Item>
             </Col>
+            
+          </Row>
+          <Row gutter={16}>
             <Col span={12}>
-            <Form.Item
+              <Form.Item
+                name="name"
+                label="Tên rạp"
+                rules={[
+                  {
+                    required: true,
+                    message: "Hãy nhập tên rạp...",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
                 name="status"
                 label="Trạng thái"
                 rules={[
@@ -259,37 +265,17 @@ const ModelDetailCinema = ({
                   }}
                   options={[
                     {
-                      value: 1  ,
+                      value: 1,
                       label: "Hoạt động",
                     },
                     {
                       value: 0,
                       label: "Ngừng hoạt động",
-                    }
+                    },
                   ]}
                 />
               </Form.Item>
             </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item name="codeCinema" label="Mã rạp">
-                <Input disabled={true} />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="name" label="Tên rạp"
-                rules={[
-                  {
-                    required: true,
-                    message: "Hãy nhập tên rạp...",
-                  },
-                ]}
-              >
-                <Input />
-              </Form.Item>
-            </Col>
-            <Col span={12}></Col>
           </Row>
           <Row gutter={16}>
             <Col span={12}>

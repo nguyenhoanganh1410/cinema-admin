@@ -26,7 +26,7 @@ const IndexEmployee = () => {
   return (
     <div className="site-card-wrapper">
       <Title level={5} style={{ marginBottom: "1rem" }}>
-        Nhân Viên
+        Quản lý nhân viên
       </Title>
       <Row
         gutter={{

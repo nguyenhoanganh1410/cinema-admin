@@ -7,6 +7,7 @@ import PayComponent from "./PayComponent";
 import ResultPage from "../sucesspage/ResultPage";
 import { useDispatch, useSelector } from "react-redux";
 import { cancelReservationData } from "../../services/ReservationFetch";
+import Title from "antd/es/typography/Title";
 
 const BookingComponent = ({ setTab }) => {
   const { token } = theme.useToken();
@@ -79,13 +80,10 @@ const BookingComponent = ({ setTab }) => {
     minHeight: "80vh",
   };
   return (
-    <div className="bookingComponent" style={{ marginBottom: "3rem" }}>
-      <Breadcrumb style={{ marginBottom: "1rem" }}>
-        <Breadcrumb.Item>Home</Breadcrumb.Item>
-        <Breadcrumb.Item>
-          <a href="">Đặt vé</a>
-        </Breadcrumb.Item>
-      </Breadcrumb>
+    <div className="bookingComponent">
+      <Title level={5} style={{ marginBottom: "1rem", marginTop:"0rem" }}>
+        Đặt vé
+      </Title>
       <Steps current={current} items={items} />
       <div style={contentStyle}>{steps[current].content}</div>
       <div

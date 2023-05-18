@@ -34,16 +34,16 @@ const TableProduct = ({keyword}) => {
   };
 
   const columns = [
-    {
-      title: "Id",
-      dataIndex: "id",
-      width: "5%",
+    // {
+    //   title: "Id",
+    //   dataIndex: "id",
+    //   width: "5%",
       
-    },
+    // },
     {
       title: "Mã sản phẩm",
       dataIndex: "productCode",
-      width: "10%",
+      // width: "10%",
       render: (val,record) => {
         return (
           <a
@@ -60,7 +60,7 @@ const TableProduct = ({keyword}) => {
     {
       title: "Thể loại",
       dataIndex: "type",
-      width: "10%",
+      // width: "10%",
       render: (type) => {
         let name = "";
         if (type === "SP") {
@@ -74,13 +74,13 @@ const TableProduct = ({keyword}) => {
     {
       title: "Tên sản phẩm",
       dataIndex: "productName",
-      width: "30%",
+      // width: "30%",
 
     },
     {
       title: "Mô tả",
       dataIndex: "desc",
-      width: "30%",
+      // width: "30%",
 
     },
     {

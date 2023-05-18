@@ -49,7 +49,7 @@ const TableFilms = ({ start_date, end_date }) => {
   const columns = [
     {
       title: "Mã hóa đơn",
-      dataIndex: "id",
+      dataIndex: "code",
     },
     {
       title: "Khách hàng",
@@ -73,6 +73,7 @@ const TableFilms = ({ start_date, end_date }) => {
     {
       title: "Tổng tiền hoàn trả",
       dataIndex: "totalPrice",
+      align: "right",
       render: (val) => {
         return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
       },
@@ -251,6 +252,7 @@ const TableFilms = ({ start_date, end_date }) => {
               refundDate: moment(item.refundDate).format("DD/MM/YYYY HH:mm"),
               totalPrice: item.totalPrice,
               status: item.status,
+              code: item.code,
             };
           });
 

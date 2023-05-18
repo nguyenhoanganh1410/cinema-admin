@@ -71,6 +71,7 @@ const IndexLinePrice = ({ setTab, selectedIdHeader }) => {
   const [idPriceLine, setIdPriceLine] = useState(0);
   const [selectedId, setSelectedId] = useState([]);
   const [showModalDetailCustomer, setShowModalDetailCustomer] = useState(false);
+  const user = useSelector((state) => state.user);
 
   const { RangePicker } = DatePicker;
 
@@ -216,6 +217,8 @@ const IndexLinePrice = ({ setTab, selectedIdHeader }) => {
       startDate: startDate,
       endDate: endDate,
       status: val.status,
+      note: val.note,
+      userUpdate: user.id
     };
     if (
       currentDate > startDateDb &&
@@ -291,6 +294,7 @@ const IndexLinePrice = ({ setTab, selectedIdHeader }) => {
             applyTo: response.applyTo,
             applyToHall: response.applyToHall,
             date: [dayjs(response.startDate, newDateFormat), dayjs(response.endDate, newDateFormat)],
+            note: response.note,
           });
         }
       } catch (error) {
@@ -478,6 +482,18 @@ const IndexLinePrice = ({ setTab, selectedIdHeader }) => {
             </Form.Item>
           </Col>
         </Row>
+        <Row gutter={16}>
+          <Col span={24}>
+            <Form.Item name="note" label="Ghi chú">
+              <TextArea
+                disabled={statusDb === 1 ? true : false}
+                rows={3}
+                placeholder="Nhập ghi chú bảng giá"
+                // maxLength={6}
+              />
+            </Form.Item>
+          </Col>
+        </Row>
 
 
       </Form>
@@ -500,7 +516,7 @@ const IndexLinePrice = ({ setTab, selectedIdHeader }) => {
               Danh sách giá
             </span>
           </Space>
-          {currentDate < startDate || currentDate < endDate && statusDb === 0 ? (
+          { statusDb === 0 && currentDate < endDateDb  ? (
             <Button
               type="primary"
               onClick={() => handleOpenModel()}
