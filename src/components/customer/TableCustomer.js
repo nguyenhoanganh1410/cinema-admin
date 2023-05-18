@@ -34,13 +34,13 @@ const TableCustomer = ({ keySearch }) => {
   };
 
   const columns = [
+    // {
+    //   title: "Id",
+    //   dataIndex: "id",
+    // },
     {
-      title: "Id",
-      dataIndex: "id",
-    },
-    {
-      title: "Họ và Tên",
-      dataIndex: "name",
+      title: "Mã khách hàng",
+      dataIndex: "code",
       render: (val,record) => {
         return (
           <a
@@ -52,6 +52,11 @@ const TableCustomer = ({ keySearch }) => {
           </a>
         );
       },
+    },
+    {
+      title: "Họ và Tên",
+      dataIndex: "name",
+      
     },
     {
       title: "Số điện thoại",
@@ -314,6 +319,7 @@ const TableCustomer = ({ keySearch }) => {
               rank: item.Rank?.nameRank,
               image: item.image,
               status: item.isDeleted,
+              code: item.code,
             };
           })
         );

@@ -9,6 +9,7 @@
     "@testing-library/user-event": "^13.5.0",
     "antd": "^5.4.0",
     "axios": "^1.2.3",
+    "barcode-react-scanner": "^1.2.0",
     "dayjs": "^1.11.7",
     "exceljs": "^4.3.0",
     "file-saver": "^2.0.5",

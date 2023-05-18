@@ -131,6 +131,7 @@ const ModelDetailCustomer = ({
 
           form.setFieldsValue({
             id: response.id,
+            code: response.code,
             firstName: response.firstName,
             lastname: response.lastName,
             phone: response.phone,
@@ -264,7 +265,7 @@ const ModelDetailCustomer = ({
         <Form form={form} onFinish={handleSubmit} id="myForm" layout="vertical">
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item name="id" label="ID">
+              <Form.Item name="code" label="Mã khách hàng">
                 <Input disabled={true} />
               </Form.Item>
             </Col>

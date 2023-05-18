@@ -50,6 +50,7 @@ const IndexCustomer = ({ setTab ,setSelectedIdHeader}) => {
     {
       title: "Giá bán",
       dataIndex: "price",
+      align: "right",
       render:(val) => {
         return `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       }
@@ -78,7 +79,7 @@ const IndexCustomer = ({ setTab ,setSelectedIdHeader}) => {
   return (
     <div className="site-card-wrapper">
       <Title level={5} style={{ marginBottom: "1rem" }}>
-        Bảng giá 
+        Quản lý bảng giá 
       </Title>
       <Row
         gutter={{
@@ -122,11 +123,14 @@ const IndexCustomer = ({ setTab ,setSelectedIdHeader}) => {
           lg: 16,
         }}
       >
-        <Col span={24}>
+        <Col span={24} style = {{
+          
+        }}>
           {isShowTable ? <TableCustomer setTab={setTab} setSelectedIdHeader={setSelectedIdHeader} startDatePicker={startDatePicker} endDatePicker={endDatePicker}  /> :
            <Table
            columns={columns}
            dataSource={listProduct}
+           style={{ width: "80%" }}
             />
            }
           

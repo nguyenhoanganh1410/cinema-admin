@@ -271,11 +271,7 @@ const ModelDetailMovie = ({ showModalDetailMovie, setShowModalDetailMovie,select
       >
         <Form form={form} onFinish={handleSubmit} id="myForm" layout="vertical">
           <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item name="id" label="ID" >
-                <Input disabled={true}  />
-              </Form.Item>
-            </Col>
+            
             <Col span={12}>
               <Form.Item name="codeMovie" label="Mã phim" >
                 <Input disabled={true}  />

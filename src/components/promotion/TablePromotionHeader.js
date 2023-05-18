@@ -129,19 +129,26 @@ const TablePromotionHeader = ({
     {
       title: "Mã CT khuyễn mãi",
       dataIndex: "promotionCode",
+      render: (text, record) => (
+        <a
+          onClick={() => handleOnclik(record.id)}
+        >
+          {text}
+        </a>
+      ),
     },
     {
       title: "Tên CT khuyễn mãi",
       dataIndex: "namePromotion",
       key: "name",
-      render: (text, record) => (
-        <a
-          style={{ textTransform: "capitalize" }}
-          onClick={() => handleOnclik(record.id)}
-        >
-          {text.toLowerCase()}
-        </a>
-      ),
+      // render: (text, record) => (
+      //   <a
+      //     style={{ textTransform: "capitalize" }}
+      //     onClick={() => handleOnclik(record.id)}
+      //   >
+      //     {text.toLowerCase()}
+      //   </a>
+      // ),
     },
     {
       title: "Ngày bắt đầu",

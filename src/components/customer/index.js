@@ -24,7 +24,7 @@ const IndexCustomer = () => {
   return (
     <div className="site-card-wrapper">
       <Title level={5} style={{ marginBottom: "1rem" }}>
-        Khách Hàng
+        Quản lý khách hàng
       </Title>
       <Row
         gutter={{

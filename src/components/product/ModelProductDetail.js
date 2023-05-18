@@ -149,9 +149,9 @@ const ModelDetailCustomer = ({
       >
         <Form form={form} onFinish={handleSubmit} id="myForm" layout="vertical">
           <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item name="id" label="id">
-                <Input disabled={true} />
+          <Col span={12}>
+              <Form.Item name="productCode" label="Mã sản phẩm">
+                <Input disabled={true}/>
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -189,14 +189,6 @@ const ModelDetailCustomer = ({
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="productCode" label="Mã sản phẩm">
-                <Input disabled={true}/>
-              </Form.Item>
-            </Col>
-            <Col span={12}></Col>
-          </Row>
-          <Row gutter={16}>
-            <Col span={12}>
               <Form.Item
                 name="image"
                 label="Hình ảnh"
@@ -220,7 +212,8 @@ const ModelDetailCustomer = ({
                 </Upload>
               </Form.Item>
             </Col>
-            <Col span={12}></Col>
+            
+            {/* <Col span={12}></Col> */}
           </Row>
           <Row  gutter={16}>
             <Col span={24}>

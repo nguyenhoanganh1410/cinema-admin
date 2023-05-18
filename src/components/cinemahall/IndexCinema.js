@@ -40,7 +40,7 @@ const IndexCinema = ({ setTab, setSelectedIdCinema, setStatusDb }) => {
   return (
     <div className="site-card-wrapper">
       <Title level={5} style={{ marginBottom: "1rem" }}>
-        Rạp
+        Quản lý rạp
       </Title>
       <Row
         gutter={{

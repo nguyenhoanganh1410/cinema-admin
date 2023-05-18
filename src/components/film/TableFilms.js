@@ -36,11 +36,11 @@ const TableFilms = ({keyword,startDatePicker,endDatePicker}) => {
 
   const columns = [
     
-    {
-      title: "Id",
-      dataIndex: "id",
-      key: "id",
-    },
+    // {
+    //   title: "Id",
+    //   dataIndex: "id",
+    //   key: "id",
+    // },
     {
       title: "Mã phim",
       dataIndex: "code",

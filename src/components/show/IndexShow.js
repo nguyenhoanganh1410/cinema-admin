@@ -25,7 +25,7 @@ const IndexShow = ({ setTab }) => {
   return (
     <div className="site-card-wrapper">
       <Title level={5} style={{ marginBottom: "1rem" }}>
-        Lịch chiếu
+        Quản lý lịch chiếu
       </Title>
       <Row
         style={{ margin: "1rem 0 1rem 0" }}

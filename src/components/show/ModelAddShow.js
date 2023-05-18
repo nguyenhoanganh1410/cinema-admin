@@ -228,6 +228,7 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
             showDate: item.showDate,
             startTime: item.ShowTime.showTime,
             endTime: item.endTime,
+            code: item.Show.code,
           };
         });
         setListShowDuplicate(list);
@@ -358,7 +359,7 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
             arrTimePassed.push(options);
           }
           const timePic = timePicked[timePicked.length - 1];
-        // console.log("arrTimePassed", arrTimePassed);
+        // console.log("res", res);
 
 
           if (isCheck && arrTimePassed.length > 0) {
@@ -384,10 +385,8 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
               } 
             }
             setListTime(arrTimePassed);
-          } else if (isCheck && arrTimePassed.length === 0){
-            setListTime([]);
-          }
-          else {
+          } 
+          else if (!isCheck || isCheck && res.data === 0) {
             const index = arrTime.findIndex((item) => item.value === timePic);
             // console.log("index--", index);
             if (index !== -1) {
@@ -410,6 +409,8 @@ const ModelAddShow = ({ showModalAddCustomer, setShowModalAddCustomer }) => {
               }
             }
             setListTime(arrTime);
+          } else if (isCheck && arrTimePassed.length === 0){
+            setListTime([]);
           }
         }
       } catch (error) {
