@@ -265,6 +265,9 @@ const ModelDetailCustomer = ({
         <Form form={form} onFinish={handleSubmit} id="myForm" layout="vertical">
           <Row gutter={16}>
             <Col span={12}>
+              <Form.Item name="id" label="ID" hidden={true}>
+                <Input />
+              </Form.Item>
               <Form.Item name="code" label="Mã khách hàng">
                 <Input disabled={true} />
               </Form.Item>

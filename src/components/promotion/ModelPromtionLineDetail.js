@@ -122,7 +122,7 @@ const ModelPromtionLineDetail = ({
         }
       >
         <Form
-          onFinish={handleSubmit}
+          // onFinish={handleSubmit}
           id="myFormAddLinePro"
           form={form}
           layout="vertical"
@@ -238,7 +238,7 @@ const ModelPromtionLineDetail = ({
                 <InputNumber
                   style={{ width: "100%" }}
                   min={1}
-                  max={100}
+                  max={100000000}
                   disabled={
                     statusDb === 1
                       ? true
@@ -260,7 +260,7 @@ const ModelPromtionLineDetail = ({
                 <InputNumber
                   style={{ width: "100%" }}
                   min={1}
-                  max={10}
+                  max={100000000}
                   disabled={
                     statusDb === 1
                       ? true
