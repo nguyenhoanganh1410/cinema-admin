@@ -30,7 +30,7 @@ const IndexTicket = () => {
   const { RangePicker } = DatePicker;
   const [startDatePicker, setStartDatePicker] = useState("");
   const [endDatePicker, setEndDatePicker] = useState("");
-  const [idScan, setIdScan] = useState("");
+  const [idScan, setIdScan] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [delayScan, setDelayScan] = useState(500);
   const [isScan, setIsScan] = useState(false);

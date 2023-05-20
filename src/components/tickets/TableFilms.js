@@ -26,6 +26,7 @@ import ModelDetailMovie from "./ModelMovieDetail";
 import orderApi from "../../api/orderApi";
 import moment from "moment";
 import { MESSAGE_SYSTEM_ERRO, REASON_REFULT } from "../../constant";
+import dayjs from "dayjs";
 
 const TableFilms = ({ start_date, end_date, idScan }) => {
   // const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -107,6 +108,7 @@ const TableFilms = ({ start_date, end_date, idScan }) => {
               title="Đổi trả hóa đơn"
               icon={<RetweetOutlined />}
               disabled={
+                
                     currentDay > moment(record.showDate).format("YYYY-MM-DD")
                   ? true
                   : false ||
@@ -185,8 +187,11 @@ const TableFilms = ({ start_date, end_date, idScan }) => {
   };
 
   useEffect(() => {
-    if (idScan) {
+    console.log("idScan", idScan);
+    if (idScan &&  typeof idScan === "number") {
       showModalDetail(idScan);
+    } else if (idScan !== 0 ) {
+      message.error("Không tìm thấy mã hóa đơn");
     }
   }, [idScan]);
 
