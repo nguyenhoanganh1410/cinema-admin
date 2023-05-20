@@ -134,9 +134,11 @@ const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
     setDiscountMoney(0);
     setPromotion([]);
     setOptions([]);
+    setPromotionApplicalbe([])
   };
   const handleClickCustomer = () => {
     setTextSearch("");
+    console.log(customerSearched)
     if (customerSearched) {
       setPay([...pay, { customer: customerSearched }]);
 
@@ -149,6 +151,7 @@ const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
 
       getPromotion(dataPayload)
         .then((result) => {
+          setCustomerSearched(null);
           const promotionWarning = result.filter((val) => {
             return val?.warning === true;
           });
@@ -176,9 +179,8 @@ const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
           setDiscountMoney(discount);
           setOptions(dataOptions);
           setPromotion(result);
-          setCustomerSearched(null);
         })
-        .catch((error) => {});
+        .catch((error) => {}).finally(()=> setCustomerSearched(null));
     }
   };
 
@@ -190,7 +192,7 @@ const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
     console.log(value);
     setTypeCustomer(value);
     if (value === "KH001") {
-      const data = await customerApi.getCustomerByPhone(SDT_VANG_LAI);
+      const data = await customerApi.getCustomer(36);
       console.log(data);
       if (data.id) {
         setCustomerSearched(data);
@@ -482,7 +484,7 @@ const PayComponent = ({ next, setIsSucess, setIdOrder }) => {
             </Form.Item>
 
             <Form.Item label="Ghi chú">
-              <TextArea rows={2} />
+              <TextArea rows={2} placeholder="Nhập ghi chú..."/>
             </Form.Item>
             <div className="block_details">
               <p>
