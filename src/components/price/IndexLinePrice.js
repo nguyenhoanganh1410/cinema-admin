@@ -352,7 +352,8 @@ const IndexLinePrice = ({ setTab, selectedIdHeader }) => {
   };
 
 
-  console.log("listPriceLine", isModalOpenDelete);
+  console.log("start", startDate);
+  console.log("cr", currentDate);
 
   return (
     <div className="site-card-wrapper" style={{ minWidth: "100vh" }}>
@@ -516,7 +517,7 @@ const IndexLinePrice = ({ setTab, selectedIdHeader }) => {
               Danh sách giá
             </span>
           </Space>
-          { statusDb === 0 && currentDate < endDateDb  ? (
+          { currentDate < startDate && statusDb === 0  ? (
             <Button
               type="primary"
               onClick={() => handleOpenModel()}
