@@ -62,6 +62,19 @@ const useModelPromotionLine = ({
   const [promotionLine, setPromotionLine] = useState(null);
   const [isEnable, setIsEnable] = useState(true);
   const [promtionDetails, setPromotionDetails] = useState(null)
+  
+  const [category, setCategory] = useState(0);
+  const [qtyBuy, setQtyBuy] = useState(0);
+  const [totalDiscount, setTotalDiscount] = useState(0);
+  
+  const [moneyBought, setMoneyBought] = useState(0);
+  const [percentDiscount, setPercentDiscount] = useState(0);
+  const [maxMoneyPercent, setMaxMoneyPercent] = useState(0);
+
+  const [productBuy, setProductBuy] = useState(0);
+  const [productReceive, setProductReceive] = useState(0);
+  const [qtyReceive, setQtyReceive] = useState(0);
+
   const onClose = () => {
     setIsShowModelDetail(false);
   };
@@ -69,6 +82,25 @@ const useModelPromotionLine = ({
 //   //handle submit form create new customer...
   const handleSubmit = (val) => {
     console.log("val", val);
+    console.log("======= MoneyPromotion =========");
+    console.log("category", category);
+    console.log("qtyBuy", qtyBuy);
+    console.log("totalDiscount", totalDiscount);
+
+    console.log("======= Percent =========");
+    console.log("moneyBought", moneyBought);
+    console.log("percentDiscount", percentDiscount);
+    console.log("maxMoneyPercent", maxMoneyPercent);
+
+    console.log("======= Product =========");
+    console.log("productBuy", productBuy);
+    console.log("productReceive", productReceive);
+    console.log("qtyReceive", qtyReceive);
+    console.log("qtyBuy", qtyBuy);
+
+
+
+
     // const payloadLine = {
     //   desc: val.desc,
     //   startDate: startDate,
@@ -198,6 +230,15 @@ const useModelPromotionLine = ({
     promtionDetails,
     setStartDate,
     setEndDate,
+    setCategory,
+    setQtyBuy,
+    setTotalDiscount,
+    setMoneyBought,
+    setPercentDiscount,
+    setMaxMoneyPercent,
+    setProductBuy,
+    setProductReceive,
+    setQtyReceive,
   };
 };
 

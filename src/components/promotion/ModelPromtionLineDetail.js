@@ -53,6 +53,15 @@ const ModelPromtionLineDetail = ({
     promtionDetails,
     setStartDate,
     setEndDate,
+    setCategory,
+    setQtyBuy,
+    setTotalDiscount,
+    setMoneyBought,
+    setPercentDiscount,
+    setMaxMoneyPercent,
+    setProductBuy,
+    setProductReceive,
+    setQtyReceive,
   } = useModelPromotionLine({
     isShowModelDetail,
     setIsShowModelDetail,
@@ -61,12 +70,17 @@ const ModelPromtionLineDetail = ({
 
   const currentDate = dayjs().format(newDateFormat);
 
-  const RenderDaTaType = () => {
+  const RenderDaTaType = (handleSubmit) => {
     console.log(isEnable);
     if (!promotionLine) return null;
     if (+promotionLine.type === 1) {
       return (
         <ProductPromotion
+          setProductBuy={setProductBuy}
+          setProductReceive={setProductReceive}
+          setQtyReceive={setQtyReceive}
+          setQtyBuy={setQtyBuy}
+
           handleSubmit={handleSubmit}
           disabled={isEnable}
           listProductSeat={listProductSeat}
@@ -79,9 +93,13 @@ const ModelPromtionLineDetail = ({
     } else if (+promotionLine.type === 2) {
       return (
         <MoneyPromotion
+         setCategory={setCategory}
+          setQtyBuy={setQtyBuy}
+          setTotalDiscount={setTotalDiscount}
+
           handleSubmit={handleSubmit}
           listProductSeat={listProductSeat}
-          disabled={isEnable}
+          // disabled={isEnable}
           promtionDetails={promtionDetails}
           startDate={startDate}
           statusDb={statusDb}
@@ -90,6 +108,9 @@ const ModelPromtionLineDetail = ({
     } else {
       return (
         <PercentPromotion
+          setMoneyBought={setMoneyBought}
+          setPercentDiscount={setPercentDiscount}
+          setMaxMoneyPercent={setMaxMoneyPercent}
           handleSubmit={handleSubmit}
           disabled={isEnable}
           promtionDetails={promtionDetails}
@@ -122,7 +143,7 @@ const ModelPromtionLineDetail = ({
         }
       >
         <Form
-          // onFinish={handleSubmit}
+          onFinish={handleSubmit}
           id="myFormAddLinePro"
           form={form}
           layout="vertical"
@@ -356,7 +377,7 @@ const ModelPromtionLineDetail = ({
               Chi tiết loại khuyến mãi
             </span>
           </Space>
-          <RenderDaTaType />
+          <RenderDaTaType handleSubmit={handleSubmit} />
         </Form>
 
         {/* <RenderType /> */}

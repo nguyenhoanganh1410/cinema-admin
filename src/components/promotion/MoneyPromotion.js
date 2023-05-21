@@ -23,6 +23,10 @@ import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 const { Option } = Select;
 
 const MoneyPromotion = ({
+  setCategory,
+  setQtyBuy,
+  setTotalDiscount,
+  handleClick,
   handleSubmit,
   showModalAddCustomer,
   disabled,
@@ -45,14 +49,30 @@ const MoneyPromotion = ({
         qtyBuy: promtionDetails?.qty_buy || 0,
       });
     }
-  }, [promtionDetails]);
+  }, []);
+
+  const onFinish = (values) => {
+    console.log("values", values);
+    handleSubmit(values);
+  };
+
+  const onChangeCategory = (value) => {
+    // console.log(`selected ${value}`);
+    setCategory(value);
+  };
+
+  const onChangeQty = (value) => {
+    console.log(`selected ${value}`);
+    // setQtyBuy(value);
+  }
+
 
   return (
     <>
       <Form
         form={form}
-        id="myFormAddLinePro"
-        onFinish={handleSubmit}
+        // id="myFormAddLinePro"
+        // onFinish={ onFinish }
         layout="vertical"
       >
         <Row gutter={16}>
@@ -68,6 +88,7 @@ const MoneyPromotion = ({
               ]}
             >
               <Select
+                onChange={onChangeCategory}
                 disabled= {
                   statusDb === 1 ? true : false
                   || currentDate > dayjs(startDate).format(newDateFormat) ? true : false
@@ -94,6 +115,7 @@ const MoneyPromotion = ({
               ]}
             >
               <InputNumber
+               onChange={onChangeQty}
                 disabled= {
                   statusDb === 1 ? true : false
                   || currentDate > dayjs(startDate).format(newDateFormat) ? true : false
@@ -121,6 +143,9 @@ const MoneyPromotion = ({
               ]}
             >
               <InputNumber
+              onBlur={e => {
+                setTotalDiscount(Number(e.target.value.replace(/\VNĐ\s?|(,*)/g, "")))
+              }}
                 disabled= {
                   statusDb === 1 ? true : false
                   || currentDate > dayjs(startDate).format(newDateFormat) ? true : false

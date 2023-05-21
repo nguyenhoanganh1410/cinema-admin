@@ -22,7 +22,7 @@ const PercentPromotion = (props) => {
   const { disabled, promtionDetails } = props;
   const onFinish = (values) => {
     console.log("values", values);
-    props.handleSubmit("values");
+    props.handleSubmit(values);
   };
 
   const newDateFormat = "YYYY-MM-DD";

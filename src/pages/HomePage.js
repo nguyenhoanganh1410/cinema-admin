@@ -275,9 +275,14 @@ const HomePage = () => {
           style={{
             height: 24,
             margin: 16,
-            background: "rgba(255, 255, 255, 0.2)",
+            background: "#001529",
           }}
-        />
+        >
+          {/* <img
+            src=""
+            alt="logo"
+            /> */}
+        </div>
         <Menu
           theme="dark"
           defaultSelectedKeys={["1"]}
