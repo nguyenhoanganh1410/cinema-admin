@@ -234,7 +234,7 @@ const TableEmployee = ({searchText}) => {
           marginBottom: 16,
         }}
       >
-        <Button
+        {/* <Button
           type="primary"
           danger
           onClick={handleDelete}
@@ -244,7 +244,7 @@ const TableEmployee = ({searchText}) => {
           style={{ marginRight: "1rem" }}
         >
           Xóa
-        </Button>
+        </Button> */}
         {/* <Button
           type="primary"
           onClick={handleUpdate}
@@ -262,13 +262,7 @@ const TableEmployee = ({searchText}) => {
           {hasSelected ? `Selected ${selectedRowKeys.length} items` : ""}
         </span>
       </div>
-      <Table rowSelection={{
-          selectedRowKeys,
-          onChange: onSelectChange,
-          onSelect: (record) => {
-            setSelectedId(record.id);
-          },
-        }} 
+      <Table
         columns={columns} dataSource={listStaff} />
       <Modal
         title="Xóa nhân viên"
