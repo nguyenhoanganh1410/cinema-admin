@@ -30,12 +30,12 @@ const columnsCus = [
   {
     title: "STT",
     dataIndex: "key",
-    width: "10%",
+    width: "3%",
   },
   {
     title: "Mã KH",
-    dataIndex: "idCustomer",
-    width: "15%",
+    dataIndex: "code",
+    width: "18%",
   },
   {
     title: "Tên khách hàng",

@@ -77,6 +77,7 @@ const IndexDashboard = () => {
           return {
             name: item.Customer.firstName + " " + item.Customer.lastName,
             rank: item.Customer.Rank.nameRank,
+            code: item.Customer.code,
             ...item,
           }
         });
