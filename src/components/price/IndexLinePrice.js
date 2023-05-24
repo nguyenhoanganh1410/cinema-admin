@@ -80,17 +80,17 @@ const IndexLinePrice = ({ setTab, selectedIdHeader }) => {
     {
       title: "Mã Sản phẩm",
       dataIndex: "productCode",
-      render: (val,recod) => {
-        return (
-          <a
-            onClick={() => {
-              showModalDetail(recod);
-            }}
-          >
-            {val}
-          </a>
-        );
-      },
+      // render: (val,recod) => {
+      //   return (
+      //     <a
+      //       onClick={() => {
+      //         showModalDetail(recod);
+      //       }}
+      //     >
+      //       {val}
+      //     </a>
+      //   );
+      // },
     },
     {
       title: "Tên Sản phẩm",
